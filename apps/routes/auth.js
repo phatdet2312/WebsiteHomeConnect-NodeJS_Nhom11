@@ -59,10 +59,44 @@ router.post('/api/login', (req, res, next) => {
   })(req, res, next);
 });
 
+// ==========================================
+// 2. ĐĂNG NHẬP GOOGLE (OAUTH2)
+// ==========================================
+router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
+// Callback của Google buộc phải xài redirect vì đây là cơ chế của trình duyệt chuyển trang
+router.get('/google/callback', (req, res, next) => {
+  passport.authenticate('google', { session: false, failureRedirect: '/auth/login', failureFlash: true }, async (err, user, info) => {
+    if (err) return next(err);
+    if (!user) {
+      req.flash('error_msg', 'Đăng nhập Google thất bại');
+      return res.redirect('/auth/login');
+    }
+
+    const token = jwt.sign({ id: user.Id }, JWT_SECRET, { expiresIn: '7d' });
+
+    res.cookie('auth_token', token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 7 * 24 * 60 * 60 * 1000 
+    });
+
+    let redirectUrl = '/';
+    try {
+        const rolesData = await sequelize.query(
+            `SELECT r.Name FROM AspNetRoles r INNER JOIN AspNetUserRoles ur ON r.Id = ur.RoleId WHERE ur.UserId = :userId`,
+            { replacements: { userId: user.Id }, type: sequelize.QueryTypes.SELECT }
+        );
+        const roles = rolesData.map(r => r.Name);
+        if (roles.includes('Admin') || roles.includes('Employee') || user.IsSuperAdmin) redirectUrl = '/admin/dashboard';
+    } catch (e) {}
+
+    res.redirect(redirectUrl);
+  })(req, res, next);
+});
 
 // ==========================================
-// 2. ĐĂNG XUẤT
+// 3. ĐĂNG XUẤT
 // ==========================================
 router.get('/logout', async (req, res) => {
   if (req.user) {
@@ -81,7 +115,7 @@ router.get('/logout', async (req, res) => {
 });
 
 // ==========================================
-// 3. ĐĂNG KÝ & OTP (STATELESS API)
+// 4. ĐĂNG KÝ & OTP (STATELESS API)
 // ==========================================
 router.get('/register', (req, res) => {
   if (req.isAuthenticated()) return res.redirect('/');
@@ -197,7 +231,7 @@ router.post('/api/register/verify-code', async (req, res) => {
 });
 
 // ==========================================
-// 4. ĐỔI MẬT KHẨU (API JSON)
+// 5. ĐỔI MẬT KHẨU (API JSON)
 // ==========================================
 router.get('/change-password', (req, res) => {
   if (!req.isAuthenticated()) return res.redirect('/auth/login');
@@ -213,7 +247,9 @@ router.post('/api/change-password', async (req, res) => {
       return res.json({ success: false, message: 'Mật khẩu mới không khớp.'});
     }
     const user = await ThongTinNguoiDung.findByPk(req.user.Id);
-
+    if (!user.PasswordHash || !user.PasswordHash.startsWith('$2')) {
+      return res.json({ success: false, message: 'Tài khoản này đăng nhập bằng Google, không có mật khẩu để thay đổi.'});
+    }
     const isMatch = await bcrypt.compare(OldPassword, user.PasswordHash);
     if (!isMatch) {
       return res.json({ success: false, message: 'Mật khẩu hiện tại không đúng.'});
