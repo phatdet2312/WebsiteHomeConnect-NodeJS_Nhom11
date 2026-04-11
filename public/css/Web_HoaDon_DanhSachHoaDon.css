@@ -1,0 +1,233 @@
+﻿/*/css/Web_HoaDon_DanhSachHoaDon.css*/
+/* Root Variables (đồng bộ với Layout_Web.css) */
+:root {
+    --primary-color: #F28C38; /* Cam đậm */
+    --secondary-color: #007BFF; /* Xanh dương */
+    --background-dark: #1A1A1A; /* Đen */
+    --background-gray: #2D2D2D; /* Xám đậm */
+    --text-light: #FFFFFF; /* Trắng */
+    --text-muted: #A0A0A0; /* Xám nhạt */
+    --font-primary: 'Inter', sans-serif;
+    --font-heading: 'Montserrat', sans-serif;
+    --header-height: 80px;
+    --title-height: 60px; /* Chiều cao tiêu đề cố định */
+}
+
+/* Page Title (Tiêu đề cố định) */
+.page-title {
+    position: fixed;
+    top: var(--header-height); /* Ngay dưới header */
+    left: 0;
+    width: 100%;
+    background-color: var(--background-gray);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    z-index: 900; /* Dưới header (z-index: 1000) */
+    text-align: center;
+    padding: 15px 0;
+}
+
+    .page-title h2 {
+        font-family: var(--font-heading);
+        font-size: 2rem;
+        color: var(--text-light);
+        margin: 0;
+    }
+
+/* Hoa Don Section */
+.hoa-don-section {
+    padding: calc(40px + var(--title-height)) 0 40px; /* Thêm padding-top để tránh che bởi tiêu đề */
+    max-width: 1400px;
+    margin: 0 auto;
+    background-color: transparent; /* Trong suốt để thấy hình mờ */
+}
+
+.no-data {
+    text-align: center;
+    font-size: 1.2rem;
+    color: var(--text-muted);
+    background-color: rgba(0, 0, 0, 0.3); /* Nền mờ nhẹ */
+    padding: 20px;
+    border-radius: 10px;
+}
+
+/* Table */
+.hoa-don-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background-color: rgba(0, 0, 0, 0.3); /* Nền mờ để thấy hình nền */
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+    .hoa-don-table th,
+    .hoa-don-table td {
+        padding: 12px 15px;
+        text-align: left;
+        font-size: 0.9rem;
+        color: var(--text-light);
+    }
+
+    .hoa-don-table th {
+        background-color: var(--primary-color);
+        font-weight: 600;
+        font-family: var(--font-heading);
+    }
+
+    .hoa-don-table td {
+        border-bottom: 1px solid var(--text-muted);
+    }
+
+    .hoa-don-table tr {
+        transition: background-color 0.3s, box-shadow 0.3s;
+    }
+
+        .hoa-don-table tr:hover {
+            background-color: rgba(255, 255, 255, 0.2); /* Nền hover nhẹ */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+    .hoa-don-table span {
+        display: block;
+        line-height: 1.4;
+    }
+
+    .hoa-don-table .btn-primary {
+        background-color: var(--primary-color);
+        border: none;
+        padding: 6px 12px;
+        font-size: 0.85rem;
+        border-radius: 5px;
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+        .hoa-don-table .btn-primary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+/* Table Responsive */
+.table-responsive {
+    max-height: calc(100vh - var(--header-height) - var(--title-height) - 80px); /* Chỉ bảng cuộn dọc */
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch; /* Cuộn mượt trên mobile */
+    background-color: transparent; /* Trong suốt */
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+    .page-title 
+    
+    
+     {
+        font-size: 1.8rem;
+    }
+
+    .hoa-don-table th,
+    .hoa-don-table td {
+        font-size: 0.85rem;
+        padding: 10px;
+    }
+}
+
+@media (max-width: 768px) {
+    .page-title h2 {
+        font-size: 1.5rem;
+    }
+
+    .hoa-don-section {
+        padding: calc(30px + var(--title-height)) 10px 30px;
+    }
+
+    .table-responsive {
+        overflow-x: hidden; /* Không cần cuộn ngang vì chuyển thành thẻ */
+    }
+
+    .hoa-don-table {
+        display: block;
+        background-color: transparent; /* Trong suốt trên mobile */
+    }
+
+        .hoa-don-table thead {
+            display: none;
+        }
+
+        .hoa-don-table tbody,
+        .hoa-don-table tr {
+            display: block;
+        }
+
+        .hoa-don-table tr {
+            margin-bottom: 20px;
+            border-radius: 10px;
+            background-color: rgba(0, 0, 0, 0.3); /* Nền mờ nhẹ */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .hoa-don-table td {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: flex-start;
+            padding: 10px 15px;
+            border-bottom: 1px solid var(--text-muted);
+            font-size: 0.9rem;
+            position: relative;
+        }
+
+    
+        hoa-don-table td:before {
+                content: attr(data-label);
+                font-weight: 600;
+                color: var(--primary-color);
+                margin-right: 10px;
+                flex: 0 0 35%;
+                min-width: 120px;
+            }
+
+            .hoa-don-table td span {
+                flex: 1;
+                word-break: break-word;
+            }
+
+            .hoa-don-table td:last-child {
+                border-bottom: none;
+                text-align: center;
+                display: block;
+                padding: 10px;
+            }
+
+                .hoa-don-table td:last-child .btn {
+                    width: 100%;
+                    max-width: 200px;
+                    margin: 0 auto;
+                }
+
+        .hoa-don-table tr:hover {
+            background-color: rgba(0, 0, 0, 0.3);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+}
+
+@media (max-width: 576px) {
+    .page-title h2 {
+        font-size: 1.3rem;
+    }
+
+    .hoa-don-section {
+        padding: calc(20px + var(--title-height)) 10px 20px;
+    }
+
+    .hoa-don-table td {
+        font-size: 0.8rem;
+    }
+
+        .hoa-don-table td:before {
+            flex: 0 0 30%;
+            min-width: 100px;
+        }
+
+        .hoa-don-table td:last-child .btn {
+            font-size: 0.8rem;
+            padding: 5px 10px;
+        }
+}

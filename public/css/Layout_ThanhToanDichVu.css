@@ -1,0 +1,138 @@
+﻿/* wwwroot/css/Layout_ThanhToanDichVu.css */
+body {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    min-height: 100vh;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.display-5 {
+    background: linear-gradient(90deg, #007bff, #6610f2);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.card {
+    border-radius: 20px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+    .card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.15) !important;
+    }
+
+.table thead {
+    background: linear-gradient(90deg, #667eea, #764ba2);
+    color: white;
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    border: none;
+    border-radius: 50px;
+    padding: 12px 40px;
+    font-weight: 600;
+}
+
+    .btn-success:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(40,167,69,0.4);
+    }
+
+.text-success {
+    font-weight: 700;
+    font-size: 1.4rem;
+}
+#vnpayModal .modal-xl {
+    max-width: 95%;
+    width: 900px;
+}
+
+#vnpayLoading {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ==================== FIX ẢNH HOVER PHÓNG TO - PHIÊN BẢN TINH TẾ ==================== */
+
+/* 1. Đảm bảo các container cha không cắt nội dung */
+#danhSachKy,
+.card-body,
+.card,
+.container,
+.container.my-5 {
+    overflow: visible !important;
+    position: relative;
+}
+
+    /* 2. Card danh sách kỳ nằm trên card phương thức thanh toán */
+    .card:nth-of-type(1) { /* Card danh sách kỳ */
+        position: relative;
+        z-index: 10;
+    }
+
+    .card:nth-of-type(2) { /* Card phương thức thanh toán */
+        position: relative;
+        z-index: 5;
+    }
+
+/* 3. Dòng kỳ (.ky-item) */
+.ky-item {
+    position: relative;
+    overflow: visible !important;
+    z-index: 1;
+}
+
+    .ky-item:hover {
+        z-index: 100;
+        background: #f8fdff !important;
+    }
+
+/* 4. Wrapper ảnh */
+.anh-minh-chung-khach {
+    position: relative;
+    display: inline-block;
+}
+
+/* 5. Ảnh thumbnail gốc */
+.anh-minh-chung-thumbnail-khach {
+    width: 36px;
+    height: 36px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 2px solid #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    transition: all 0.35s ease; /* Mượt hơn */
+    cursor: zoom-in;
+}
+
+    /* 6. Hiệu ứng hover - PHIÊN BẢN NHẸ NHÀNG */
+    .anh-minh-chung-thumbnail-khach:hover {
+        transform: scale(15); 
+        transform-origin: left center; /* Vẫn mở rộng sang phải */
+        z-index: 99999 !important; /* Vẫn cao để vượt mọi lớp */
+        position: relative !important;
+        border-radius: 10px; /* Bo tròn nhẹ */
+        border: 3px solid #007bff; /* Viền xanh nhẹ, không dày quá */
+        box-shadow: 0 15px 40px rgba(0,0,0,0.4); /* Bóng tự nhiên, không quá đậm */
+        /* Bỏ outline để tránh loá */
+    }
+
+/* 7. Đảm bảo không bị giới hạn ngang */
+html, body {
+    overflow-x: visible !important;
+}

@@ -1,0 +1,52 @@
+﻿/*css/Logo-Load.css*/
+
+#loading {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.3); /* Làm nền trong suốt hơn */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100000;
+    backdrop-filter: blur(2px); /* Thêm hiệu ứng mờ nhẹ để làm nổi bật */
+}
+
+.loading-wrapper {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.loading-logo {
+    width: 50px;
+    height: auto;
+}
+
+.spinner {
+    position: absolute;
+    width: 70px;
+    height: 70px;
+    border: 4px solid transparent;
+    border-top: 4px solid #ff69b4;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Đảm bảo form không bị ẩn hoàn toàn khi loading hiển thị */
+.container {
+    position: relative;
+}

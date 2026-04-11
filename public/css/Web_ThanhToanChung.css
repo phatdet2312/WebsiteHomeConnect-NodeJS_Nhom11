@@ -1,0 +1,218 @@
+﻿.card {
+    transition: transform 0.2s;
+    border-radius: 10px;
+}
+
+    .card:hover {
+        transform: scale(1.02);
+    }
+
+.btn-success {
+    background-color: #28a745;
+    border-color: #28a745;
+    padding: 10px 20px;
+}
+
+    .btn-success:hover {
+        background-color: #218838;
+        border-color: #1e7e34;
+    }
+
+.btn-secondary {
+    background-color: #6c757d;
+    border-color: #6c757d;
+    padding: 10px 20px;
+}
+
+    .btn-secondary:hover {
+        background-color: #5a6268;
+        border-color: #545b62;
+    }
+
+.text-primary {
+    color: #0d6efd !important;
+}
+
+.text-success {
+    color: #28a745 !important;
+}
+
+.border-primary {
+    border-color: #0d6efd !important;
+}
+
+.border-success {
+    border-color: #28a745 !important;
+}
+
+.border-info {
+    border-color: #17a2b8 !important;
+}
+
+/* Khung chứa ảnh */
+.image-container {
+    width: 180px;
+    height: 180px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f8f9fa;
+    margin: 15px;
+    border-radius: 8px;
+}
+
+/* Ảnh sản phẩm */
+.product-image {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    object-position: center;
+}
+
+/* Căn chỉnh nội dung */
+.card-body {
+    padding: 20px;
+}
+
+.card-title {
+    font-size: 1.25rem;
+    margin-bottom: 10px;
+}
+
+.card-text {
+    font-size: 0.95rem;
+    margin-bottom: 8px;
+}
+
+.form-control {
+    max-width: 100px;
+}
+
+.form-label {
+    margin-bottom: 5px;
+}
+
+/* Điều chỉnh bố cục sản phẩm */
+.product-info-row {
+    display: flex;
+    align-items: center;
+    gap: 20px; /* Khoảng cách giữa tên/giá và số lượng/tổng tiền */
+    flex-wrap: wrap; /* Cho phép xuống dòng trên mobile nếu cần */
+}
+
+.product-info-left {
+    flex: 1; /* Chiếm không gian còn lại */
+    min-width: 200px; /* Đảm bảo không quá hẹp */
+}
+
+.product-info-right {
+    flex: 0 0 auto; /* Không co giãn, giữ kích thước tự nhiên */
+    min-width: 150px; /* Đảm bảo đủ chỗ cho input và tổng tiền */
+}
+
+/* Tối ưu cho mobile */
+@media (max-width: 1200px) {
+    .container {
+        padding: 0 10px;
+        margin-top: 20px;
+    }
+
+    h1 {
+        font-size: 1.5rem;
+        margin-bottom: 20px;
+    }
+
+    .card {
+        margin-bottom: 15px;
+    }
+
+    .image-container {
+        width: 120px;
+        height: 120px;
+        margin: 10px;
+    }
+
+    .card-body {
+        padding: 10px;
+    }
+
+    .card-title {
+        font-size: 1rem;
+        margin-bottom: 5px;
+    }
+
+    .card-text {
+        font-size: 0.85rem;
+        margin-bottom: 5px;
+    }
+
+    .form-control {
+        max-width: 80px;
+        font-size: 0.85rem;
+    }
+
+    .form-label {
+        font-size: 0.85rem;
+    }
+
+    .btn-lg {
+        padding: 8px 15px;
+        font-size: 0.9rem;
+    }
+
+    .product-info-row {
+        gap: 10px; /* Giảm khoảng cách trên mobile */
+    }
+
+    .product-info-left {
+        min-width: 150px;
+    }
+
+    .product-info-right {
+        min-width: 120px;
+    }
+}
+
+/* Tinh chỉnh cho màn hình rất nhỏ */
+@media (max-width: 1200px) {
+    .image-container {
+        width: 100px;
+        height: 100px;
+        margin: 8px;
+    }
+
+    .card-title {
+        font-size: 0.9rem;
+    }
+
+    .card-text {
+        font-size: 0.8rem;
+    }
+
+    .form-control {
+        max-width: 70px;
+        font-size: 0.8rem;
+    }
+
+    .form-label {
+        font-size: 0.8rem;
+    }
+
+    .btn-lg {
+        padding: 6px 12px;
+        font-size: 0.8rem;
+    }
+
+    .product-info-row {
+        gap: 8px;
+    }
+
+    .product-info-left {
+        min-width: 120px;
+    }
+
+    .product-info-right {
+        min-width: 100px;
+    }
+}

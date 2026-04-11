@@ -1,0 +1,1202 @@
+﻿/*Admin_CanHo.css */
+.content-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 0px;
+}
+
+.search-container {
+    margin-bottom: 20px;
+}
+
+.search-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    max-width: 500px;
+}
+
+.search-input {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.search-btn {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+}
+
+    .search-btn:hover {
+        background-color: #0056b3;
+    }
+
+.suggestions {
+    display: none;
+    position: absolute;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    max-height: 200px;
+    overflow-y: auto;
+    width: 100%;
+    max-width: 500px;
+    z-index: 1000;
+}
+
+    .suggestions.show {
+        display: block;
+    }
+
+.suggestion-item {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    font-size: 14px;
+    color: #333;
+    cursor: default;
+    border-bottom: 1px solid #f1f1f1;
+}
+
+    .suggestion-item:last-child {
+        border-bottom: none;
+    }
+
+.suggestion-image {
+    width: 50px;
+    height: 50px;
+    margin-right: 10px;
+    object-fit: cover;
+}
+
+.alert {
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.alert-error {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.alert-warning {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.action-bar {
+    margin-bottom: 20px;
+    display: flex;
+    gap: 10px;
+    position: sticky;
+    bottom: 0;
+    background-color: #f9f9f9;
+    padding: 10px;
+    border-top: 1px solid #ddd;
+    z-index: 900;
+}
+
+.action-bar-centered { /*căn giữa*/
+    margin-bottom: 0px; /* Giảm margin-bottom */
+    display: flex;
+    justify-content: center; /* Căn giữa */
+    gap: 10px;
+    position: sticky;
+    bottom: 0;
+    background-color: #f9f9f9;
+    padding: 0px; /* Giảm padding để thu hẹp khoảng cách */
+    border-top: 1px solid #ddd;
+    z-index: 900;
+}
+
+.action-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.add-btn {
+    background-color: #28a745;
+    color: #fff;
+}
+
+    .add-btn:hover {
+        background-color: #218838;
+    }
+
+.table-container {
+    max-height: calc(100vh - 300px);
+    overflow-y: auto;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #fff;
+}
+
+    .data-table th,
+    .data-table td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .data-table th {
+        background-color: #007bff;
+        color: #fff;
+        position: sticky;
+        top: 0;
+        z-index: 900;
+    }
+
+    .data-table tbody tr:hover {
+        background-color: #f9f9f9;
+    }
+
+.description-container {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.description-text {
+    font-size: 14px;
+    color: #666;
+}
+
+.read-more-btn {
+    background: none;
+    border: none;
+    color: #007bff;
+    font-size: 14px;
+    cursor: pointer;
+    padding: 0;
+}
+
+    .read-more-btn:hover {
+        color: #0056b3;
+        text-decoration: underline;
+    }
+
+.product-image {
+    max-width: 100px;
+    max-height: 100px;
+    object-fit: cover;
+}
+
+.status-link {
+    text-decoration: none;
+    font-size: 14px;
+    padding: 5px 10px;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+}
+
+.status-on {
+    color: #28a745;
+}
+
+    .status-on:hover {
+        background-color: #28a745;
+        color: #fff;
+    }
+
+.status-off {
+    color: #dc3545;
+}
+
+    .status-off:hover {
+        background-color: #dc3545;
+        color: #fff;
+    }
+
+.action-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.action-link {
+    text-decoration: none;
+    font-size: 14px;
+    padding: 5px 10px;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+}
+
+.view-link {
+    color: #007bff;
+}
+
+    .view-link:hover {
+        background-color: #007bff;
+        color: #fff;
+    }
+
+.edit-link {
+    color: #ff9900;
+}
+
+    .edit-link:hover {
+        background-color: #ff9900;
+        color: #fff;
+    }
+
+.fixed-bar {
+    position: sticky;
+    bottom: 0;
+    background-color: #f9f9f9;
+    padding: 10px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    border-top: 1px solid #ddd;
+    z-index: 900;
+}
+
+.filter-select {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+    margin-right: 10px;
+}
+
+.delete-btn {
+    background-color: #dc3545;
+    color: #fff;
+}
+
+    .delete-btn:hover {
+        background-color: #c82333;
+    }
+
+.update-btn {
+    background-color: #17a2b8;
+    color: #fff;
+}
+
+    .update-btn:hover {
+        background-color: #138496;
+    }
+
+    .delete-btn:disabled,
+    .update-btn:disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+    }
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: #333;
+}
+
+.hide-btn {
+    background-color: #ff9900;
+    color: #fff;
+}
+
+    .hide-btn:hover {
+        background-color: #e68a00;
+    }
+
+.confirm-btn {
+    background-color: #007bff;
+    color: #fff;
+}
+
+    .confirm-btn:hover {
+        background-color: #0056b3;
+    }
+/* Style cho form trong Add.cshtml và Update.cshtml */
+.form-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.form-scroll-container {
+    max-height: calc(110vh - 300px);
+    overflow-y: auto;
+    border-radius: 50px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    padding: 20px 20px 10px;
+    ;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.sub-label {
+    margin-top: 10px;
+    font-size: 13px;
+    color: #666;
+}
+
+.form-input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+    transition: border-color 0.3s ease;
+}
+
+    .form-input:focus {
+        outline: none;
+        border-color: #007bff;
+        box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+    }
+
+.error-message {
+    display: block;
+    font-size: 12px;
+    color: #dc3545;
+    margin-top: 5px;
+}
+
+.custom-editor {
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+    .custom-editor .toolbar {
+        background: #f5f5f5;
+        padding: 5px;
+        border-bottom: 1px solid #ddd;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+    }
+
+        .custom-editor .toolbar button,
+        .custom-editor .toolbar select,
+        .custom-editor .toolbar input[type="color"] {
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 14px;
+            background-color: #fff;
+            transition: background-color 0.3s ease;
+        }
+
+            .custom-editor .toolbar button:hover,
+            .custom-editor .toolbar select:hover,
+            .custom-editor .toolbar input[type="color"]:hover {
+                background-color: #e0e0e0;
+            }
+
+    .custom-editor #descriptionEditor {
+        min-height: 400px;
+        padding: 10px;
+        font-size: 14px;
+        color: #333;
+    }
+
+.preview-image {
+    max-width: 200px;
+    margin-top: 10px;
+    border-radius: 5px;
+}
+
+.preview-additional-images {
+    margin-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.preview-additional-image {
+    max-width: 100px;
+    max-height: 100px; /* Giới hạn chiều cao để ảnh thẳng hàng */
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    object-fit: contain; /* Giữ tỷ lệ ảnh, không méo */
+}
+/* Style cho Update.cshtml */
+.update-description-input {
+    min-height: 40px;
+    height: auto;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    cursor: text;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    resize: vertical;
+}
+
+.update-gallery-preview {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+    padding-bottom: 10px;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+    /* Ẩn các ảnh từ vị trí thứ 11 trở đi */
+    .update-gallery-preview .update-gallery-preview-item:nth-child(n+11) {
+        display: none;
+    }
+    /* Hiển thị tất cả ảnh khi có class .show-all */
+    .update-gallery-preview.show-all .update-gallery-preview-item {
+        display: flex !important;
+    }
+/* Style cho nút Xem thêm/Thu gọn */
+.view-more-btn {
+    background: none;
+    border: none;
+    color: #007bff;
+    font-size: 14px;
+    cursor: pointer;
+    padding: 5px 0;
+    text-align: center;
+    width: 100%;
+    display: none;
+}
+
+    .view-more-btn.show {
+        display: block;
+    }
+
+    .view-more-btn:hover {
+        color: #0056b3;
+        text-decoration: underline;
+    }
+
+.update-gallery-preview-item {
+    position: relative;
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+}
+
+.update-delete-btn {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background-color: #dc3545;
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-size: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+    .update-delete-btn:hover {
+        background-color: #c82333;
+    }
+
+.update-description-modal .modal-dialog {
+    margin-top: 50px;
+}
+/* Style cho CanHo/Display.cshtml */
+.product-details {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.product-image-container {
+    flex: 0 0 auto;
+}
+
+.product-info {
+    flex: 1;
+    text-align: right;
+}
+
+.info-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+    .info-table tr {
+        margin-bottom: 10px;
+    }
+
+.label-cell {
+    width: 150px;
+    font-weight: bold;
+    padding: 5px 0;
+    text-align: left;
+}
+
+.info-table td {
+    padding: 5px 0;
+}
+
+.super-admin {
+    color: red !important;
+    font-weight: bold; /* Tùy chọn: in đậm */
+}
+
+/* Cải thiện phần phòng (mới thêm) */
+.phong-container {
+    max-height: 400px; /* Giới hạn chiều cao để scroll nếu nhiều phòng */
+    overflow-y: auto;
+    padding: 10px;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    margin-bottom: 20px;
+}
+
+.phong-item {
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* Khoảng cách giữa các element trong phòng */
+    padding: 20px; /* Padding nội bộ lớn hơn */
+    margin-bottom: 20px; /* Khoảng cách giữa các phòng lớn hơn */
+    border: 1px solid #eee;
+    border-radius: 10px;
+    background-color: #fff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05); /* Shadow nhẹ để nổi bật */
+}
+
+    .phong-item .form-group {
+        margin-bottom: 0; /* Giảm margin form-group trong phòng */
+    }
+
+    .phong-item .update-gallery-preview {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); /* Grid cho ảnh phòng, responsive */
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+    .phong-item .delete-btn {
+        align-self: flex-end; /* Căn phải button xóa */
+        margin-top: 10px;
+        width: auto;
+        padding: 8px 15px;
+    }
+
+.khong-co-anh-phong {
+    color: #999;
+    font-style: italic;
+    text-align: center;
+}
+
+
+.ten-phong-input ~ .error-message {
+    display: block;
+    font-size: 12px;
+    color: #dc3545;
+    margin-top: 5px;
+}
+
+/* Cập nhật Admin_CanHo.css */
+/* Cập nhật Admin_CanHo.css */
+
+/* Style cho cột tổng phòng */
+.room-toggle-link {
+    text-decoration: none;
+    color: #007bff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+    .room-toggle-link:hover {
+        text-decoration: underline;
+    }
+
+.room-arrow {
+    font-size: 12px;
+    transition: transform 0.3s ease;
+}
+
+.room-subrow {
+    background-color: #f9f9f9;
+}
+
+.rooms-container {
+    padding: 10px;
+    max-height: 200px; /* Giới hạn chiều cao cho scroll */
+    overflow-y: auto;
+}
+
+    .rooms-container.scrollable .rooms-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 10px;
+        max-height: 150px; /* Tối đa 5 phòng ~ 150px, scroll nếu nhiều hơn */
+        overflow-y: auto;
+    }
+
+.room-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+    .room-item:hover {
+        background-color: #e9ecef;
+    }
+
+.room-name {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.room-status {
+    font-size: 12px;
+    padding: 2px 6px;
+    border-radius: 3px;
+}
+
+    .room-status.status-on {
+        background-color: #28a745;
+        color: #fff;
+    }
+
+    .room-status.status-off {
+        background-color: #dc3545;
+        color: #fff;
+    }
+
+/* Style cho modal ảnh phòng */
+/* Cập nhật Admin_CanHo.css - Phần Modal Ảnh Phòng (Thiết kế lại chuyên nghiệp) */
+
+/* Modal chung cho ảnh phòng */
+#roomImagesModal .modal-dialog {
+    max-width: 900px; /* Chiều rộng modal lớn hơn cho desktop */
+    margin: 1.75rem auto; /* Căn giữa */
+}
+
+#roomImagesModal .modal-content {
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15); /* Shadow chuyên nghiệp */
+    overflow: hidden;
+}
+
+#roomImagesModal .modal-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); /* Gradient đẹp */
+    color: white;
+    border-bottom: none;
+    padding: 1rem 1.5rem;
+}
+
+#roomImagesModal .modal-title {
+    margin: 0;
+    font-weight: 600;
+    font-size: 1.25rem;
+}
+
+#roomImagesModal .modal-close {
+    color: white;
+    opacity: 0.8;
+    font-size: 1.5rem;
+    transition: opacity 0.3s ease;
+}
+
+    #roomImagesModal .modal-close:hover {
+        opacity: 1;
+    }
+
+#roomImagesModal .modal-body {
+    padding: 1.5rem;
+    background: #f8f9fa;
+}
+
+/* Container chính cho ảnh - Responsive flex */
+.room-images-container {
+    display: flex;
+    gap: 1.5rem;
+    align-items: flex-start;
+    background: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* Card ảnh chính - Cố định kích thước desktop, responsive mobile */
+.main-image-card {
+    flex: 0 0 450px; /* Chiều rộng cố định desktop */
+    height: 450px; /* Chiều cao cố định desktop */
+    position: relative;
+    background: #f8f9fa;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+    .main-image-card:hover {
+        transform: scale(1.02); /* Hiệu ứng hover nhẹ */
+    }
+
+.main-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* Thay đổi từ cover sang contain để không cắt mép, hiển thị tự nhiên */
+    object-position: center;
+    display: block;
+}
+
+/* Nút điều hướng - Thiết kế đẹp hơn */
+.nav-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.9);
+    color: #333;
+    border: none;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.25rem;
+    font-weight: bold;
+    z-index: 10;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+    .nav-btn:hover {
+        background: white;
+        color: #007bff;
+        transform: translateY(-50%) scale(1.1);
+    }
+
+.prev-btn {
+    left: 12px;
+}
+
+.next-btn {
+    right: 12px;
+}
+
+/* Container thumbnails - Bên phải, chiều cao bằng ảnh chính */
+.thumbnails-container {
+    flex: 1;
+    height: 450px; /* Bằng chiều cao ảnh chính desktop */
+    overflow-y: auto;
+    border-radius: 8px;
+    padding: 0.5rem;
+    background: #f8f9fa;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+    /* Đảm bảo chiều rộng đủ, không bị che bởi scrollbar */
+    scrollbar-width: thin; /* Firefox */
+    scrollbar-color: #ccc #f8f9fa;
+}
+
+    .thumbnails-container::-webkit-scrollbar {
+        width: 6px; /* Giảm chiều rộng scrollbar */
+    }
+
+    .thumbnails-container::-webkit-scrollbar-track {
+        background: #f8f9fa;
+        border-radius: 3px;
+    }
+
+    .thumbnails-container::-webkit-scrollbar-thumb {
+        background: #ccc;
+        border-radius: 3px;
+    }
+
+        .thumbnails-container::-webkit-scrollbar-thumb:hover {
+            background: #999;
+        }
+
+/* List thumbnails dọc */
+.thumbnails-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding-right: 0.5rem; /* Padding phải để tránh che bởi scrollbar */
+}
+
+.thumbnail-image {
+    width: 100%;
+    height: 80px; /* Chiều cao thumbnail lớn hơn cho dễ click */
+    object-fit: cover; /* Cover cho thumbnail để vuông vắn */
+    border-radius: 6px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+    .thumbnail-image:hover,
+    .thumbnail-image.active {
+        border-color: #007bff;
+        box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+        transform: scale(1.02);
+    }
+
+
+
+/* Các style khác giữ nguyên... */
+
+/* Responsive cho Mobile (dưới 768px) - Cập nhật để fix scroll ngang */
+@media (max-width: 768px) {
+    #roomImagesModal .modal-dialog {
+        margin: 0.5rem;
+        max-width: calc(100% - 1rem);
+    }
+
+    .room-images-container {
+        flex-direction: column; /* Stack vertically trên mobile */
+        gap: 1rem;
+        padding: 1rem;
+    }
+
+    .main-image-card {
+        flex: none;
+        width: 100%;
+        height: 300px; /* Giảm chiều cao trên mobile */
+    }
+
+    .thumbnails-container {
+        height: auto; /* Tự do chiều cao trên mobile */
+        max-height: 300px; /* Giới hạn nếu cần */
+        width: 100%; /* Đảm bảo full width */
+        overflow-x: auto; /* Thêm scroll ngang cho container nếu cần */
+        overflow-y: hidden; /* Ẩn scroll dọc */
+        -webkit-overflow-scrolling: touch; /* Smooth scroll trên iOS */
+        scrollbar-width: auto; /* Hiển thị scrollbar mỏng trên Firefox */
+        scrollbar-color: #ccc #f8f9fa; /* Màu scrollbar Firefox */
+    }
+
+        .thumbnails-container::-webkit-scrollbar {
+            height: 4px; /* Chiều cao scrollbar ngang mỏng trên Chrome/Safari */
+        }
+
+        .thumbnails-container::-webkit-scrollbar-track {
+            background: #f8f9fa;
+            border-radius: 2px;
+        }
+
+        .thumbnails-container::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 2px;
+        }
+
+            .thumbnails-container::-webkit-scrollbar-thumb:hover {
+                background: #999;
+            }
+
+    .thumbnails-list {
+        display: flex;
+        flex-direction: row;
+        gap: 0.5rem;
+        padding-bottom: 0.5rem;
+        width: max-content; /* Cho phép list rộng hơn container để scroll */
+        min-width: 100%; /* Đảm bảo không co lại */
+        overflow-x: auto; /* Scroll ngang chính */
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch; /* Smooth scroll iOS */
+        scrollbar-width: auto; /* Hiển thị scrollbar mỏng trên Firefox (nếu áp dụng) */
+        scrollbar-color: #ccc #f8f9fa;
+    }
+
+        .thumbnails-list::-webkit-scrollbar {
+            height: 4px; /* Hiển thị scrollbar ngang mỏng */
+            display: block !important; /* Đảm bảo hiển thị */
+        }
+
+        .thumbnails-list::-webkit-scrollbar-track {
+            background: #f8f9fa;
+            border-radius: 2px;
+        }
+
+        .thumbnails-list::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 2px;
+        }
+
+            .thumbnails-list::-webkit-scrollbar-thumb:hover {
+                background: #999;
+            }
+
+    .thumbnail-image {
+        flex: 0 0 100px; /* Chiều rộng cố định, không co giãn */
+        height: 100px;
+        min-width: 100px; /* Đảm bảo không nhỏ hơn */
+        max-width: 100px; /* Giới hạn tối đa */
+        object-fit: cover;
+        border-radius: 6px;
+        cursor: pointer;
+        border: 2px solid transparent;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+        .thumbnail-image:hover,
+        .thumbnail-image.active {
+            border-color: #007bff;
+            box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+            transform: scale(1.02);
+        }
+
+    .nav-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+    }
+
+    .prev-btn {
+        left: 8px;
+    }
+
+    .next-btn {
+        right: 8px;
+    }
+
+    #roomImagesModal .modal-body {
+        padding: 1rem;
+    }
+}
+
+
+/* ============ CỘT HỢP ĐỒNG – PHIÊN BẢN GỌN ĐẸP NHẤT 2025 ============ */
+.hopdong-column {
+    vertical-align: middle;
+    padding: 6px 4px;
+    min-width: 155px; /* Giảm từ 190 → 155 */
+    width: 100px;
+    font-size: 13px; /* Nhỏ hơn 1 chút */
+}
+
+/* Card khi đã có hợp đồng – thu nhỏ đẹp */
+.hopdong-card {
+    background: linear-gradient(135deg, #f8fff9 0%, #f1f8f5 100%);
+    border: 1.3px solid #28a745;
+    border-radius: 8px;
+    padding: 7px 8px; /* Giảm padding từ 10px → 7px */
+    text-align: center;
+    font-size: 12.8px; /* Nhỏ hơn một chút */
+    line-height: 1.35; /* Dòng sát lại */
+    box-shadow: 0 1px 5px rgba(40, 167, 69, 0.15);
+    transition: all 0.2s ease;
+}
+
+    .hopdong-card:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 10px rgba(40, 167, 69, 0.22);
+    }
+
+.hopdong-type {
+    font-weight: 700;
+    font-size: 13.8px; /* Từ 15 → 13.8 */
+    color: #28a745;
+    margin-bottom: 3px;
+}
+
+.hopdong-info {
+    margin: 3px 0;
+    color: #212529;
+    font-size: 12.6px;
+}
+
+.hopdong-date {
+    font-size: 11.8px; /* Nhỏ hơn, gọn hơn */
+    color: #555;
+    margin: 3px 0;
+}
+
+.hopdong-footer {
+    margin-top: 6px;
+    padding-top: 5px;
+    border-top: 1px dashed #28a745;
+}
+
+.hopdong-view-link {
+    color: #007bff;
+    font-size: 12.3px;
+    font-weight: 500;
+    text-decoration: none;
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 6px;
+    background: transparent;
+    transition: all 0.25s ease;
+    border: 1px solid transparent;
+}
+
+    .hopdong-view-link:hover {
+        background: #007bff;
+        color: white !important;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
+        border: 1px solid #007bff;
+    }
+
+/* Card khi chưa có hợp đồng – cũng thu nhỏ */
+.hopdong-empty-card {
+    text-align: center;
+    padding: 8px 6px; /* Giảm padding */
+    background: #fff8f8;
+    border: 1.3px dashed #dc3545;
+    border-radius: 8px;
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.hopdong-add-link {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 6px;
+    color: #dc3545;
+    font-weight: 500;
+    font-size: 12.5px;
+    text-decoration: none;
+    background: transparent;
+    transition: all 0.25s ease;
+    border: 1px solid transparent;
+}
+
+    .hopdong-add-link:hover {
+        background: #dc3545;
+        color: white !important;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 10px rgba(220, 53, 69, 0.3);
+        border: 1px solid #dc3545;
+    }
+
+
+.status-featured {
+    color: #e67e22;
+    font-weight: bold;
+}
+
+    .status-featured:hover {
+        background-color: #e67e22;
+        color: white;
+    }
+
+.status-not-featured {
+    color: #95a5a6;
+}
+
+    .status-not-featured:hover {
+        background-color: #95a5a6;
+        color: white;
+    }
+
+
+
+
+
+/* ================== THU NHỎ TOÀN BỘ NỘI DUNG BẢNG 30% — SIÊU GỌN, SIÊU ĐẸP ================== */
+.data-table {
+    font-size: 13px !important; /* Chữ nhỏ hơn 30% (từ ~16px → 13px) */
+    line-height: 1.4 !important; /* Dòng sát lại, gọn hơn */
+}
+
+    .data-table th,
+    .data-table td {
+        padding: 8px 6px !important; /* Giảm padding từ 12px → 8px */
+        font-size: inherit !important;
+    }
+
+    .data-table .product-image {
+        max-width: 70px !important; /* Ảnh nhỏ hơn */
+        max-height: 70px !important;
+    }
+
+    .data-table .status-link {
+        padding: 4px 8px !important; /* Nút Bật/Tắt nhỏ hơn */
+        font-size: 12.5px !important;
+    }
+
+    .data-table .action-link {
+        padding: 4px 8px !important;
+        font-size: 12.5px !important;
+    }
+
+/* Cột hợp đồng: thu nhỏ card */
+.hopdong-card,
+.hopdong-empty-card {
+    padding: 6px !important;
+    font-size: 12px !important;
+    line-height: 1.3 !important;
+}
+
+.hopdong-type {
+    font-size: 13px !important;
+}
+
+.hopdong-info,
+.hopdong-date,
+.hopdong-footer {
+    font-size: 11.5px !important;
+}
+
+.hopdong-view-link,
+.hopdong-add-link {
+    font-size: 11.8px !important;
+    padding: 3px 8px !important;
+}
+
+/* Cột phòng */
+.room-toggle-link {
+    font-size: 12.8px !important;
+}
+
+.room-count {
+    font-weight: 600;
+}
+
+/* Các modal vẫn to bình thường — không bị ảnh hưởng */
+.modal .modal-content {
+    font-size: 14px !important;
+}

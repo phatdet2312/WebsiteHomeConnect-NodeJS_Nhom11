@@ -1,0 +1,1063 @@
+﻿/* Web_QuanLyLich.css – GIAO DIỆN QUẢN LÝ LỊCH SIÊU ĐẸP 2025 – ĐÃ TỐI ƯU SCROLL + MÀU SẮC */
+:root {
+    --calendar-bg: #1a1a1a;
+    --calendar-text: #ffffff;
+    --calendar-border: rgba(242, 140, 56, 0.2);
+    --primary-color: #F28C38;
+    --secondary-color: #40C4FF;
+    --event-color: #fbbf24;
+    --lunar-text: #94a3b8;
+    --sidebar-bg: rgba(15, 23, 42, 0.9);
+    --header-bg: rgba(20, 28, 44, 0.7);
+    --modal-bg: #0f172a;
+    --input-bg: rgba(255,255,255,0.05);
+    --weekday-bg: rgba(242, 140, 56, 0.15);
+    --weekday-text: #F28C38;
+}
+/* CONTAINER CHÍNH */
+.lich-container {
+    display: flex;
+    height: calc(100vh - var(--header-height));
+    background: var(--calendar-bg);
+    overflow: hidden;
+}
+/* SIDEBAR TRÁI – DANH SÁCH LỊCH */
+.lich-sidebar {
+    width: 280px;
+    padding: 25px;
+    background: var(--sidebar-bg);
+    border-right: 1px solid var(--calendar-border);
+    display: flex;
+    flex-direction: column;
+    backdrop-filter: blur(10px);
+}
+
+.sidebar-title {
+    font-size: 1.4rem;
+    color: var(--primary-color);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+}
+
+.lich-list {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding-right: 8px;
+}
+
+    .lich-list::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .lich-list::-webkit-scrollbar-thumb {
+        background: rgba(242, 140, 56, 0.4);
+        border-radius: 3px;
+    }
+
+.lich-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: var(--input-bg);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+    .lich-item:hover {
+        background: rgba(242, 140, 56, 0.15);
+        transform: translateY(-2px);
+    }
+
+.lich-color {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.2);
+}
+
+.lich-name {
+    flex: 1;
+    color: white;
+    font-weight: 500;
+}
+
+.lich-item i {
+    color: #94a3b8;
+    font-size: 1.1rem;
+}
+
+.add-lich-btn {
+    margin-top: 20px;
+    padding: 14px;
+    background: linear-gradient(135deg, var(--primary-color), #f59e0b);
+    color: white;
+    border-radius: 12px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-weight: 600;
+    box-shadow: 0 8px 20px rgba(242, 140, 56, 0.3);
+}
+
+    .add-lich-btn:hover {
+        background: linear-gradient(135deg, #f59e0b, var(--primary-color));
+        transform: translateY(-3px);
+        box-shadow: 0 12px 30px rgba(242, 140, 56, 0.4);
+    }
+/* MAIN CALENDAR */
+.lich-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+/* HEADER ĐIỀU HƯỚNG – CỐ ĐỊNH, KHÔNG CUỘN */
+.lich-header {
+    padding: 25px 25px 20px 25px;
+    background: var(--header-bg);
+    backdrop-filter: blur(15px);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--calendar-border);
+    flex-shrink: 0;
+}
+
+.current-month {
+    font-size: 2.2rem;
+    font-weight: 900;
+    color: var(--primary-color);
+    text-shadow: 0 0 20px rgba(242, 140, 56, 0.4);
+}
+
+.nav-buttons {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.nav-btn {
+    background: rgba(242, 140, 56, 0.15);
+    border: 1px solid rgba(242, 140, 56, 0.3);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-weight: 600;
+    backdrop-filter: blur(5px);
+}
+
+    .nav-btn:hover {
+        background: var(--primary-color);
+        transform: scale(1.05);
+        box-shadow: 0 8px 20px rgba(242, 140, 56, 0.4);
+    }
+
+#todayBtn {
+    background: linear-gradient(135deg, var(--primary-color), #f59e0b);
+    box-shadow: 0 6px 15px rgba(242, 140, 56, 0.3);
+}
+
+    #todayBtn:hover {
+        transform: translateY(-2px);
+    }
+
+.view-select {
+    background: rgba(255,255,255,0.08);
+    color: white;
+    border: 1px solid rgba(242, 140, 56, 0.3);
+    padding: 12px 24px;
+    border-radius: 50px;
+    cursor: pointer;
+    font-weight: 500;
+}
+/* CALENDAR GRID – CHỈ PHẦN NÀY CUỘN */
+.calendar-wrapper {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.calendar-grid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 10px;
+    padding: 0 25px 25px 25px;
+    overflow-y: auto;
+}
+
+    .calendar-grid::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .calendar-grid::-webkit-scrollbar-thumb {
+        background: rgba(242, 140, 56, 0.4);
+        border-radius: 4px;
+    }
+
+    .calendar-grid::-webkit-scrollbar-track {
+        background: transparent;
+    }
+/* WEEKDAY HEADER – NỔI BẬT HƠN */
+.weekday-header {
+    text-align: center;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--weekday-text);
+    padding: 16px;
+    background: var(--weekday-bg);
+    border-radius: 14px;
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(242, 140, 56, 0.3);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+/* DAY CELL */
+.day-cell {
+    background: var(--input-bg);
+    border-radius: 14px;
+    padding: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    min-height: 130px;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid rgba(255,255,255,0.05);
+}
+
+    .day-cell:hover {
+        background: rgba(242, 140, 56, 0.15);
+        transform: translateY(-4px);
+        box-shadow: 0 10px 25px rgba(242, 140, 56, 0.2);
+        border-color: rgba(242, 140, 56, 0.4);
+    }
+
+.day-number {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: white;
+    text-align: left;
+}
+
+.lunar-date {
+    font-size: 0.9rem;
+    color: var(--lunar-text);
+    margin-top: 4px;
+}
+
+.event-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--event-color);
+    margin: 3px 0;
+    align-self: flex-start;
+}
+
+.other-month {
+    opacity: 0.35;
+}
+
+.today {
+    border: 3px solid var(--primary-color) !important;
+    background: rgba(242, 140, 56, 0.2) !important;
+    box-shadow: 0 0 30px rgba(242, 140, 56, 0.5);
+}
+/* MODAL TẠO/SỬA SỰ KIỆN */
+.event-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    backdrop-filter: blur(12px);
+}
+
+    .event-modal.active {
+        display: flex;
+    }
+
+.modal-content {
+    background: var(--modal-bg);
+    width: 90%;
+    max-width: 600px;
+    border-radius: 24px;
+    padding: 30px;
+    box-shadow: 0 30px 80px rgba(242,140,56,0.4);
+    position: relative;
+    border: 1px solid rgba(242,140,56,0.3);
+}
+
+.close-modal {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: rgba(220,38,38,0.2);
+    border: none;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    color: white;
+    font-size: 1.6rem;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+    .close-modal:hover {
+        background: #dc2626;
+        transform: scale(1.1);
+    }
+
+.modal-title {
+    font-size: 1.9rem;
+    color: var(--primary-color);
+    margin-bottom: 25px;
+    font-weight: 800;
+    text-align: center;
+}
+
+.event-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+    .form-group label {
+        color: var(--lunar-text);
+        font-weight: 600;
+        font-size: 1rem;
+    }
+
+.form-input {
+    background: var(--input-bg);
+    border: 1px solid var(--calendar-border);
+    color: white;
+    padding: 14px 18px;
+    border-radius: 14px;
+    font-size: 1rem;
+    transition: all 0.3s;
+}
+
+    .form-input:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(242, 140, 56, 0.2);
+    }
+
+.time-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.participants-list,
+.reminders-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.add-btn {
+    color: var(--secondary-color);
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px;
+    border-radius: 10px;
+    transition: all 0.3s;
+}
+
+    .add-btn:hover {
+        background: rgba(64, 196, 255, 0.15);
+    }
+
+.save-event {
+    background: linear-gradient(135deg, var(--primary-color), #f59e0b);
+    color: white;
+    padding: 16px;
+    border-radius: 50px;
+    border: none;
+    font-weight: 800;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 10px 30px rgba(242, 140, 56, 0.4);
+}
+
+    .save-event:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 20px 40px rgba(242, 140, 56, 0.6);
+    }
+/* RESPONSIVE */
+@media (max-width: 992px) {
+    .lich-container {
+        flex-direction: column;
+    }
+
+    .lich-sidebar {
+        width: 100%;
+        height: 220px;
+        border-right: none;
+        border-bottom: 1px solid var(--calendar-border);
+    }
+
+    .lich-list {
+        flex-direction: row;
+        overflow-x: auto;
+        padding-bottom: 10px;
+    }
+
+    .lich-item {
+        min-width: 200px;
+    }
+
+    .add-lich-btn {
+        margin-top: 15px;
+        margin-left: 10px;
+    }
+}
+
+@media (max-width: 768px) {
+    .lich-header {
+        flex-direction: column;
+        gap: 15px;
+        align-items: stretch;
+    }
+
+    .nav-buttons {
+        justify-content: center;
+    }
+
+    .current-month {
+        text-align: center;
+        font-size: 1.8rem;
+    }
+
+    .calendar-grid {
+        gap: 6px;
+        padding: 0 15px 15px 15px;
+    }
+
+    .day-cell {
+        min-height: 90px;
+        padding: 10px;
+    }
+
+    .day-number {
+        font-size: 1.3rem;
+    }
+
+    .weekday-header {
+        padding: 12px;
+        font-size: 0.95rem;
+    }
+}
+/* MODAL THÊM LỊCH MỚI – ĐẸP NHƯ MODAL SỰ KIỆN */
+.add-calendar-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    backdrop-filter: blur(12px);
+}
+
+    .add-calendar-modal.active {
+        display: flex;
+    }
+
+.add-calendar-content {
+    background: var(--modal-bg);
+    width: 90%;
+    max-width: 500px;
+    border-radius: 24px;
+    padding: 30px;
+    box-shadow: 0 30px 80px rgba(242,140,56,0.4);
+    position: relative;
+    border: 1px solid rgba(242,140,56,0.3);
+}
+
+.add-calendar-close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: rgba(220,38,38,0.2);
+    border: none;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    color: white;
+    font-size: 1.6rem;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+    .add-calendar-close:hover {
+        background: #dc2626;
+        transform: scale(1.1);
+    }
+
+.add-calendar-title {
+    font-size: 1.9rem;
+    color: var(--primary-color);
+    margin-bottom: 25px;
+    font-weight: 800;
+    text-align: center;
+}
+
+.add-calendar-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.color-picker {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.color-option {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    cursor: pointer;
+    border: 3px solid transparent;
+    transition: all 0.3s;
+}
+
+    .color-option.selected {
+        border-color: white;
+        transform: scale(1.1);
+        box-shadow: 0 0 20px rgba(255,255,255,0.3);
+    }
+
+.save-calendar-btn {
+    background: linear-gradient(135deg, var(--primary-color), #f59e0b);
+    color: white;
+    padding: 16px;
+    border-radius: 50px;
+    border: none;
+    font-weight: 800;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 10px 30px rgba(242, 140, 56, 0.4);
+}
+
+    .save-calendar-btn:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 20px 40px rgba(242, 140, 56, 0.6);
+    }
+
+
+/* MODAL THÔNG BÁO – COPY 100% TỪ ADMIN VIEW */
+.notification-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.6);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    backdrop-filter: blur(4px);
+}
+
+    .notification-modal.active {
+        display: flex;
+    }
+
+.notification-content {
+    background: white;
+    width: 90%;
+    max-width: 380px;
+    border-radius: 16px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    animation: notifPop 0.4s ease;
+    position: relative;
+}
+
+@keyframes notifPop {
+    0% {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.notification-icon {
+    font-size: 2.8rem;
+    margin-bottom: 12px;
+    display: block !important;
+}
+
+    .notification-icon.success {
+        color: #28A745;
+    }
+
+    .notification-icon.error {
+        color: #DC3545;
+    }
+
+.notification-message {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 16px;
+}
+
+.notification-close {
+    position: absolute;
+    top: 12px;
+    right: 16px;
+    background: none;
+    border: none;
+    font-size: 1.6rem;
+    color: #999;
+    cursor: pointer;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.2s;
+}
+
+    .notification-close:hover {
+        background: #f0f0f0;
+        color: #333;
+    }
+/* BẢO VỆ FONT AWESOME */
+#notificationModal i, #notificationModal .fas {
+    font-family: "Font Awesome 6 Free" !important;
+    font-weight: 900 !important;
+}
+
+
+
+/* HIỂN THỊ TÊN SỰ KIỆN TRONG Ô NGÀY – PHIÊN BẢN ĐẸP NHẤT */
+.day-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 8px;
+}
+
+.events-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: auto; /* Đẩy danh sách sự kiện xuống dưới cùng ô ngày */
+}
+
+.event-item {
+    padding: 4px 8px;
+    border-radius: 8px;
+    color: white;
+    font-size: 0.8rem;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    opacity: 0.95;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    cursor: default;
+    transition: all 0.2s ease;
+}
+
+    .event-item:hover {
+        opacity: 1;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    }
+
+.event-more {
+    padding: 4px 8px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.15);
+    color: white;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-align: center;
+    cursor: default;
+}
+
+/* Khi hover toàn bộ ô ngày → làm sự kiện nổi bật hơn */
+.day-cell:hover .event-item {
+    opacity: 1;
+    transform: translateY(-2px);
+}
+
+
+
+/* HÀNH ĐỘNG TRÊN LỊCH ITEM */
+.lich-actions {
+    display: flex;
+    gap: 8px;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.lich-item:hover .lich-actions {
+    opacity: 1;
+}
+
+.lich-edit, .lich-delete {
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 6px;
+    transition: all 0.2s;
+}
+
+.lich-edit {
+    color: #40C4FF;
+}
+
+    .lich-edit:hover {
+        background: rgba(64, 196, 255, 0.2);
+        transform: scale(1.1);
+    }
+
+.lich-delete {
+    color: #ef4444;
+}
+
+    .lich-delete:hover {
+        background: rgba(239, 68, 68, 0.2);
+        transform: scale(1.1);
+    }
+
+
+/* MODAL XÁC NHẬN XÓA LỊCH – ĐẸP & CHUYÊN NGHIỆP */
+.delete-confirm-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    backdrop-filter: blur(12px);
+}
+
+    .delete-confirm-modal.active {
+        display: flex;
+    }
+
+.delete-confirm-content {
+    background: var(--modal-bg);
+    width: 90%;
+    max-width: 460px;
+    border-radius: 24px;
+    padding: 30px;
+    text-align: center;
+    box-shadow: 0 30px 80px rgba(239, 68, 68, 0.4);
+    position: relative;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.delete-icon {
+    font-size: 4.5rem;
+    color: #ef4444;
+    margin-bottom: 20px;
+    opacity: 0.9;
+}
+
+.delete-title {
+    font-size: 1.9rem;
+    color: #ef4444;
+    font-weight: 800;
+    margin-bottom: 15px;
+}
+
+.delete-message {
+    font-size: 1.1rem;
+    color: #e2e8f0;
+    line-height: 1.6;
+    margin-bottom: 30px;
+}
+
+.delete-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+
+.btn-cancel {
+    background: rgba(255,255,255,0.1);
+    color: white;
+    padding: 14px 30px;
+    border-radius: 50px;
+    border: 1px solid rgba(255,255,255,0.2);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+    .btn-cancel:hover {
+        background: rgba(255,255,255,0.2);
+        transform: translateY(-2px);
+    }
+
+.btn-delete {
+    background: linear-gradient(135deg, #dc2626, #ef4444);
+    color: white;
+    padding: 14px 30px;
+    border-radius: 50px;
+    border: none;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 10px 30px rgba(239, 68, 68, 0.4);
+}
+
+    .btn-delete:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 20px 40px rgba(239, 68, 68, 0.6);
+    }
+
+
+/* TAB SWITCH TRONG MODAL SỰ KIỆN */
+.modal-tabs {
+    display: flex;
+    background: rgba(15, 23, 42, 0.8);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 14px;
+    background: transparent;
+    border: none;
+    color: #94a3b8;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+    .tab-btn.active,
+    .tab-btn:hover {
+        background: var(--primary-color);
+        color: white;
+    }
+
+.tab-content {
+    display: none;
+}
+
+    .tab-content.active {
+        display: block;
+        animation: fadeIn 0.4s ease;
+    }
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* DANH SÁCH CHI TIẾT SỰ KIỆN TRONG TAB – ĐẸP NHƯ GOOGLE CALENDAR */
+.events-detail-list {
+    max-height: 58vh;
+    overflow-y: auto;
+    padding-right: 8px;
+}
+
+    .events-detail-list::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .events-detail-list::-webkit-scrollbar-thumb {
+        background: rgba(242, 140, 56, 0.4);
+        border-radius: 3px;
+    }
+
+.event-detail-item {
+    background: rgba(255,255,255,0.08);
+    border-radius: 16px;
+    padding: 18px;
+    margin-bottom: 12px;
+    border-left: 5px solid transparent;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+    .event-detail-item:hover {
+        background: rgba(255,255,255,0.15);
+        transform: translateY(-4px);
+        box-shadow: 0 10px 25px rgba(242,140,56,0.2);
+    }
+
+.event-detail-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+    .event-detail-title::before {
+        content: "";
+        width: 12px;
+        height: 12px;
+        background: currentColor;
+        border-radius: 50%;
+        flex-shrink: 0;
+    }
+
+.event-detail-time {
+    font-size: 1rem;
+    color: #F28C38;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+}
+
+.event-detail-location,
+.event-detail-desc {
+    font-size: 0.95rem;
+    color: #e2e8f0;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    line-height: 1.5;
+}
+
+    .event-detail-location i,
+    .event-detail-desc i,
+    .event-detail-time i {
+        color: #40C4FF;
+        margin-top: 2px;
+    }
+
+    .event-detail-location:empty,
+    .event-detail-desc:empty {
+        display: none;
+    }
+
+/* Khi không có sự kiện */
+.events-detail-list p {
+    font-size: 1.1rem;
+    color: #94a3b8;
+    font-style: italic;
+}
+
+
+/* HÀNH ĐỘNG TRÊN SỰ KIỆN TRONG TAB CHI TIẾT */
+.event-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-top: 12px;
+    opacity: 0.7;
+    transition: opacity 0.3s;
+}
+
+.event-detail-item:hover .event-actions {
+    opacity: 1;
+}
+
+.event-edit, .event-delete {
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 8px;
+    transition: all 0.2s;
+    font-size: 1.1rem;
+}
+
+.event-edit {
+    color: #40C4FF;
+}
+
+    .event-edit:hover {
+        background: rgba(64, 196, 255, 0.2);
+        transform: scale(1.1);
+    }
+
+.event-delete {
+    color: #ef4444;
+}
+
+    .event-delete:hover {
+        background: rgba(239, 68, 68, 0.2);
+        transform: scale(1.1);
+    }
+
+
+.event-item.multi-day {
+    opacity: 0.8;
+    font-style: italic;
+}
+
+
+
+
+.event-detail-title {
+    color: white;
+    position: relative;
+    padding-left: 16px;
+}
+
+    .event-detail-title::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 10px;
+        height: 10px;
+        background: currentColor;
+        border-radius: 50%;
+    }
