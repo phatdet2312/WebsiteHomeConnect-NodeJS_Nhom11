@@ -1,0 +1,35 @@
+
+<!-- views/errors/500.ejs -->
+
+<div class="container text-center" style="margin-top: 80px; margin-bottom: 80px;">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div style="font-size: 8rem; font-weight: 900; color: #c62828; line-height:1; opacity:.12;">500</div>
+      <div style="margin-top:-40px;">
+        <i class="fas fa-exclamation-triangle fa-4x text-danger mb-3"></i>
+        <h2 class="fw-bold text-dark mb-2">L&#7895;i m&#225;y ch&#7911;</h2>
+        <p class="text-muted mb-3">
+          &#272;&#227; x&#7843;y ra l&#7895;i kh&#244;ng mong mu&#7889;n tr&#234;n m&#225;y ch&#7911;.<br>
+          &#272;&#7897;i ng&#361; k&#7929; thu&#7853;t c&#7911;a ch&#250;ng t&#244;i &#273;&#227; &#273;&#432;&#7907;c th&#244;ng b&#225;o.
+        </p>
+        <% if (typeof error !== 'undefined' && error) { %>
+          <div class="alert alert-danger text-start small mb-4" style="border-radius:10px;">
+            <strong><i class="fas fa-bug me-2"></i>Chi ti&#7871;t l&#7895;i:</strong><br>
+            <code><%= error %></code>
+          </div>
+        <% } %>
+        <div class="d-flex gap-3 justify-content-center flex-wrap">
+          <a href="/" class="btn btn-primary px-4 py-2" style="border-radius:10px;">
+            <i class="fas fa-home me-2"></i>V&#7873; trang ch&#7911;
+          </a>
+          <button onclick="location.reload()" class="btn btn-outline-danger px-4 py-2" style="border-radius:10px;">
+            <i class="fas fa-redo me-2"></i>Th&#7917; l&#7841;i
+          </button>
+          <button onclick="history.back()" class="btn btn-outline-secondary px-4 py-2" style="border-radius:10px;">
+            <i class="fas fa-arrow-left me-2"></i>Quay l&#7841;i
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

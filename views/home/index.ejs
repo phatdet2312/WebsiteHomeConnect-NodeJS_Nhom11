@@ -1,0 +1,22 @@
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 text-center">
+            <h1 class="display-4 fw-bold text-primary mb-4">Chào mừng đến với hệ thống</h1>
+            <p class="lead text-muted mb-5">
+                Bạn đã đăng nhập thành công bằng JWT Token!<br>
+                Đây là phiên bản Boilerplate tối giản, sẵn sàng để bạn phát triển tiếp các tính năng khác.
+            </p>
+            
+            <div class="card shadow-sm border-0" style="border-radius: 16px;">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold mb-3">Thông tin tài khoản của bạn:</h5>
+                    <ul class="list-group list-group-flush text-start">
+                        <li class="list-group-item"><strong>Họ Tên:</strong> <%= user.HoTen || user.UserName %></li>
+                        <li class="list-group-item"><strong>Email:</strong> <%= user.Email %></li>
+                        <li class="list-group-item"><strong>Vai trò:</strong> <%= (user.dataValues.roles && user.dataValues.roles.length > 0) ? user.dataValues.roles.join(', ') : 'Chưa phân quyền' %></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

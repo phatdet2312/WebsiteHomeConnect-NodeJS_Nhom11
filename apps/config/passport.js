@@ -1,4 +1,5 @@
 const LocalStrategy = require('passport-local').Strategy;
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const JwtStrategy = require('passport-jwt').Strategy;
 const { ExtractJwt } = require('passport-jwt');
 const bcrypt = require('bcrypt');
@@ -49,7 +50,7 @@ module.exports = function (passport) {
           where: { [Op.or]: [{ Email: email }, { UserName: email }, { PhoneNumber: email }] }
         });
         if (!user) return done(null, false, { message: 'Email hoặc mật khẩu không đúng' });
-        
+        if (!user.PasswordHash) return done(null, false, { message: 'Tài khoản này đăng nhập bằng Google' });
 
         let isMatch = false;
         if (user.PasswordHash.startsWith('$2')) isMatch = await bcrypt.compare(password, user.PasswordHash);
@@ -61,7 +62,39 @@ module.exports = function (passport) {
     }
   ));
 
-  // 2. CHIẾN LƯỢC JWT TỐI THƯỢNG (Thay thế hoàn toàn Session deserialize)
+  // 2. CHIẾN LƯỢC GOOGLE (Không dùng session)
+  passport.use('google', new GoogleStrategy(
+    {
+      clientID: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      callbackURL: process.env.GOOGLE_CALLBACK_URL || 'http://localhost:3000/auth/google/callback'
+    },
+    async (accessToken, refreshToken, profile, done) => {
+      try {
+        const email = profile.emails && profile.emails[0] ? profile.emails[0].value : null;
+        if (!email) return done(null, false, { message: 'Không lấy được email từ Google' });
+
+        let user = await ThongTinNguoiDung.findOne({ where: { Email: email } });
+        if (!user) {
+          const userId = uuidv4();
+          user = await ThongTinNguoiDung.create({
+            Id: userId, UserName: email, NormalizedUserName: email.toUpperCase(),
+            Email: email, NormalizedEmail: email.toUpperCase(), EmailConfirmed: true,
+            PasswordHash: null, SecurityStamp: uuidv4(), ConcurrencyStamp: uuidv4(),
+            HoTen: profile.displayName || email, IsSuperAdmin: false, TrangThaiHoatDong: false,
+            PhoneNumberConfirmed: false, TwoFactorEnabled: false, LockoutEnabled: true, AccessFailedCount: 0
+          });
+          await KhachHang.create({ UserId: userId, TenKH: profile.displayName || email, EmailKH: email, AvatarUrl: (profile.photos && profile.photos[0]) ? profile.photos[0].value : null });
+          try {
+            await sequelize.query(`INSERT INTO AspNetUserRoles (UserId, RoleId) SELECT :userId, Id FROM AspNetRoles WHERE Name = 'Customer'`, { replacements: { userId } });
+          } catch (roleErr) { }
+        }
+        return done(null, user);
+      } catch (err) { return done(err); }
+    }
+  ));
+
+  // 3. CHIẾN LƯỢC JWT TỐI THƯỢNG (Thay thế hoàn toàn Session deserialize)
   const jwtOptions = {
     jwtFromRequest: ExtractJwt.fromExtractors([cookieExtractor, ExtractJwt.fromAuthHeaderAsBearerToken()]),
     secretOrKey: process.env.JWT_SECRET || 'DayLaMotSecretKeyRatDaiVaAnToanChoHS256JwtToken2025!'
