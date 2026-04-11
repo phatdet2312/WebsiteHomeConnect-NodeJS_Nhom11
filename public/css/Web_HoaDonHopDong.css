@@ -1,0 +1,1092 @@
+﻿/* WEB_HOADONHOPDONG_VIP.CSS – PHIÊN BẢN SIÊU SANG 2025 – KHÁC BIỆT HOÀN TOÀN */
+
+:root {
+    --gold: #f59e0b;
+    --gold-dark: #d97706;
+    --dark: #0f172a;
+    --glass: rgba(15, 25, 40, 0.6);
+    --border-glow: rgba(245, 158, 11, 0.4);
+}
+
+/* HERO */
+.contract-hero {
+    padding: 140px 20px 100px;
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #000000 100%);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+}
+
+.hero-title {
+    font-size: 5.5rem;
+    font-weight: 900;
+    line-height: 1.1;
+    margin-bottom: 20px;
+}
+
+.gold-text {
+    background: linear-gradient(90deg, #facc15, #fbbf24, #f59e0b);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: 0 0 40px rgba(245, 158,11,0.6);
+}
+
+.diamond-text {
+    background: linear-gradient(90deg, #8b5cf6, #ec4899, #f43f5e);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: 0 0 50px rgba(236,72,153,0.6);
+}
+
+.hero-subtitle {
+    font-size: 1.6rem;
+    color: #cbd5e1;
+    max-width: 700px;
+    margin: 0 auto 40px;
+}
+
+.hero-decoration {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+}
+
+.diamond-large {
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(245,158,11,0.15) 0%, transparent 70%);
+    clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(45deg);
+    animation: rotate 30s linear infinite;
+}
+
+.diamond-small {
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    background: rgba(245,158,11,0.2);
+    clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+    filter: blur(1px);
+}
+
+.d1 {
+    top: 20%;
+    left: 15%;
+    animation: float 8s infinite ease-in-out;
+}
+
+.d2 {
+    top: 30%;
+    right: 20%;
+    animation: float 12s infinite ease-in-out reverse;
+}
+
+.d3 {
+    bottom: 25%;
+    left: 25%;
+    animation: float 10s infinite ease-in-out;
+}
+
+/* GRID */
+.contract-section {
+    padding: 80px 20px;
+    background: #0a0e17;
+    min-height: 100vh;
+}
+
+.contract-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+    gap: 30px;
+    max-width: 1600px;
+    margin: 0 auto;
+}
+
+/* CARD CHÍNH */
+.contract-card {
+    background: var(--glass);
+    backdrop-filter: blur(20px);
+    border-radius: 24px;
+    border: 1px solid var(--border-glow);
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+    transition: all 0.6s ease;
+}
+
+    .contract-card:hover {
+        transform: translateY(-15px);
+        box-shadow: 0 30px 60px rgba(245,158,11,0.4);
+        border-color: var(--gold);
+    }
+
+.card-header {
+    background: linear-gradient(135deg, #1e293b, #334155);
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border-glow);
+}
+
+.contract-id {
+    font-size: 1.4rem;
+    font-weight: 900;
+    color: var(--gold);
+    letter-spacing: 2px;
+}
+
+.contract-address {
+    font-size: 0.95rem;
+    color: #94a3b8;
+    margin-top: 4px;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.payment-method {
+    background: rgba(255,255,255,0.1);
+    padding: 8px 16px;
+    border-radius: 1px solid var(--gold);
+    border-radius: 50px;
+    color: #fbbf24;
+    font-size: 0.9rem;
+}
+
+.status-badge {
+    padding: 8px 20px;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+    .status-badge.success {
+        background: rgba(34,197,94,0.2);
+        color: #86efac;
+        border: 1px solid #22c55e;
+    }
+
+    .status-badge.warning {
+        background: rgba(251,146,60,0.2);
+        color: #fb923c;
+        border: 1px solid #fb923c;
+    }
+
+.card-body {
+    padding: 30px;
+    text-align: center;
+}
+
+.total-amount {
+    margin-bottom: 25px;
+}
+
+    .total-amount .label {
+        display: block;
+        color: #94a3b8;
+        font-size: 1.1rem;
+        margin-bottom: 10px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+    }
+
+    .total-amount .amount {
+        font-size: 3rem;
+        font-weight: 900;
+        background: linear-gradient(90deg, #facc15, #fbbf24);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        text-shadow: 0 0 30px rgba(245,158,11,0.6);
+    }
+
+.info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    color: #e2e8f0;
+    font-size: 1.1rem;
+}
+
+    .info-item i {
+        color: var(--gold);
+        font-size: 1.4rem;
+    }
+
+/* TOGGLE BUTTON */
+.toggle-details {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(to right, #1e293b, #334155);
+    border: none;
+    color: #fbbf24;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: all 0.4s;
+}
+
+    .toggle-details:hover {
+        background: var(--gold);
+        color: black;
+    }
+
+    .toggle-details.active i {
+        transform: rotate(180deg);
+    }
+
+/* CHI TIẾT */
+.contract-details {
+    display: none;
+    background: rgba(10, 14, 23, 0.8);
+    padding: 30px;
+    border-top: 1px solid var(--border-glow);
+}
+
+.details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.detail-item {
+    background: rgba(30, 41, 59, 0.6);
+    border-radius: 16px;
+    padding: 20px;
+    border: 1px solid rgba(245,158,11,0.3);
+}
+
+.item-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+    color: var(--gold);
+    font-weight: 700;
+}
+
+
+
+/* TIMELINE */
+.timeline-section {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-glow);
+}
+
+    .timeline-section h4 {
+        color: var(--gold);
+        text-align: center;
+        margin-bottom: 20px;
+        font-size: 1.3rem;
+    }
+
+.timeline-row {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 12px 0;
+    position: relative;
+}
+
+    .timeline-row:not(:last-child)::after {
+        content: '';
+        position: absolute;
+        left: 12px;
+        top: 40px;
+        height: 50px;
+        width: 2px;
+        background: var(--gold);
+        opacity: 0.3;
+    }
+
+.timeline-point {
+    width: 14px;
+    height: 14px;
+    background: var(--gold);
+    border-radius: 50%;
+    box-shadow: 0 0 20px var(--gold);
+    flex-shrink: 0;
+}
+
+.timeline-title {
+    color: #fbbf24;
+    font-weight: 700;
+}
+
+.timeline-date {
+    color: #94a3b8;
+    font-size: 0.9rem;
+}
+
+.timeline-note {
+    color: #86efac;
+    font-style: italic;
+    margin-top: 4px;
+}
+
+/* NÚT LỌC VIP */
+.vip-filter-btn {
+    position: fixed;
+    right: 30px;
+    bottom: 30px;
+    width: 70px;
+    height: 70px;
+    background: linear-gradient(45deg, #1e293b, #334155);
+    border: 3px solid var(--gold);
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 9999;
+    box-shadow: 0 0 30px rgba(245,158,11,0.8);
+    transition: all 0.4s;
+}
+
+    .vip-filter-btn:hover {
+        transform: scale(1.15);
+        box-shadow: 0 0 50px rgba(245,158,11,1);
+    }
+
+    .vip-filter-btn i {
+        font-size: 1.8rem;
+        color: var(--gold);
+    }
+
+.btn-text {
+    font-size: 0.7rem;
+    margin-top: 4px;
+    color: #fbbf24;
+    font-weight: 700;
+}
+
+.pulse-ring {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border: 3px solid var(--gold);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+    opacity: 0;
+}
+
+.btn-glow {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at center, rgba(245,158,11,0.3), transparent 70%);
+    border-radius: 50%;
+    filter: blur(20px);
+}
+
+/* DRAWER */
+.vip-filter-drawer {
+    position: fixed;
+    right: -400px;
+    top: 0;
+    width: 400px;
+    height: 100vh;
+    background: linear-gradient(to left, #0f172a, #1e293b);
+    backdrop-filter: blur(20px);
+    z-index: 1001;
+    transition: right 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
+    box-shadow: -20px 0 50px rgba(0,0,0,0.8);
+}
+
+    .vip-filter-drawer.active {
+        right: 0;
+    }
+
+.drawer-header {
+    padding: 25px;
+    background: linear-gradient(135deg, var(--gold), #dc2626);
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.vip-select {
+    background: rgba(30, 41, 59, 0.8);
+    border: 2px solid var(--gold);
+    color: white;
+    border-radius: 12px;
+    padding: 14px;
+}
+
+.apply-btn {
+    margin-top: 30px;
+    background: var(--gold);
+    color: black;
+    border: none;
+    padding: 16px;
+    border-radius: 50px;
+    font-weight: 900;
+    width: 100%;
+    font-size: 1.1rem;
+    transition: all 0.3s;
+}
+
+    .apply-btn:hover {
+        background: #fbbf24;
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(245,158,11,0.5);
+    }
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+    .contract-grid {
+        grid-template-columns: 1fr;
+        padding: 0 15px;
+    }
+
+    .hero-title {
+        font-size: 3rem;
+    }
+
+    .total-amount .amount {
+        font-size: 2.5rem;
+    }
+
+    .vip-filter-drawer {
+        width: 100%;
+        right: -100%;
+    }
+
+        .vip-filter-drawer.active {
+            right: 0;
+        }
+}
+
+/* ANIMATION */
+@keyframes rotate {
+    to {
+        transform: translate(-50%, -50%) rotate(360deg);
+    }
+}
+
+@keyframes float {
+    0%,100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-20px);
+    }
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        opacity: 0;
+    }
+
+    70% {
+        opacity: 0.8;
+    }
+
+    100% {
+        transform: scale(1.6);
+        opacity: 0;
+    }
+}
+
+/* SPINNER VIP */
+.luxury-spinner {
+    width: 80px;
+    height: 80px;
+    border: 6px solid rgba(245,158,11,0.2);
+    border-top-color: #f59e0b;
+    border-right-color: #d97706;
+    border-bottom-color: #dc2626;
+    border-radius: 50%;
+    animation: spin 1.5s linear infinite;
+    margin: 0 auto;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.empty-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 80px 20px;
+    color: #94a3b8;
+}
+/* ============== CHI TIẾT – 1 HÀNG 3 BẢNG (GIỐNG DỊCH VỤ NHƯNG VIP HƠN) ============== */
+.details-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.detail-item {
+    background: rgba(30, 41, 59, 0.7);
+    border-radius: 18px;
+    padding: 20px;
+    border: 1px solid rgba(245,158,11,0.3);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.6);
+    transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+    position: relative;
+    cursor: pointer;
+    min-height: 180px;
+    overflow: hidden;
+}
+
+    .detail-item:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 40px rgba(245,158,11,0.4);
+        border-color: var(--gold);
+    }
+
+    .detail-item::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, rgba(245,158,11,0.1), transparent);
+        opacity: 0;
+        transition: opacity 0.4s;
+        pointer-events: none;
+    }
+
+    .detail-item:hover::before {
+        opacity: 1;
+    }
+
+    /* KHI MỞ RỘNG → CHIẾM 2 CỘT (GIỐNG DỊCH VỤ) */
+    .detail-item.expanded {
+        grid-column: span 2;
+        min-height: auto;
+        z-index: 10;
+    }
+
+.item-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 18px;
+    color: var(--gold);
+    font-weight: 900;
+    font-size: 1.1rem;
+    text-shadow: 0 0 15px rgba(245,158,11,0.6);
+}
+
+    .item-header i {
+        font-size: 1.4rem;
+        color: #fbbf24;
+    }
+
+/* TEXT TRUNCATE + ELLIPSIS KHI CHƯA MỞ */
+.text-truncate {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+    max-width: 180px;
+}
+
+/* KHI MỞ RỘNG → HIỆN ĐỦ NỘI DUNG */
+.detail-item.expanded .text-truncate {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    max-width: none;
+}
+
+/* RESPONSIVE – XUỐNG DÒNG ĐẸP */
+@media (max-width: 1200px) {
+    .details-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .detail-item.expanded {
+        grid-column: span 2;
+    }
+}
+
+@media (max-width: 768px) {
+    .details-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .detail-item.expanded {
+        grid-column: 1 / -1;
+    }
+}
+/* ============== CHI TIẾT – NHỎ GỌN, ĐẸP NHƯ DỊCH VỤ, NHƯNG VIP HƠN ============== */
+.details-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.detail-item {
+    background: rgba(30, 41, 59, 0.75);
+    border-radius: 16px;
+    padding: 14px 16px;
+    border: 1px solid rgba(245,158,11,0.3);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.5);
+    transition: all 0.4s ease;
+    position: relative;
+    cursor: pointer;
+    min-height: 140px !important;
+    max-height: 200px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+    .detail-item:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 16px 32px rgba(245,158,11,0.35);
+        border-color: var(--gold);
+    }
+
+    .detail-item::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, rgba(245,158,11,0.12), transparent 70%);
+        opacity: 0;
+        transition: opacity 0.4s;
+        pointer-events: none;
+        border-radius: 16px;
+    }
+
+    .detail-item:hover::before {
+        opacity: 1;
+    }
+
+    /* KHI MỞ RỘNG → CHIẾM 2 CỘT, CAO HƠN */
+    .detail-item.expanded {
+        grid-column: span 2;
+        min-height: auto !important;
+        max-height: none;
+        z-index: 10;
+        padding: 20px;
+    }
+
+.item-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    color: var(--gold);
+    font-weight: 900;
+    font-size: 1rem;
+    text-shadow: 0 0 12px rgba(245,158,11,0.5);
+}
+
+    .item-header i {
+        font-size: 1.2rem;
+        color: #fbbf24;
+    }
+
+.item-body {
+    flex: 1;
+    font-size: 0.82rem;
+    line-height: 1.4;
+}
+
+    .item-body div {
+        display: flex;
+        justify-content: space-between;
+        padding: 5px 0;
+        border-bottom: 1px dashed rgba(255,255,255,0.12);
+    }
+
+        .item-body div:last-child {
+            border: none;
+            padding-top: 8px;
+            margin-top: 6px;
+            border-top: 1.5px solid var(--gold);
+            font-weight: 900;
+            font-size: 0.9rem;
+            color: #86efac;
+        }
+
+/* TEXT TRUNCATE SIÊU CHUẨN */
+.text-truncate {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+    max-width: 100%;
+}
+
+/* KHI MỞ RỘNG → HIỆN ĐỦ */
+.detail-item.expanded .text-truncate {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    max-width: none;
+}
+
+/* RESPONSIVE */
+@media (max-width: 1200px) {
+    .details-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .detail-item.expanded {
+        grid-column: span 2;
+    }
+}
+
+@media (max-width: 768px) {
+    .details-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .detail-item.expanded {
+        grid-column: 1 / -1;
+    }
+}
+
+
+/* ==================== NỀN SIÊU SANG 2025 – ĐEN VÀNG KIM CƯƠNG – ĐỈNH CAO LUXURY ==================== */
+
+/* NỀN TOÀN TRANG */
+body {
+    background: #000;
+    background: linear-gradient(135deg, #000000 0%, #0f0a1e 50%, #1a0d2e 100%);
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+}
+
+    body::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: radial-gradient(circle at 20% 80%, rgba(245,158,11,0.15) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(139,92,246,0.1) 0%, transparent 50%), radial-gradient(circle at 50% 50%, rgba(245,158,11,0.08) 0%, transparent 70%);
+        pointer-events: none;
+        z-index: -2;
+        animation: breath 20s infinite ease-in-out;
+    }
+
+    body::after {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-image: repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(245,158,11,0.03) 35px, rgba(245,158,11,0.03) 70px), repeating-linear-gradient(-45deg, transparent, transparent 35px, rgba(139,92,246,0.03) 35px, rgba(139,92,246,0.03) 70px);
+        pointer-events: none;
+        z-index: -1;
+    }
+
+/* NÂNG CẤP HERO – SANG HƠN 300% */
+.contract-hero {
+    padding: 160px 20px 120px;
+    background: radial-gradient(ellipse at top, #1a0d2e 0%, transparent 70%), radial-gradient(ellipse at bottom, #000000 0%, transparent 60%), linear-gradient(135deg, #0f0a1e 0%, #1e0d35 50%, #000000 100%);
+    position: relative;
+    overflow: hidden;
+    border-bottom: 1px solid rgba(245,158,11,0.3);
+}
+
+    .contract-hero::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: conic-gradient(from 0deg at 50% 50%, transparent, rgba(245,158,11,0.15), rgba(139,92,246,0.12), rgba(245,158,11,0.15), transparent);
+        animation: rotate 60s linear infinite;
+        opacity: 0.4;
+    }
+
+    .contract-hero::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at 30% 30%, rgba(245,158,11,0.2) 0%, transparent 40%), radial-gradient(circle at 70% 70%, rgba(139,92,246,0.15) 0%, transparent 40%);
+        pointer-events: none;
+    }
+
+/* NÂNG CẤP NỀN CHỨA CARD – CÓ CHIỀU SÂU, CÓ ÁNH KIM */
+.contract-section {
+    padding: 100px 20px;
+    background: transparent;
+    position: relative;
+    z-index: 1;
+}
+
+    .contract-section::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to bottom, rgba(15,10,30,0.95) 0%, rgba(10,5,23,0.98) 100%), url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="none"/><path d="M50,5 L92,40 L92,60 L50,95 L8,60 L8,40 Z" fill="none" stroke="rgba(245,158,11,0.04)" stroke-width="1"/></svg>') repeat;
+        backdrop-filter: blur(10px);
+        mask-image: linear-gradient(to bottom, black 90%, transparent);
+        -webkit-mask-image: linear-gradient(to bottom, black 90%, transparent);
+        pointer-events: none;
+    }
+
+/* HIỆU ỨNG ÁNH KIM LẤP LÁNH NHẸ KHI DI CHUỘT */
+@keyframes breath {
+    0%, 100% {
+        opacity: 0.6;
+    }
+
+    50% {
+        opacity: 1;
+    }
+}
+
+/* CARD CHÍNH – NÂNG CẤP ĐỘ SÂU */
+.contract-card {
+    background: rgba(20, 15, 40, 0.65) !important;
+    backdrop-filter: blur(20px) !important;
+    border: 1px solid rgba(245,158,11,0.5) !important;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.9), inset 0 0 30px rgba(245,158,11,0.15) !important;
+}
+
+/* NÚT "XEM CHI TIẾT" – SANG HƠN */
+.toggle-details {
+    background: linear-gradient(to right, #1e0d35, #2d1b69) !important;
+    color: #fbbf24 !important;
+    font-weight: 800 !important;
+    letter-spacing: 1px;
+    text-shadow: 0 0 10px rgba(251,191,36,0.6);
+}
+
+    .toggle-details:hover {
+        background: linear-gradient(to right, var(--gold), #f59e0b) !important;
+        color: #000 !important;
+        transform: translateY(-2px);
+    }
+
+/* KHI MỞ CHI TIẾT – NỀN ĐẬM HƠN */
+.contract-details {
+    background: linear-gradient(to bottom, rgba(15,10,35,0.95), rgba(10,5,25,0.98)) !important;
+    border-top: 1px solid var(--gold);
+    box-shadow: inset 0 10px 30px rgba(245,158,11,0.2);
+}
+
+
+/* ==================== ĐOẠN BỔ SUNG – ĐỂ NÚT KIM CƯƠNG + DRAWER HOẠT ĐỘNG GIỐNG HỆT PHẦN DỊCH VỤ ==================== */
+
+.filter-diamond-btn {
+    position: fixed;
+    left: 28px;
+    bottom: 38px;
+    width: 80px;
+    height: 80px;
+    z-index: 9999;
+    cursor: pointer;
+    animation: diamondFloat 6s infinite ease-in-out;
+}
+
+.diamond-outer {
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    border-radius: 50%;
+    padding: 8px;
+    box-shadow: 0 0 30px rgba(0,255,255,0.6), 0 0 60px rgba(255,0,255,0.4), inset 0 0 30px rgba(0,255,255,0.2);
+    animation: diamondPulse 4s infinite;
+}
+
+.diamond-inner {
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at 30% 30%, #1a1a2e, #0f0f1e);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    box-shadow: 0 0 40px rgba(0,255,255,0.8), 0 0 80px rgba(255,0,255,0.5), inset 0 0 40px rgba(0,255,255,0.3);
+}
+
+.diamond-icon {
+    width: 52px;
+    height: 52px;
+    filter: drop-shadow(0 0 20px #00ffff);
+}
+
+.filter-icon-text {
+    position: absolute;
+    font-size: 1.6rem;
+    color: white;
+    text-shadow: 0 0 20px #00ffff, 0 0 40px #ff00ff;
+    animation: textGlow 3s infinite alternate;
+}
+
+.diamond-badge {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    background: linear-gradient(45deg, #ff006e, #ffbe0b);
+    color: white;
+    font-weight: 900;
+    font-size: 0.8rem;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 20px rgba(255, 0, 68, 0.9);
+    border: 3px solid white;
+    animation: badgePulse 1.5s infinite;
+}
+
+/* DRAWER LỌC GIỐNG DỊCH VỤ */
+.filter-drawer {
+    position: fixed;
+    left: -400px;
+    top: 0;
+    width: 380px;
+    height: 100vh;
+    background: linear-gradient(to bottom, #0f172a, #0c0a1f);
+    backdrop-filter: blur(20px);
+    border-right: 1px solid rgba(217, 119, 6, 0.3);
+    box-shadow: 20px 0 50px rgba(0,0,0,0.7);
+    z-index: 1000;
+    transition: left 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+    overflow-y: auto;
+}
+
+    .filter-drawer.open {
+        left: 0;
+    }
+
+.filter-drawer-header {
+    padding: 20px;
+    background: linear-gradient(135deg, #d97706, #dc2626);
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 900;
+}
+
+.filter-close-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.8rem;
+    cursor: pointer;
+}
+
+.filter-drawer-body {
+    padding: 30px 25px;
+}
+
+.filter-label {
+    color: #facc15;
+    font-weight: 700;
+    margin-bottom: 12px;
+    display: block;
+}
+
+.filter-select {
+    background: rgba(15, 25, 50, 0.8);
+    border: 2px solid #d97706;
+    color: white;
+    border-radius: 12px;
+    padding: 12px 16px;
+}
+
+.filter-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.4s;
+    z-index: 999;
+}
+
+    .filter-overlay.active {
+        opacity: 1;
+        visibility: visible;
+    }
+
+/* ANIMATION */
+@keyframes diamondFloat {
+    0%,100% {
+        transform: translateY(0) rotate(0deg);
+    }
+
+    50% {
+        transform: translateY(-15px) rotate(5deg);
+    }
+}
+
+@keyframes diamondPulse {
+    0%,100% {
+        box-shadow: 0 0 30px rgba(0,255,255,0.6), 0 0 60px rgba(255,0,255,0.4);
+    }
+
+    50% {
+        box-shadow: 0 0 50px rgba(0,255,255,1), 0 0 100px rgba(255,0,255,0.8);
+    }
+}
+
+@keyframes textGlow {
+    from {
+        text-shadow: 0 0 20px #00ffff, 0 0 40px #ff00ff;
+    }
+
+    to {
+        text-shadow: 0 0 40px #00ffff, 0 0 80px #ff00ff;
+    }
+}
+
+@keyframes badgePulse {
+    0%,100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.2);
+    }
+}

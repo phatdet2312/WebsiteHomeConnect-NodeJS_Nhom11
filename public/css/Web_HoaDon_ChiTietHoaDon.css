@@ -1,0 +1,616 @@
+﻿/* /css/Web_HoaDon_ChiTietHoaDon.css */
+
+/* Root Variables (đồng bộ với Layout_Web.css) */
+:root {
+    --primary-color: #F28C38; /* Cam đậm */
+    --secondary-color: #007BFF; /* Xanh dương */
+    --background-dark: #1A1A1A; /* Đen */
+    --background-gray: #2D2D2D; /* Xám đậm */
+    --text-light: #FFFFFF; /* Trắng */
+    --text-muted: #A0A0A0; /* Xám nhạt */
+    --font-primary: 'Inter', sans-serif;
+    --font-heading: 'Montserrat', sans-serif;
+    --header-height: 80px;
+    --title-height: 60px; /* Chiều cao tiêu đề cố định */
+}
+
+/* Chi Tiet Hoa Don Section */
+.chi-tiet-hoa-don-section {
+    padding: calc(40px + var(--title-height)) 0 40px; /* Thêm padding-top để tránh che bởi tiêu đề */
+    max-width: 1400px;
+    margin: 0 auto;
+    background-color: transparent; /* Trong suốt để thấy hình mờ */
+}
+
+/* Page Title */
+.page-title {
+    position: fixed;
+    top: var(--header-height); /* Ngay dưới header */
+    left: 0;
+    width: 100%;
+    background-color: var(--background-gray);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    z-index: 900; /* Dưới header (z-index: 1000) */
+    text-align: center;
+    padding: 15px 0;
+}
+
+    .page-title h2 {
+        font-family: var(--font-heading);
+        font-size: 2rem;
+        color: var(--text-light);
+        margin: 0;
+    }
+
+/* Card Thông Tin Giao Hàng */
+.giao-hang-card {
+    background-color: var(--background-gray);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 30px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+    .giao-hang-card h4 {
+        font-family: var(--font-heading);
+        font-size: 1.5rem;
+        color: var(--text-light);
+        margin-bottom: 15px;
+    }
+
+    .giao-hang-card p {
+        font-size: 1rem;
+        color: var(--text-muted);
+        margin: 0;
+    }
+
+    .giao-hang-card .btn-primary {
+        background-color: var(--primary-color);
+        border: none;
+        padding: 8px 16px;
+        font-size: 0.9rem;
+        border-radius: 5px;
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+        .giao-hang-card .btn-primary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+/* Thông Tin Hóa Đơn Table */
+.thong-tin-hoa-don-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background-color: var(--background-gray);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 30px;
+}
+
+    .thong-tin-hoa-don-table th,
+    .thong-tin-hoa-don-table td {
+        padding: 12px 15px;
+        text-align: left;
+        font-size: 0.9rem;
+        color: var(--text-light);
+        border-bottom: 1px solid var(--text-muted);
+    }
+
+    .thong-tin-hoa-don-table th {
+        background-color: var(--background-gray);
+        font-weight: 600;
+        font-family: var(--font-heading);
+        width: 30%;
+    }
+
+    .thong-tin-hoa-don-table td {
+        vertical-align: middle;
+    }
+
+    .thong-tin-hoa-don-table span {
+        display: block;
+        line-height: 1.4;
+    }
+
+/* Danh Sách Sản Phẩm Table */
+.san-pham-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background-color: var(--background-gray);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+    .san-pham-table th,
+    .san-pham-table td {
+        padding: 12px 15px;
+        text-align: left;
+        font-size: 0.9rem;
+        color: var(--text-light);
+    }
+
+    .san-pham-table th {
+        background-color: var(--primary-color);
+        font-weight: 600;
+        font-family: var(--font-heading);
+    }
+
+    .san-pham-table td {
+        border-bottom: 1px solid var(--secondary-color);
+    }
+
+    .san-pham-table tr {
+        transition: background-color 0.3s, box-shadow 0.3s;
+    }
+
+        .san-pham-table tr:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+    .san-pham-table img {
+        width: 50px;
+        height: 50px;
+        object-fit: cover;
+        border-radius: 5px;
+    }
+
+    .san-pham-table tfoot td {
+        font-weight: 600;
+        background-color: var(--background-dark);
+        color: var(--primary-color);
+    }
+
+/* Action Buttons */
+.action-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+    .action-buttons .btn {
+        padding: 8px 16px;
+        font-size: 0.9rem;
+        border-radius: 5px;
+    }
+
+    .action-buttons .btn-primary {
+        background-color: var(--primary-color);
+        border: none;
+    }
+
+    .action-buttons .btn-secondary {
+        background-color: var(--text-muted);
+        border: none;
+    }
+
+    .action-buttons .form-select {
+        background-color: var(--background-dark);
+        color: var(--text-light);
+        border: 1px solid var(--text-muted);
+        padding: 8px;
+        font-size: 0.9rem;
+        border-radius: 5px;
+    }
+
+/* No Data Message */
+.no-data {
+    text-align: center;
+    font-size: 1.2rem;
+    color: var(--text-muted);
+    background-color: rgba(0, 0, 0, 0.3);
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 30px;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+    .page-title h2 {
+        font-size: 1.8rem;
+    }
+
+    .thong-tin-hoa-don-table th,
+    .thong-tin-hoa-don-table td,
+    .san-pham-table th,
+    .san-pham-table td {
+        font-size: 0.85rem;
+        padding: 10px;
+    }
+}
+
+@media (max-width: 768px) {
+    .page-title h2 {
+        font-size: 1.5rem;
+    }
+
+    .chi-tiet-hoa-don-section {
+        padding: calc(30px + var(--title-height)) 10px 30px;
+    }
+
+    /* Thong Tin Hoa Don Table Responsive */
+    .thong-tin-hoa-don-table {
+        display: block;
+        background-color: transparent;
+    }
+
+        .thong-tin-hoa-don-table tbody,
+        .thong-tin-hoa-don-table tr {
+            display: block;
+        }
+
+        .thong-tin-hoa-don-table tr {
+            margin-bottom: 15px;
+            border-radius: 10px;
+            background-color: var(--background-gray);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .thong-tin-hoa-don-table th,
+        .thong-tin-hoa-don-table td {
+            display: flex;
+            align-items: flex-start;
+            padding: 10px 15px;
+            border-bottom: 1px solid var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .thong-tin-hoa-don-table th {
+            background-color: transparent;
+            color: var(--primary-color);
+            font-weight: 600;
+            flex: 0 0 35%;
+            min-width: 120px;
+        }
+
+        .thong-tin-hoa-don-table td {
+            flex: 1;
+            word-break: break-word;
+        }
+
+    /* San Pham Table Responsive */
+    .san-pham-table {
+        display: block;
+        background-color: transparent;
+    }
+
+        .san-pham-table thead {
+            display: none;
+        }
+
+        .san-pham-table tbody,
+        .san-pham-table tr {
+            display: block;
+        }
+
+        .san-pham-table tr {
+            margin-bottom: 20px;
+            border-radius: 10px;
+            background-color: var(--background-gray);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .san-pham-table td {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            padding: 10px 15px;
+            border-bottom: 1px solid var(--text-muted);
+            font-size: 0.9rem;
+            position: relative;
+        }
+
+            .san-pham-table td:before {
+                content: attr(data-label);
+                font-weight: 600;
+                color: var(--primary-color);
+                margin-right: 10px;
+                flex: 0 0 35%;
+                min-width: 100px;
+            }
+
+            .san-pham-table td:last-child {
+                border-bottom: none;
+            }
+
+        .san-pham-table tfoot {
+            display: block;
+        }
+
+            .san-pham-table tfoot tr {
+                background-color: var(--background-dark);
+            }
+
+            .san-pham-table tfoot td {
+                display: flex;
+                justify-content: space-between;
+                font-size: 1rem;
+                padding: 15px;
+            }
+
+        .san-pham-table td img {
+            width: 40px;
+            height: 40px;
+        }
+
+    .action-buttons {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+        .action-buttons .btn,
+        .action-buttons .form-select {
+            width: 100%;
+            max-width: 200px;
+        }
+}
+
+@media (max-width: 576px) {
+    .page-title h2 {
+        font-size: 1.3rem;
+    }
+
+    .chi-tiet-hoa-don-section {
+        padding: calc(20px + var(--title-height)) 10px 20px;
+    }
+
+    .giao-hang-card h4 {
+        font-size: 1.3rem;
+    }
+
+    .giao-hang-card p {
+        font-size: 0.9rem;
+    }
+
+    .thong-tin-hoa-don-table th,
+    .thong-tin-hoa-don-table td,
+    .san-pham-table td {
+        font-size: 0.8rem;
+    }
+
+        .san-pham-table td:before {
+            flex: 0 0 30%;
+            min-width: 80px;
+        }
+
+    .action-buttons .btn,
+    .action-buttons .form-select {
+        font-size: 0.8rem;
+        padding: 6px 12px;
+    }
+}
+
+
+
+/* Order Timeline Container */
+.order-timeline-container {
+    background-color: var(--background-gray);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 30px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+    .order-timeline-container h4 {
+        font-family: var(--font-heading);
+        font-size: 1.5rem;
+        color: var(--text-light);
+        margin-bottom: 20px;
+    }
+
+/* Timeline Wrapper */
+.timeline-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    position: relative;
+}
+
+/* Progress Bar */
+.timeline-progress {
+    width: 100%;
+    height: 4px;
+    background-color: var(--text-muted);
+    border-radius: 2px;
+    overflow: hidden;
+    position: relative;
+}
+
+.timeline-progress-bar {
+    height: 100%;
+    background-color: var(--primary-color);
+    transition: width 0.5s ease;
+}
+
+/* Timeline Steps */
+.timeline-steps {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+}
+
+.timeline-step {
+    flex: 1;
+    text-align: center;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.timeline-step-icon {
+    width: 65px;
+    height: 65px;
+    background-color: transparent; /* Nền trong suốt */
+    border: 2px solid var(--text-muted);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+    .timeline-step-icon img {
+        width: 60px;
+        height: 60px;
+        object-fit: contain;
+    }
+
+.timeline-step.completed .timeline-step-icon {
+    border-color: var(--primary-color); /* Viền cam cho trạng thái hoàn thành */
+}
+
+.timeline-step.active .timeline-step-icon {
+    border-color: var(--secondary-color); /* Viền xanh dương cho trạng thái đang xử lý */
+    animation: pulse 1.5s infinite;
+}
+
+.timeline-step-status {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-light);
+    margin: 0;
+}
+
+.timeline-step.completed .timeline-step-status {
+    color: var(--primary-color);
+}
+
+.timeline-step.active .timeline-step-status {
+    color: var(--secondary-color);
+}
+
+.timeline-step-time {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin: 0;
+}
+
+/* Tooltip */
+.timeline-step-tooltip {
+    visibility: hidden;
+    background-color: var(--background-dark);
+    color: var(--text-light);
+    font-size: 0.8rem;
+    padding: 8px 12px;
+    border-radius: 5px;
+    position: absolute;
+    top: -40px;
+    white-space: nowrap;
+    z-index: 10;
+    opacity: 0;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.timeline-step:hover .timeline-step-tooltip {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* Animation for Active Step */
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(0, 123, 255, 0.7);
+    }
+
+    50% {
+        transform: scale(1.1);
+        box-shadow: 0 0 0 10px rgba(0, 123, 255, 0);
+    }
+
+    100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(0, 123, 255, 0);
+    }
+}
+
+/* Mobile Styles */
+@media (max-width: 768px) {
+    .order-timeline-container {
+        padding: 15px;
+    }
+
+        .order-timeline-container h4 {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+        }
+
+    .timeline-wrapper {
+        gap: 15px;
+    }
+
+    /* Progress Bar (Mobile) */
+    .timeline-progress {
+        width: 4px;
+        height: 100%;
+        position: absolute;
+        left: 17px; /* Căn giữa với hình tròn */
+        top: 0;
+        bottom: 0;
+    }
+
+    .timeline-progress-bar {
+        width: 100%;
+        height: var(--progress-height, 0%); /* Động theo tiến độ */
+        transition: height 0.5s ease;
+    }
+
+    /* Timeline Steps (Mobile) */
+    .timeline-steps {
+        flex-direction: column;
+        gap: 35px;
+        position: relative;
+        padding-left: 40px; /* Để lại không gian cho thanh tiến trình và hình tròn */
+
+    }
+
+    .timeline-step {
+        flex: none;
+        text-align: left;
+        flex-direction: row;
+        align-items: center;
+        gap: 12px;
+        position: relative;
+        padding-left: 20px; /* Tăng để đẩy tên trạng thái và thời gian ra xa icon */
+    }
+
+    .timeline-step-icon {
+        width: 50px;
+        height: 50px;
+        position: absolute;
+        left: -40px; /* Đặt hình tròn sát thanh tiến trình */
+    }
+
+        .timeline-step-icon img {
+            width: 45px;
+            height: 45px;
+        }
+
+    .timeline-step-status {
+        font-size: 0.85rem;
+    }
+
+    .timeline-step-time {
+        font-size: 0.75rem;
+    }
+
+    /* Tooltip (Mobile) */
+    .timeline-step-tooltip {
+        top: auto;
+        bottom: -30px;
+        left: 0;
+        right: auto;
+        transform: none;
+    }
+
+    .timeline-step:hover .timeline-step-tooltip {
+        visibility: visible;
+        opacity: 1;
+    }
+}

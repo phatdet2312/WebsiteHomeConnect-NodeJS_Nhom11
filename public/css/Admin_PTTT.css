@@ -1,0 +1,313 @@
+﻿/*css/Admin_PTTT.css*/
+.content-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.search-container {
+    margin-bottom: 20px;
+}
+
+.search-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    max-width: 500px;
+}
+
+.search-input {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.search-btn {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+}
+
+    .search-btn:hover {
+        background-color: #0056b3;
+    }
+
+.suggestions {
+    display: none;
+    position: absolute;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    max-height: 200px;
+    overflow-y: auto;
+    width: 100%;
+    max-width: 500px;
+    z-index: 1000;
+}
+
+    .suggestions.show {
+        display: block;
+    }
+
+.suggestion-item {
+    padding: 10px;
+    font-size: 14px;
+    color: #333;
+    cursor: default;
+    border-bottom: 1px solid #f1f1f1;
+}
+
+    .suggestion-item:last-child {
+        border-bottom: none;
+    }
+
+.alert {
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.alert-error {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.action-bar {
+    margin-bottom: 20px;
+}
+
+.action-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.add-btn {
+    background-color: #28a745;
+    color: #fff;
+}
+
+    .add-btn:hover {
+        background-color: #218838;
+    }
+
+.table-container {
+    max-height: calc(100vh - 300px);
+    overflow-y: auto;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #fff;
+}
+
+    .data-table th,
+    .data-table td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .data-table th {
+        background-color: #007bff;
+        color: #fff;
+        position: sticky;
+        top: 0;
+        z-index: 900;
+    }
+
+    .data-table tbody tr:hover {
+        background-color: #f9f9f9;
+    }
+
+.status-link {
+    text-decoration: none;
+    font-size: 14px;
+    padding: 5px 10px;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+}
+
+.status-on {
+    color: #28a745;
+}
+
+    .status-on:hover {
+        background-color: #28a745;
+        color: #fff;
+    }
+
+.status-off {
+    color: #dc3545;
+}
+
+    .status-off:hover {
+        background-color: #dc3545;
+        color: #fff;
+    }
+
+.action-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.action-link {
+    text-decoration: none;
+    font-size: 14px;
+    padding: 5px 10px;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+}
+
+.view-link {
+    color: #007bff;
+}
+
+    .view-link:hover {
+        background-color: #007bff;
+        color: #fff;
+    }
+
+.edit-link {
+    color: #ff9900;
+}
+
+    .edit-link:hover {
+        background-color: #ff9900;
+        color: #fff;
+    }
+
+.fixed-bar {
+    position: sticky;
+    bottom: 0;
+    background-color: #f9f9f9;
+    padding: 10px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    border-top: 1px solid #ddd;
+    z-index: 900;
+}
+
+.filter-select {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+    margin-right: 10px;
+}
+
+.process-btn {
+    background-color: #28a745;
+    color: #fff;
+}
+
+    .process-btn:hover {
+        background-color: #218838;
+    }
+
+.delete-btn {
+    background-color: #dc3545;
+    color: #fff;
+}
+
+    .delete-btn:hover {
+        background-color: #c82333;
+    }
+
+    .process-btn:disabled,
+    .delete-btn:disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+    }
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: #333;
+}
+
+.hide-btn {
+    background-color: #ff9900;
+    color: #fff;
+}
+
+    .hide-btn:hover {
+        background-color: #e68a00;
+    }
+
+.detail-btn {
+    background-color: #17a2b8;
+    color: #fff;
+}
+
+    .detail-btn:hover {
+        background-color: #138496;
+    }
+
+.confirm-btn {
+    background-color: #007bff;
+    color: #fff;
+}
+
+    .confirm-btn:hover {
+        background-color: #0056b3;
+    }
+
+/* Thêm style cho form trong Update.cshtml */
+.form-group {
+    margin-bottom: 20px;
+    max-width: 500px;
+}
+
+.form-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.form-input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+    transition: border-color 0.3s ease;
+}
+
+    .form-input:focus {
+        outline: none;
+        border-color: #007bff;
+        box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+    }
+
+.error-message {
+    display: block;
+    font-size: 12px;
+    color: #dc3545;
+    margin-top: 5px;
+}

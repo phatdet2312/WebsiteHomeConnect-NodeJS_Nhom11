@@ -1,0 +1,270 @@
+﻿/* Web_LienHe.css */
+
+/* Root Variables (tái sử dụng từ Layout_Web.css để nhất quán) */
+:root {
+    --primary-color: #F28C38; /* Cam đậm */
+    --secondary-color: #007BFF; /* Xanh dương */
+    --background-dark: #1A1A1A; /* Đen */
+    --background-gray: #2D2D2D; /* Xám đậm */
+    --text-light: #FFFFFF; /* Trắng */
+    --text-muted: #A0A0A0; /* Xám nhạt */
+    --font-primary: 'Inter', sans-serif;
+    --font-heading: 'Montserrat', sans-serif;
+}
+
+/* Contact Page */
+.contact-page {
+    padding: 40px 0;
+    position: relative;
+    z-index: 3; /* Đảm bảo nội dung nằm trên lớp phủ nền */
+}
+
+    /* Section Title */
+    .contact-page .section-title {
+        font-family: var(--font-heading);
+        font-size: 2.8rem; /* Kích thước chữ lớn */
+        font-weight: 700; /* Độ đậm cao */
+        text-align: center;
+        margin-bottom: 25px;
+        color: transparent; /* Để sử dụng gradient */
+        background: linear-gradient(45deg, #FFAB40, #40C4FF); /* Gradient cam sáng → xanh dương sáng */
+        -webkit-background-clip: text;
+        background-clip: text;
+        text-transform: uppercase; /* Chữ in hoa */
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3); /* Bóng chữ */
+        position: relative;
+        animation: fadeInScale 1s ease-out forwards; /* Hiệu ứng động */
+        padding: 10px 0;
+    }
+
+/* Hiệu ứng động cho tiêu đề */
+@keyframes fadeInScale {
+    0% {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Đường viền dưới tiêu đề */
+.contact-page .section-title::after {
+    content: '';
+    display: block;
+    width: 100px;
+    height: 4px;
+    background: linear-gradient(90deg, #FFAB40, #40C4FF); /* Gradient cam sáng → xanh dương sáng */
+    margin: 10px auto 0; /* Căn giữa */
+    border-radius: 2px;
+}
+
+/* Section Subtitle */
+.contact-page .section-subtitle {
+    font-size: 1.2rem;
+    text-align: center;
+    color: var(--text-muted);
+    margin-bottom: 40px;
+}
+
+/* Contact Content */
+.contact-page .contact-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin-bottom: 40px;
+}
+
+/* Contact Info */
+.contact-page .contact-info {
+    background-color: var(--background-gray);
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+    .contact-page .contact-info h3 {
+        font-family: var(--font-heading);
+        font-size: 1.8rem;
+        color: var(--text-light);
+        margin-bottom: 20px;
+    }
+
+.contact-page .info-list {
+    list-style: none;
+    padding: 0;
+}
+
+    .contact-page .info-list li {
+        display: flex;
+        align-items: center;
+        margin-bottom: 15px;
+        font-size: 1rem;
+        color: var(--text-muted);
+    }
+
+        .contact-page .info-list li i {
+            font-size: 1.2rem;
+            color: var(--primary-color);
+            margin-right: 10px;
+        }
+
+        .contact-page .info-list li a {
+            color: var(--text-light);
+            text-decoration: none;
+        }
+
+            .contact-page .info-list li a:hover {
+                color: var(--primary-color);
+            }
+
+.contact-page .social-links h4 {
+    font-family: var(--font-heading);
+    font-size: 1.2rem;
+    color: var(--text-light);
+    margin: 20px 0 10px;
+}
+
+.contact-page .social-list {
+    display: flex;
+    gap: 10px;
+    padding: 0;
+    list-style: none;
+}
+
+.contact-page .social-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background-color: var(--primary-color);
+    color: var(--text-light);
+    border-radius: 50%;
+    text-decoration: none;
+    transition: background-color 0.3s;
+}
+
+    .contact-page .social-link:hover {
+        background-color: var(--secondary-color);
+    }
+
+/* Contact Form */
+.contact-page .contact-form {
+    background-color: var(--background-gray);
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+    .contact-page .contact-form h3 {
+        font-family: var(--font-heading);
+        font-size: 1.8rem;
+        color: var(--text-light);
+        margin-bottom: 20px;
+    }
+
+.contact-page .form-group {
+    margin-bottom: 20px;
+}
+
+    .contact-page .form-group label {
+        display: block;
+        font-family: var(--font-primary);
+        font-size: 0.9rem;
+        color: var(--text-light);
+        margin-bottom: 5px;
+    }
+
+.contact-page .form-control {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: var(--text-light);
+    color: var(--background-dark);
+    font-family: var(--font-primary);
+    font-size: 0.9rem;
+}
+
+    .contact-page .form-control:focus {
+        outline: none;
+        box-shadow: 0 0 5px var(--primary-color);
+    }
+
+    .contact-page .form-control.is-invalid {
+        border: 1px solid #dc3545;
+    }
+
+.contact-page .btn-primary {
+    width: 100%;
+    padding: 12px;
+    background-color: var(--primary-color);
+    color: var(--text-light);
+    border: none;
+    border-radius: 5px;
+    font-family: var(--font-primary);
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+    .contact-page .btn-primary:hover {
+        background-color: #d97a2e;
+    }
+
+/* Contact Map */
+.contact-page .contact-map {
+    margin-top: 40px;
+}
+
+    .contact-page .contact-map h3 {
+        font-family: var(--font-heading);
+        font-size: 1.8rem;
+        color: var(--text-light);
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    .contact-page .contact-map iframe {
+        width: 100%;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    }
+
+/* Responsive */
+@media (max-width: 992px) {
+    .contact-page .contact-content {
+        grid-template-columns: 1fr;
+    }
+
+    .contact-page .contact-info,
+    .contact-page .contact-form {
+        padding: 20px;
+    }
+
+    .contact-page .section-title {
+        font-size: 2.4rem; /* Giảm kích thước chữ trên tablet */
+    }
+}
+
+@media (max-width: 576px) {
+    .contact-page .section-title {
+        font-size: 2rem; /* Giảm kích thước chữ trên mobile */
+    }
+
+    .contact-page .section-subtitle {
+        font-size: 1rem;
+    }
+
+    .contact-page .contact-info h3,
+    .contact-page .contact-form h3 {
+        font-size: 1.5rem;
+    }
+
+    .contact-page .contact-map iframe {
+        height: 300px;
+    }
+}

@@ -1,0 +1,464 @@
+﻿/* wwwroot/css/Web_DichVu.css */
+/* TRANG DỊCH VỤ NGƯỜI DÙNG – ĐẸP NHƯ APP CAO CẤP 2025 */
+
+.services-hero {
+    padding: 100px 20px 80px;
+    text-align: center;
+    background: linear-gradient(135deg, rgba(242, 140, 56, 0.2), rgba(0, 123, 255, 0.1)), url('/images/background/services-bg.jpg') center/cover no-repeat;
+    position: relative;
+    overflow: hidden;
+}
+
+    .services-hero::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: radial-gradient(circle at center, rgba(0,0,0,0.4), transparent 70%);
+    }
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.hero-title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 3.5rem;
+    font-weight: 800;
+    background: linear-gradient(90deg, #FFAB40, #40C4FF, #F28C38);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    margin-bottom: 20px;
+    text-shadow: 0 4px 20px rgba(0,0,0,0.5);
+}
+
+.hero-subtitle {
+    font-size: 1.4rem;
+    color: #ddd;
+    margin-bottom: 40px;
+    font-weight: 300;
+}
+
+.btn-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    background: linear-gradient(135deg, #F28C38, #FF, #FF6B00);
+    color: white;
+    padding: 16px 36px;
+    border-radius: 50px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    text-decoration: none;
+    box-shadow: 0 10px 30px rgba(242, 140, 56, 0.4);
+    transition: all 0.4s ease;
+}
+
+    .btn-cta:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 40px rgba(242, 140, 56, 0.6);
+        background: linear-gradient(135deg, #FF6B00, #F28C38);
+    }
+
+/* SERVICES GRID */
+.services-section {
+    padding: 80px 20px;
+    background: rgba(26, 26, 26, 0.95);
+}
+
+.services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 30px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.service-card {
+    background: linear-gradient(145deg, #2a2a2a, #222);
+    border-radius: 20px;
+    padding: 40px 20px;
+    text-align: center;
+    transition: all 0.4s ease;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    border: 1px solid #333;
+    position: relative;
+    overflow: hidden;
+}
+
+    .service-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, rgba(242,140,56,0.1), transparent);
+        opacity: 0;
+        transition: opacity 0.4s;
+    }
+
+    .service-card:hover {
+        transform: translateY(-15px) scale(1.03);
+        box-shadow: 0 25px 60px rgba(242, 140, 56, 0.4);
+    }
+
+        .service-card:hover::before {
+            opacity: 1;
+        }
+
+.service-icon {
+    width: 100px;
+    height: 100px;
+    background: linear-gradient(135deg, #F28C38, #40C4FF);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 25px;
+    font-size: 3.5rem;
+    color: white;
+    box-shadow: 0 10px 30px rgba(242, 140, 56, 0.5);
+    transition: all 0.4s;
+}
+
+.service-card:hover .service-icon {
+    transform: scale(1.15);
+    box-shadow: 0 20px 50px rgba(242, 140, 56, 0.8);
+}
+
+.service-card h3 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.6rem;
+    color: white;
+    margin: 15px 0 10px;
+}
+
+.service-card p {
+    color: #aaa;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 2.8rem;
+    }
+
+    .hero-subtitle {
+        font-size: 1.2rem;
+    }
+
+    .btn-cta {
+        padding: 14px 28px;
+        font-size: 1.1rem;
+    }
+
+    .services-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+
+    .service-icon {
+        width: 80px;
+        height: 80px;
+        font-size: 2.8rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .services-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .hero-title {
+        font-size: 2.4rem;
+    }
+}
+
+
+/* GRADIENT RIÊNG CHO TỪNG DỊCH VỤ – SIÊU ĐẸP */
+.gradient-electric {
+    background: linear-gradient(135deg, #FFD700, #FFA500) !important;
+}
+
+.gradient-water {
+    background: linear-gradient(135deg, #00BFFF, #1E90FF) !important;
+}
+
+.gradient-internet {
+    background: linear-gradient(135deg, #32CD32, #00CED1) !important;
+}
+
+.gradient-trash {
+    background: linear-gradient(135deg, #8B4513, #A0522D) !important;
+}
+
+.gradient-clean {
+    background: linear-gradient(135deg, #00FF7F, #32CD32) !important;
+}
+
+.gradient-parking {
+    background: linear-gradient(135deg, #696969, #808080) !important;
+}
+
+.gradient-security {
+    background: linear-gradient(135deg, #DC143C, #FF4500) !important;
+}
+
+.gradient-elevator {
+    background: linear-gradient(135deg, #708090, #4682B4) !important;
+}
+
+.gradient-management {
+    background: linear-gradient(135deg, #9932CC, #8A2BE2) !important;
+}
+
+.gradient-pool {
+    background: linear-gradient(135deg, #00CED1, #20B2AA) !important;
+}
+
+.gradient-gym {
+    background: linear-gradient(135deg, #FF4500, #FF6347) !important;
+}
+
+.gradient-amenity {
+    background: linear-gradient(135deg, #228B22, #32CD32) !important;
+}
+
+.gradient-gas {
+    background: linear-gradient(135deg, #FF4500, #FF6347) !important;
+}
+
+.gradient-maintenance {
+    background: linear-gradient(135deg, #696969, #808080) !important;
+}
+
+.gradient-cable {
+    background: linear-gradient(135deg, #8B008B, #9932CC) !important;
+}
+
+.gradient-default {
+    background: linear-gradient(135deg, #F28C38, #40C4FF) !important;
+}
+
+
+
+.service-icon i.ti {
+    font-size: 4rem; /* Tabler icon đẹp hơn khi to */
+    color: white;
+}
+
+@media (max-width: 768px) {
+    .service-icon i.ti {
+        font-size: 3.2rem;
+    }
+}
+
+
+
+.service-card {
+    position: relative;
+    overflow: visible !important; /* QUAN TRỌNG: cho badge tràn ra ngoài */
+}
+
+.service-icon {
+    position: relative; /* Để badge absolute theo icon */
+    display: inline-flex;
+    z-index: 1;
+}
+
+.badge-unpaid {
+    position: absolute !important;
+    top: -10px !important;
+    right: -10px !important;
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: white;
+    font-weight: 900;
+    font-size: 0.8rem;
+    min-width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.7), 0 0 20px rgba(239, 68, 68, 0.4);
+    border: 3.5px solid white;
+    padding: 0 6px;
+    z-index: 20 !important;
+    animation: pulse-badge 2s infinite;
+    transform: translateZ(0); /* Fix nhảy lung tung trên một số trình duyệt */
+    backface-visibility: hidden;
+}
+
+@keyframes pulse-badge {
+    0%, 100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.18);
+    }
+}
+
+.service-card:hover .badge-unpaid {
+    transform: scale(1.25) !important;
+    box-shadow: 0 8px 30px rgba(239, 68, 68, 0.9), 0 0 30px rgba(239, 68, 68, 0.6);
+    animation: pulse-badge 1s infinite;
+}
+
+/* Đảm bảo icon không che badge */
+.service-icon i.ti {
+    position: relative;
+    z-index: 2;
+}
+/* BỎ GẠCH CHÂN CHO THẺ <a> KHI DÙNG LÀM CARD */
+.service-card-link {
+    text-decoration: none !important;
+    color: inherit !important;
+    display: block;
+}
+
+    .service-card-link:hover {
+        text-decoration: none !important;
+        color: inherit !important;
+    }
+
+    /* Đảm bảo các phần tử con không bị gạch chân */
+    .service-card-link h3,
+    .service-card-link p,
+    .service-card-link * {
+        text-decoration: none !important;
+    }
+/* Fix cho mobile */
+@media (max-width: 768px) {
+    .badge-unpaid {
+        top: -8px !important;
+        right: -8px !important;
+        font-size: 0.75rem;
+        min-width: 24px;
+        height: 24px;
+        border-width: 3px;
+    }
+}
+
+
+
+/*
+.gradient-electric {
+    background: linear-gradient(135deg, #FFD700, #FFA500);
+}
+
+.gradient-water {
+    background: linear-gradient(135deg, #40C4FF, #0288D1);
+}
+
+.gradient-internet {
+    background: linear-gradient(135deg, #00E676, #00C853);
+}
+
+.gradient-trash {
+    background: linear-gradient(135deg, #8D6E63, #6D4C41);
+}
+
+.gradient-clean {
+    background: linear-gradient(135deg, #4CAF50, #388E3C);
+}
+
+.gradient-security {
+    background: linear-gradient(135deg, #D32F2F, #B71C1C);
+}
+
+.gradient-parking {
+    background: linear-gradient(135deg, #7B1FA2, #512DA8);
+}
+
+.gradient-elevator {
+    background: linear-gradient(135deg, #616161, #424242);
+}
+
+.gradient-management {
+    background: linear-gradient(135deg, #F57C00, #E65100);
+}
+
+.gradient-pool {
+    background: linear-gradient(135deg, #00B0FF, #0091EA);
+}
+
+.gradient-gym {
+    background: linear-gradient(135deg, #FF4081, #F50057);
+}
+
+.gradient-amenity {
+    background: linear-gradient(135deg, #66BB6A, #43A047);
+}
+
+.gradient-default {
+    background: linear-gradient(135deg, #9E9E9E, #616161);
+}
+*/
+/* wwwroot/css/Web_HopDong.css */
+/* Copy toàn bộ từ Web_DichVu.css rồi thêm đoạn này vào cuối */
+
+/* THÊM VÀO CUỐI FILE wwwroot/css/Web_HopDong.css */
+.gradient-deposit {
+    background: linear-gradient(135deg, #FFD700, #FFA500, #FF8C00) !important;
+}
+
+.gradient-installment {
+    background: linear-gradient(135deg, #9C27B0, #E91E63, #C2185B) !important;
+}
+
+.gradient-fullpay {
+    background: linear-gradient(135deg, #4CAF50, #8BC34A, #66BB6A) !important;
+}
+
+.gradient-penalty {
+    background: linear-gradient(135deg, #F44336, #D32F2F, #B71C1C) !important;
+}
+
+.gradient-rent {
+    background: linear-gradient(135deg, #FF9800, #FF5722, #E64A19) !important;
+}
+
+.gradient-management {
+    background: linear-gradient(135deg, #2196F3, #03A9F4, #0288D1) !important;
+}
+
+.gradient-service {
+    background: linear-gradient(135deg, #00BCD4, #009688, #00796B) !important;
+}
+
+.gradient-parking {
+    background: linear-gradient(135deg, #607D8B, #455A64, #37474F) !important;
+}
+
+.gradient-car {
+    background: linear-gradient(135deg, #795548, #5D4037, #3E2723) !important;
+}
+
+.gradient-motorbike {
+    background: linear-gradient(135deg, #9E9E9E, #616161, #424242) !important;
+}
+
+.gradient-maintenance {
+    background: linear-gradient(135deg, #CDDC39, #8BC34A, #558B2F) !important;
+}
+
+.gradient-other {
+    background: linear-gradient(135deg, #9C27B0, #673AB7, #512DA8) !important;
+}
+
+.gradient-contract {
+    background: linear-gradient(135deg, #673AB7, #512DA8, #311B92) !important;
+}
+.gradient-prepayment {
+    background: linear-gradient(135deg, #00D4AA, #00A884, #007A63) !important;
+}

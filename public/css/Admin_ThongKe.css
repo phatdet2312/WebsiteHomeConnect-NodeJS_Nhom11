@@ -1,0 +1,135 @@
+﻿/* wwwroot/css/Admin_ThongKe.css */
+
+.content-wrapper {
+    max-height: calc(100vh - 200px); /* Giới hạn chiều cao, trừ header/footer */
+    overflow-y: auto; /* Cho phép cuộn dọc */
+    margin-bottom: 20px;
+}
+
+.content-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.card-block {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-bottom: 20px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+    .card-block:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+.card-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #007bff;
+    margin-bottom: 15px;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.info-item {
+    background-color: #f9f9f9;
+    padding: 15px;
+    border-radius: 5px;
+    text-align: center;
+}
+
+.info-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.info-value {
+    font-size: 20px;
+    font-weight: 700;
+    color: #007bff;
+}
+
+/* Định dạng container chứa các bộ lọc */
+.filter-container {
+    margin-bottom: 20px;
+}
+
+/* Bố cục hàng ngang cho các bộ lọc */
+.filter-row {
+    display: flex;
+    align-items: center;
+    gap: 20px; /* Khoảng cách giữa các bộ lọc */
+    flex-wrap: wrap; /* Cho phép xuống dòng nếu không đủ không gian */
+}
+
+/* Định dạng nhóm bộ lọc */
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px; /* Khoảng cách giữa label và select */
+}
+
+/* Định dạng nhãn bộ lọc */
+.filter-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+}
+
+/* Định dạng select */
+.filter-select {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+    width: 200px;
+    transition: border-color 0.3s ease;
+}
+
+    .filter-select:focus {
+        outline: none;
+        border-color: #007bff;
+        box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+    }
+
+.chart-container {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-bottom: 20px;
+    width: 100%; /* Đảm bảo container chiếm toàn bộ chiều rộng */
+    overflow: hidden; /* Ngăn nội dung vượt ra ngoài */
+}
+
+.chart-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #007bff;
+    margin-bottom: 15px;
+}
+
+/* Đảm bảo biểu đồ Morris không bị ảnh hưởng */
+#myfirstchart {
+    height: 250px;
+    width: 100% !important; /* Đảm bảo biểu đồ co giãn theo container */
+    max-width: 100%; /* Ngăn vượt quá container */
+}
+
+    #myfirstchart svg {
+        width: 100% !important; /* Ép SVG co giãn theo container */
+        max-width: 100% !important; /* Ngăn SVG vượt container */
+        height: auto; /* Đảm bảo tỷ lệ */
+    }

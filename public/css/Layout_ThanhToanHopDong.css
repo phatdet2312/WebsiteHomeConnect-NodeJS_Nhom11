@@ -1,0 +1,56 @@
+﻿/* wwwroot/css/Layout_ThanhToanHopDong.css */
+body {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    min-height: 100vh;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.display-5 {
+    background: linear-gradient(90deg, #007bff, #6610f2);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.card {
+    border-radius: 20px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+    .card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.15) !important;
+    }
+
+.table thead {
+    background: linear-gradient(90deg, #667eea, #764ba2);
+    color: white;
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    border: none;
+    border-radius: 50px;
+    padding: 12px 40px;
+    font-weight: 600;
+}
+
+    .btn-success:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(40,167,69,0.4);
+    }
+
+.text-success {
+    font-weight: 700;
+    font-size: 1.4rem;
+}
+
+#vnpayModal .modal-xl {
+    max-width: 95%;
+    width: 900px;
+}
+
+#vnpayLoading {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
