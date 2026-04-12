@@ -1,7 +1,8 @@
+// app/routes/home.js
 const express = require('express');
 const router = express.Router();
 const { Op } = require('sequelize');
-const { isCustomer } = require('../middleware/auth'); // Import middleware bảo vệ
+const { isCustomer } = require('../middleware/auth'); 
 
 // GET / - Homepage
 router.get('/', (_req, res) => {
@@ -25,19 +26,40 @@ router.post('/lien-he', async (req, res) => {
   }
 });
 
-// GET /dich-vu (Khám phá Dịch vụ - Ai cũng xem được)
+// GET /dich-vu 
 router.get('/dich-vu', (_req, res) => {
   res.render('home/dichVu', { title: 'Dịch vụ - HomeConnect', layout: 'layouts/main' });
 });
 
-// =========================================================================
-// ĐÃ FIX: TRẢ LẠI ROUTE THANH TOÁN HỢP ĐỒNG ĐỂ RENDER GIAO DIỆN KHÁM PHÁ HĐ
-// =========================================================================
+// GET /thanh-toan-hop-dong
 router.get('/thanh-toan-hop-dong', isCustomer, (_req, res) => {
   res.render('home/thanhToanHopDong', { title: 'Hợp Đồng & Thanh Toán', layout: 'layouts/main' });
 });
 
-// JSON APIs for homepage
+// ==========================================
+// CÁC API CỦA TRANG CHỦ TRƯỚC ĐÂY NẰM Ở api.js
+// ==========================================
+
+// GET /api/home - data cho trang chủ
+router.get('/api/home', async (req, res) => {
+  try {
+    const { BannerQuangCao, CanHo, Tang, ToaNha, DSA_CanHo, DichVu } = require('../models');
+    const [banners, featuredCanHo, dichVus] = await Promise.all([
+      BannerQuangCao.findAll({ where: { TTHienThi: true }, order: [['MaAQC','ASC']] }),
+      CanHo.findAll({
+        where: { TTHienThi: true, TTDeXuat: true },
+        include: [
+          { model: Tang, as: 'Tang', include: [{ model: ToaNha, as: 'ToaNha' }] },
+          { model: DSA_CanHo, as: 'DSA_CanHos', limit: 1 }
+        ],
+        limit: 6, order: [['MaCanHo','DESC']]
+      }),
+      DichVu.findAll({ where: { TTHienThi: true }, limit: 6 })
+    ]);
+    res.json({ banners, featuredCanHo, dichVus });
+  } catch (err) { res.json({ banners: [], featuredCanHo: [], dichVus: [] }); }
+});
+
 router.get('/api/can-ho-noi-bat', async (req, res) => {
   try {
     const { CanHo, Tang, ToaNha, DSA_CanHo } = require('../models');

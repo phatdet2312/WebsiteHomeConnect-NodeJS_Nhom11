@@ -1,3 +1,4 @@
+// routes/hoaDonHopDong.js
 const express = require('express');
 const router = express.Router();
 const { isCustomer } = require('../middleware/auth');
@@ -13,7 +14,7 @@ router.use(isCustomer);
 async function layMaTrangThai(tenTT) {
     const tt = await TrangThai.findOne({ where: { TenTT: tenTT } });
     return tt ? tt.MaTT : null;
-} 
+}
 
 // ĐÃ FIX LOGIC KHÓA: Giống hệt dịch vụ, chỉ khóa khi đã thanh toán hoặc đang chạy VNPay 45s
 async function getHoaDonBiKhoa(maTTPaid, maTTInProgress) {

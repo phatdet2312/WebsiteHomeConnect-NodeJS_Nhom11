@@ -15,8 +15,8 @@ router.get('/', async (req, res) => {
     if (status !== undefined && status !== '') where.TTHienThi = status === 'true';
     const { count, rows } = await ToaNha.findAndCountAll({
       where,
-      limit, 
-      offset, 
+      limit,
+      offset,
       order: [['MaToaNha', 'DESC']]
     });
     res.render('admin/toaNha/index', {

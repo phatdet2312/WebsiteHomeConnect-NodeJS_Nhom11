@@ -9,7 +9,7 @@
     <p style="color:rgba(255,255,255,.7);margin:0;font-size:.875rem;" id="resultCount">Đang tải...</p>
   </div>
 </div>
- 
+
 <div class="container py-4">
   <div class="row g-4">
     <!-- ── SIDEBAR FILTERS ── -->
@@ -118,6 +118,7 @@
 const isAuth = document.querySelector('meta[name="is-auth"]')?.content === 'true';
 let currentPage = 1;
 let currentLoai = '';
+let toaNhaLoaded = false;
 
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
@@ -127,17 +128,6 @@ if (urlParams.get('minGia'))  document.getElementById('minGia').value = urlParam
 if (urlParams.get('maxGia'))  document.getElementById('maxGia').value = urlParams.get('maxGia');
 if (urlParams.get('page'))    currentPage = parseInt(urlParams.get('page')) || 1;
 if (urlParams.get('loai'))    setLoai(urlParams.get('loai'));
-if (urlParams.get('maToaNha')) {/* set after load */}
-
-fetch('/api/toa-nha').then(r=>r.json()).then(list=>{
-  const sel = document.getElementById('toaNhaSelect');
-  list.forEach(t=>{
-    const opt = document.createElement('option');
-    opt.value = t.MaToaNha; opt.textContent = t.TenToaNha;
-    if (urlParams.get('maToaNha') == t.MaToaNha) opt.selected = true;
-    sel.appendChild(opt);
-  });
-});
 
 function setLoai(val) {
   currentLoai = val;
@@ -178,14 +168,29 @@ function resetFilter() {
 }
 
 function loadCanHo(query) {
-  document.getElementById('loadingState').style.display = 'block';
+  const loading = document.getElementById('loadingState');
+  const errEl = document.getElementById('errorState');
+  
+  if(loading) loading.style.display = 'block';
   document.getElementById('canHoGrid').innerHTML = '';
-  document.getElementById('errorState').classList.add('d-none');
+  if(errEl) errEl.classList.add('d-none'); // ĐÃ FIX: Bọc an toàn chống lỗi null
 
-  fetch('/api/kham-pha?' + query)
+  fetch('/kham-pha/api/list?' + query)
     .then(r=>r.json())
     .then(data=>{
-      document.getElementById('loadingState').style.display = 'none';
+      if(loading) loading.style.display = 'none';
+      
+      if(!toaNhaLoaded && data.toaNhas) {
+         const sel = document.getElementById('toaNhaSelect');
+         data.toaNhas.forEach(t=>{
+            const opt = document.createElement('option');
+            opt.value = t.MaToaNha; opt.textContent = t.TenToaNha;
+            if (urlParams.get('maToaNha') == t.MaToaNha) opt.selected = true;
+            sel.appendChild(opt);
+         });
+         toaNhaLoaded = true;
+      }
+
       document.getElementById('resultCount').textContent = 'Tìm thấy ' + (data.total||0) + ' căn hộ';
       if (!data.canHos || data.canHos.length === 0) {
         document.getElementById('canHoGrid').innerHTML = `<div class="col-12"><div class="hc-empty"><div class="empty-icon"><i class="fas fa-search"></i></div><div class="empty-title">Không tìm thấy căn hộ nào</div><div class="empty-desc">Thử điều chỉnh bộ lọc tìm kiếm</div><button onclick="resetFilter()" class="btn-hc-primary mt-3" style="margin:12px auto 0;">Xóa bộ lọc</button></div></div>`;
@@ -226,7 +231,6 @@ function loadCanHo(query) {
         </div>`;
       }).join('');
 
-      // Pagination
       if (data.totalPages > 1) {
         let pg = '';
         if (data.currentPage > 1) pg += `<button class="pg-btn" onclick="applyFilter(${data.currentPage-1})"><i class="fas fa-chevron-left"></i></button>`;
@@ -242,10 +246,11 @@ function loadCanHo(query) {
       }
     })
     .catch(()=>{
-      document.getElementById('loadingState').style.display = 'none';
-      const e = document.getElementById('errorState');
-      e.innerHTML = '<i class="fas fa-exclamation-circle" style="color:var(--danger);"></i><span>Lỗi tải dữ liệu, vui lòng thử lại.</span>';
-      e.classList.remove('d-none');
+      if(loading) loading.style.display = 'none';
+      if(errEl) {
+        errEl.innerHTML = '<i class="fas fa-exclamation-circle" style="color:var(--danger);"></i><span>Lỗi tải dữ liệu, vui lòng thử lại.</span>';
+        errEl.classList.remove('d-none');
+      }
     });
 }
 

@@ -3,7 +3,7 @@ const express = require('express');
 const router = express.Router();
 const { DanhMucNoiThat } = require('../../models');
 const { Op } = require('sequelize');
- 
+
 // GET / - list with search + pagination
 router.get('/', async (req, res) => {
   try {

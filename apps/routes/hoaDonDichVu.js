@@ -1,3 +1,5 @@
+
+// apps/routes/hoaDonDichVu.js
 const express = require('express');
 const router = express.Router();
 const { isCustomer } = require('../middleware/auth');
@@ -16,19 +18,27 @@ async function layMaTrangThai(tenTT) {
 }
 
 async function getHoaDonBiKhoa(maTTPaid, maTTInProgress) {
-    const paidRows = await sequelize.query(
-        `SELECT l.MaHDDV FROM LS_TTHDDV l
-         INNER JOIN (SELECT MaHDDV, MAX(MaLS) as MaxLS FROM LS_TTHDDV GROUP BY MaHDDV) m ON l.MaHDDV = m.MaHDDV AND l.MaLS = m.MaxLS
-         WHERE l.MaTT = :maTT`,
-        { type: sequelize.QueryTypes.SELECT, replacements: { maTT: maTTPaid } }
-    ).catch(() => []);
+    let paidRows = [];
+    let inProgressRows = [];
 
-    const inProgressRows = await sequelize.query(
-        `SELECT l.MaHDDV FROM LS_TTHDDV l
-         INNER JOIN (SELECT MaHDDV, MAX(MaLS) as MaxLS FROM LS_TTHDDV GROUP BY MaHDDV) m ON l.MaHDDV = m.MaHDDV AND l.MaLS = m.MaxLS
-         WHERE l.MaTT = :maTT AND l.ThoiGianThayDoi >= DATEADD(second, -45, GETDATE())`,
-        { type: sequelize.QueryTypes.SELECT, replacements: { maTT: maTTInProgress } }
-    ).catch(() => []);
+    if (maTTPaid) {
+        paidRows = await sequelize.query(
+            `SELECT l.MaHDDV FROM LS_TTHDDV l
+             INNER JOIN (SELECT MaHDDV, MAX(MaLS) as MaxLS FROM LS_TTHDDV GROUP BY MaHDDV) m ON l.MaHDDV = m.MaHDDV AND l.MaLS = m.MaxLS
+             WHERE l.MaTT = :maTT`,
+            { type: sequelize.QueryTypes.SELECT, replacements: { maTT: maTTPaid } }
+        ).catch(() => []);
+    }
+
+    // Chỉ truy vấn khóa VNPay 45s nếu biến maTTInProgress được truyền vào (lúc Checkout)
+    if (maTTInProgress) {
+        inProgressRows = await sequelize.query(
+            `SELECT l.MaHDDV FROM LS_TTHDDV l
+             INNER JOIN (SELECT MaHDDV, MAX(MaLS) as MaxLS FROM LS_TTHDDV GROUP BY MaHDDV) m ON l.MaHDDV = m.MaHDDV AND l.MaLS = m.MaxLS
+             WHERE l.MaTT = :maTT AND l.ThoiGianThayDoi >= DATEADD(second, -45, GETDATE())`,
+            { type: sequelize.QueryTypes.SELECT, replacements: { maTT: maTTInProgress } }
+        ).catch(() => []);
+    }
 
     const paid = paidRows.map(r => r.MaHDDV);
     const inProg = inProgressRows.map(r => r.MaHDDV);
@@ -64,9 +74,10 @@ router.get('/api/danh-sach', async (req, res) => {
         const maCanHoList = hopDongs.map(h => h.MaCanHo);
 
         const dichVus = await DichVu.findAll({ where: { TTHienThi: true } });
+        
+        // CẢI TIẾN: Chỉ ẩn khi "Đã thanh toán". Không truyền maTTInProgress để VẪN HIỂN THỊ BADGE NỢ.
         const maTTPaid = await layMaTrangThai('Đã thanh toán');
-        const maTTInProgress = await layMaTrangThai('Đang thanh toán');
-        const hoaDonBiKhoa = await getHoaDonBiKhoa(maTTPaid, maTTInProgress);
+        const hoaDonBiKhoa = await getHoaDonBiKhoa(maTTPaid, null);
 
         const ctDichVus = await CT_DichVu.findAll({ where: { MaCanHo: maCanHoList, Gia: { [Op.gt]: 0 } } });
         
@@ -100,9 +111,9 @@ router.get('/api/unpaid', async (req, res) => {
         const maCanHoList = hopDongs.map(h => h.MaCanHo);
         if (!maCanHoList.length) return res.json({ success: false, message: 'Bạn không có hợp đồng căn hộ đang hoạt động!' });
 
+        // CẢI TIẾN YÊU CẦU: Vẫn cho người dùng xem danh sách các kỳ. Bỏ chặn hiển thị "Đang thanh toán"
         const maTTPaid = await layMaTrangThai('Đã thanh toán');
-        const maTTInProgress = await layMaTrangThai('Đang thanh toán');
-        const hoaDonBiKhoa = await getHoaDonBiKhoa(maTTPaid, maTTInProgress);
+        const hoaDonBiKhoa = await getHoaDonBiKhoa(maTTPaid, null);
 
         const ctList = await CT_DichVu.findAll({
             where: { MaDV: maDV, MaCanHo: maCanHoList },
@@ -156,14 +167,14 @@ router.get('/api/history', async (req, res) => {
         if (!hoaDons.length) return res.json({ success: true, data: [] });
         const maHDList = hoaDons.map(h => h.MaHDDV);
 
-        // Bỏ include CT_DichVu để chống lỗi. Fetch thuần CT_HDDV
-        const ctHoaDons = await CT_HDDV.findAll({ where: { MaHDDV: maHDList } });
+        const ctHoaDons = await CT_HDDV.findAll({ 
+            where: { MaHDDV: maHDList }
+        });
 
         const maCHs = [...new Set(ctHoaDons.map(c => c.MaCanHo))];
         const maDVs = [...new Set(ctHoaDons.map(c => c.MaDV))];
         const maKys = [...new Set(ctHoaDons.map(c => c.MaKy))];
 
-        // Lôi 100% CT_DichVu gốc lên RAM để mapping thủ công, không qua Sequelize Include nữa
         const ctDichVus = await CT_DichVu.findAll({
             where: {
                 [Op.or]: ctHoaDons.map(c => ({ MaDV: c.MaDV, MaCanHo: c.MaCanHo, MaKy: c.MaKy }))
@@ -213,7 +224,7 @@ router.get('/api/history', async (req, res) => {
                     viTri: cH ? `Tòa ${cH.Tang?.ToaNha?.TenToaNha || 'N/A'} - Tầng ${cH.Tang?.TenTang || 'N/A'}` : 'N/A',
                     donGia: Number(ct.DonGia),
                     sl: ct.SL || 1,
-                    urlAnh: ctDvGoc.urlAnh || '' // Bóc ảnh ra đúng 100%
+                    urlAnh: ctDvGoc.urlAnh || '' 
                 };
             });
 
@@ -254,22 +265,15 @@ router.post('/api/checkout', async (req, res) => {
         const isVnPay = pttt.TenPT.toLowerCase().includes('vnpay');
         const targetStatus = isVnPay ? 'Đang thanh toán' : 'Chờ thanh toán';
 
+        // TẠI BƯỚC NÀY MỚI CHẶN THANH TOÁN (Radar 45s của VNPay + Trạng thái Đã thanh toán)
         const maTTPaid = await layMaTrangThai('Đã thanh toán');
         const maTTInProgress = await layMaTrangThai('Đang thanh toán');
-        const maTTPending = await layMaTrangThai('Chờ thanh toán');
         
-        if (!maTTPaid || !maTTInProgress || !maTTPending) {
-            return res.json({ success: false, message: 'Lỗi hệ thống: Không tìm thấy các trạng thái cần thiết trong DB' });
+        if (!maTTPaid || !maTTInProgress) {
+            return res.json({ success: false, message: 'Lỗi hệ thống: Không tìm thấy mã trạng thái' });
         }
 
-        const lockedRows = await sequelize.query(
-            `SELECT l.MaHDDV FROM LS_TTHDDV l
-             INNER JOIN (SELECT MaHDDV, MAX(MaLS) as MaxLS FROM LS_TTHDDV GROUP BY MaHDDV) m ON l.MaHDDV = m.MaHDDV AND l.MaLS = m.MaxLS
-             WHERE l.MaTT IN (:maTTPaid, :maTTPending) OR (l.MaTT = :maTTInProgress AND l.ThoiGianThayDoi >= DATEADD(second, -45, GETDATE()))`,
-            { type: sequelize.QueryTypes.SELECT, replacements: { maTTPaid, maTTPending, maTTInProgress } }
-        ).catch(() => []);
-        const hoaDonBiKhoa = [...new Set(lockedRows.map(r => r.MaHDDV))];
-
+        const hoaDonBiKhoa = await getHoaDonBiKhoa(maTTPaid, maTTInProgress);
         const validItems = [];
         let tongTien = 0;
 
@@ -286,7 +290,7 @@ router.post('/api/checkout', async (req, res) => {
             }
         }
 
-        if (!validItems.length) return res.json({ success: false, message: 'Kỳ này đã được thanh toán hoặc đang chờ xử lý. Vui lòng tải lại trang!' });
+        if (!validItems.length) return res.json({ success: false, message: 'Giao dịch thất bại! Kỳ dịch vụ này đang được người khác thanh toán qua VNPay hoặc đã được thanh toán hoàn tất.' });
 
         const hoaDon = await HD_DichVu.create({ MaKH: maKH, MaPT: parseInt(maPT), NgayThanhToan: new Date() });
         const ctRecords = validItems.map(vi => ({ MaDV: vi.mDV, MaCanHo: vi.mCH, MaKy: vi.mKy, MaHDDV: hoaDon.MaHDDV, SL: 1, DonGia: vi.conThieu }));

@@ -16,7 +16,7 @@ router.get('/', async (req, res) => {
     if (maToaNha && maToaNha !== '') where.MaToaNha = parseInt(maToaNha);
     const [{ count, rows }, toaNhaList] = await Promise.all([
       Tang.findAndCountAll({
-        where, 
+        where,
         limit,
         offset,
         order: [['MaTang', 'DESC']],
