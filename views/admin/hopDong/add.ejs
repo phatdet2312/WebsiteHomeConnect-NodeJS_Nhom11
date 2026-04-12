@@ -1,0 +1,186 @@
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<style>
+.filter-label { display:block; font-size:.75rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; margin-bottom:5px; }
+.card-block { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); border: 1px solid #e2e8f0; margin-bottom:20px;}
+.card-title-sub { font-size: 1.05rem; font-weight: 800; color: var(--primary); margin-bottom: 15px; display:flex; align-items:center; gap:8px;}
+.img-preview-box { display:flex; flex-wrap:wrap; gap:10px; margin-top:10px; }
+.img-preview-item { position:relative; width:80px; height:80px; border-radius:8px; border:1px solid #ddd; overflow:hidden; }
+.img-preview-item img { width:100%; height:100%; object-fit:cover; }
+.img-preview-item button { position:absolute; top:2px; right:2px; background:rgba(220,38,38,0.9); color:#fff; border:none; border-radius:50%; width:20px; height:20px; font-size:.7rem; cursor:pointer; }
+</style>
+
+<div class="admin-page-header">
+  <div><h4>Tạo Hợp đồng mới</h4><p>Lập hợp đồng qua API an toàn</p></div>
+  <a href="/admin/hop-dong" class="btn-ghost"><i class="fas fa-arrow-left me-2"></i>Quay lại</a>
+</div>
+
+<div id="loader" style="padding:50px;text-align:center;"><i class="fas fa-circle-notch fa-spin fa-2x text-primary"></i></div>
+
+<form id="addForm" style="display:none;" onsubmit="submitForm(event)">
+  <div class="row">
+    <div class="col-lg-8">
+      <div class="card-block">
+        <div class="card-title-sub"><i class="fas fa-file-signature"></i>Thông tin chính</div>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="filter-label">Khách hàng <b class="text-danger">*</b></label>
+            <select id="MaKH" name="MaKH" class="hc-select" required><option value="">-- Chọn --</option></select>
+          </div>
+          <div class="col-md-6">
+            <label class="filter-label">Căn hộ <b class="text-danger">*</b></label>
+            <select id="MaCanHo" name="MaCanHo" class="hc-select" required><option value="">-- Chọn --</option></select>
+          </div>
+          <div class="col-md-6">
+            <label class="filter-label">Loại Hợp đồng <b class="text-danger">*</b></label>
+            <select id="MaLoaiHD" name="MaLoaiHD" class="hc-select" required><option value="">-- Chọn --</option></select>
+          </div>
+          <div class="col-md-6">
+            <label class="filter-label">Vai trò <b class="text-danger">*</b></label>
+            <select id="MaVaiTroHD" name="MaVaiTroHD" class="hc-select" required><option value="">-- Chọn --</option></select>
+          </div>
+          <div class="col-md-6">
+            <label class="filter-label">Giá gốc (VNĐ)</label>
+            <input type="number" id="GiaTriCanHo" name="GiaTriCanHo" class="hc-input" min="0">
+          </div>
+          <div class="col-md-6">
+            <label class="filter-label">Giá thỏa thuận (VNĐ)</label>
+            <input type="number" id="GiaThoaThuan" name="GiaThoaThuan" class="hc-input" min="0">
+          </div>
+        </div>
+      </div>
+
+      <div class="card-block">
+        <div class="card-title-sub"><i class="fas fa-calendar-alt"></i>Thời hạn & Nhóm phụ trách</div>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="filter-label">Nhân viên phụ trách</label>
+            <select id="MaNV" name="MaNV" class="hc-select"><option value="">-- Tự do --</option></select>
+          </div>
+          <div class="col-md-6">
+            <label class="filter-label">Ngày lập <b class="text-danger">*</b></label>
+            <input type="date" id="NgayLap" name="NgayLap" class="hc-input" required>
+          </div>
+          <div class="col-md-4">
+            <label class="filter-label">Ngày xử lý dự kiến</label>
+            <input type="date" id="NgayXuLyDuKien" name="NgayXuLyDuKien" class="hc-input">
+          </div>
+          <div class="col-md-4">
+            <label class="filter-label">Ngày hiệu lực</label>
+            <input type="date" id="NgayHieuLuc" name="NgayHieuLuc" class="hc-input">
+          </div>
+          <div class="col-md-4">
+            <label class="filter-label">Ngày hết hạn</label>
+            <input type="date" id="NgayHetHan" name="NgayHetHan" class="hc-input">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4">
+      <div class="card-block">
+        <div class="card-title-sub"><i class="fas fa-address-book"></i>Liên hệ & Chứng từ</div>
+        <div style="margin-bottom:15px;">
+            <label class="filter-label">Địa chỉ ký HĐ</label>
+            <input type="text" id="DiaChiKyHopDong" name="DiaChiKyHopDong" class="hc-input">
+        </div>
+        <div style="margin-bottom:15px;">
+            <label class="filter-label">SĐT Nhận Liên Lạc</label>
+            <input type="text" id="SDTNhanLienLac" name="SDTNhanLienLac" class="hc-input">
+        </div>
+        <div style="margin-bottom:15px; background:#f8fafc; padding:15px; border-radius:8px; border:1px dashed var(--primary);">
+            <label class="filter-label" style="color:var(--primary);">Ảnh Đại Diện HĐ <b class="text-danger">*</b></label>
+            <input type="file" id="urlAnhHD" accept="image/*" required style="font-size:.8rem; width:100%; margin-bottom:10px;" onchange="previewMain(this)">
+            <img id="mainPreview" style="width:100%; height:150px; object-fit:cover; border-radius:8px; display:none;">
+        </div>
+        <div style="background:#f8fafc; padding:15px; border-radius:8px; border:1px dashed #94a3b8;">
+            <label class="filter-label">Ảnh Bổ Sung (Scan HĐ)</label>
+            <input type="file" id="galleryInput" multiple accept="image/*" style="font-size:.8rem; width:100%;" onchange="previewGallery(this)">
+            <div class="img-preview-box" id="galleryPreviewBox"></div>
+        </div>
+      </div>
+      
+      <button type="submit" id="submitBtn" class="btn-hc-primary w-100" style="padding:12px;font-size:1.1rem;"><i class="fas fa-save me-2"></i>Tạo Hợp Đồng</button>
+    </div>
+  </div>
+</form>
+
+<script>
+let galleryFiles = [];
+
+document.addEventListener('DOMContentLoaded', async () => {
+    document.getElementById('NgayLap').value = new Date().toISOString().split('T')[0];
+    const res = await fetch('/admin/hop-dong/api/form-data');
+    const json = await res.json();
+    if(json.success) {
+        document.getElementById('MaKH').innerHTML += json.data.khachHangs.map(k => `<option value="${k.maKH}">${k.tenKH} (${k.sdt || k.email || 'No info'})</option>`).join('');
+        document.getElementById('MaCanHo').innerHTML += json.data.canHos.map(c => `<option value="${c.maCanHo}">${c.tenCanHo} - ${c.tenToaNha}/${c.tenTang}</option>`).join('');
+        document.getElementById('MaLoaiHD').innerHTML += json.data.loaiHDs.map(l => `<option value="${l.maLoaiHD}">${l.tenLoai}</option>`).join('');
+        document.getElementById('MaVaiTroHD').innerHTML += json.data.vaiTroHDs.map(v => `<option value="${v.maVaiTroHD}">${v.tenVaiTro}</option>`).join('');
+        document.getElementById('MaNV').innerHTML += json.data.nhanViens.map(n => `<option value="${n.maNV}">${n.tenNV}</option>`).join('');
+        
+        document.getElementById('loader').style.display = 'none';
+        document.getElementById('addForm').style.display = 'block';
+    }
+});
+
+function previewMain(input) {
+    if(input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = e => { document.getElementById('mainPreview').src = e.target.result; document.getElementById('mainPreview').style.display = 'block'; }
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+function previewGallery(input) {
+    if(input.files) {
+        for(let i=0; i<input.files.length; i++) {
+            galleryFiles.push(input.files[i]);
+            const reader = new FileReader();
+            const index = galleryFiles.length - 1;
+            reader.onload = e => {
+                document.getElementById('galleryPreviewBox').innerHTML += `
+                    <div class="img-preview-item" id="g_${index}">
+                        <img src="${e.target.result}">
+                        <button type="button" onclick="removeGallery(${index})"><i class="fas fa-times"></i></button>
+                    </div>`;
+            };
+            reader.readAsDataURL(input.files[i]);
+        }
+        input.value = ''; // reset
+    }
+}
+
+function removeGallery(index) {
+    galleryFiles[index] = null;
+    document.getElementById('g_' + index).style.display = 'none';
+}
+
+async function submitForm(e) {
+    e.preventDefault();
+    const result = await Swal.fire({ title:'Tạo hợp đồng?', icon:'question', showCancelButton:true, confirmButtonColor:'#0061ff', confirmButtonText:'Đồng ý' });
+    if(!result.isConfirmed) return;
+
+    const btn = document.getElementById('submitBtn');
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Đang lưu...'; btn.disabled = true;
+
+    const fd = new FormData();
+    ['MaKH','MaCanHo','MaLoaiHD','MaVaiTroHD','MaNV','GiaTriCanHo','GiaThoaThuan','NgayLap','NgayXuLyDuKien','NgayHieuLuc','NgayHetHan','DiaChiKyHopDong','SDTNhanLienLac'].forEach(id => {
+        fd.append(id, document.getElementById(id).value);
+    });
+
+    const mainFile = document.getElementById('urlAnhHD').files[0];
+    if(mainFile) fd.append('urlAnhHD', mainFile);
+
+    galleryFiles.filter(f => f !== null).forEach(f => fd.append('additionalImages', f));
+
+    try {
+        const res = await fetch('/admin/hop-dong/api/add', { method: 'POST', body: fd });
+        const json = await res.json();
+        if(json.success) Swal.fire('Thành công', json.message, 'success').then(() => window.location.href = '/admin/hop-dong/display/' + json.id);
+        else throw new Error(json.message);
+    } catch(err) {
+        Swal.fire('Lỗi', err.message, 'error');
+        btn.innerHTML = '<i class="fas fa-save me-2"></i>Tạo Hợp Đồng'; btn.disabled = false;
+    }
+}
+</script>

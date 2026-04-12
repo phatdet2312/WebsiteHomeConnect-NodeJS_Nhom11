@@ -1,0 +1,250 @@
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<style>
+.filter-label { display:block; font-size:.75rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; margin-bottom:5px; }
+.suggestion-item { padding:10px 15px; display:flex; align-items:center; gap:10px; cursor:pointer; border-bottom:1px solid #eee; }
+.suggestion-item:hover { background:#f8fafc; }
+.suggestion-image { width:32px; height:32px; object-fit:cover; border-radius:4px; border:1px solid #ddd; }
+.badge-hd { padding: 4px 10px; border-radius: 20px; font-size: .75rem; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; }
+.b-cho { background: #fef9c3; color: #a16207; }
+.b-ky { background: #dcfce7; color: #15803d; }
+.b-huy { background: #fee2e2; color: #b91c1c; }
+.price-col { text-align:right; font-weight:600; }
+.pg-btn { display:inline-flex; align-items:center; justify-content:center; min-width:34px; height:34px; padding:0 10px; border-radius:8px; border:1.5px solid var(--border); background:var(--bg-white); color:var(--text-secondary); font-size:.82rem; font-weight:600; cursor:pointer; }
+.pg-btn:hover, .pg-btn.active { border-color:var(--primary); color:var(--primary); }
+.pg-btn.active { background:var(--primary); color:white; }
+</style>
+
+<div class="admin-page-header">
+  <div>
+    <h4>Quản lý Hợp đồng</h4>
+    <p>Tổng: <span id="totalItemsDisplay">0</span> hợp đồng</p>
+  </div>
+  <a href="/admin/hop-dong/add" class="btn-hc-primary"><i class="fas fa-plus me-2"></i>Tạo hợp đồng mới</a>
+</div>
+
+<div class="table-card mb-3">
+  <div class="table-card-header"><div class="table-card-title"><i class="fas fa-filter me-2 text-primary"></i>Bộ lọc</div></div>
+  <div style="padding:16px 20px;">
+    <div class="row g-2 align-items-end position-relative">
+      <div class="col-md-3 position-relative">
+        <label class="filter-label">Tìm kiếm</label>
+        <input type="text" id="searchInput" class="hc-input" placeholder="Mã, tên KH, căn hộ..." autocomplete="off">
+        <div id="suggestionBox" style="display:none; position:absolute; top:100%; left:0; right:0; background:#fff; box-shadow:0 10px 25px rgba(0,0,0,0.1); border-radius:8px; z-index:100; margin-top:5px; border:1px solid #eee;"></div>
+      </div>
+      <div class="col-md-2">
+        <label class="filter-label">Trạng thái</label>
+        <select id="statusFilter" class="hc-select">
+          <option value="tatCa">Tất cả</option>
+          <option value="null">Chờ duyệt</option>
+          <option value="true">Đã ký</option>
+          <option value="false">Đã hủy</option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <label class="filter-label">Loại HĐ</label>
+        <select id="loaiHDFilter" class="hc-select"><option value="">Tất cả</option></select>
+      </div>
+      <div class="col-md-2">
+        <label class="filter-label">Vai trò</label>
+        <select id="vaiTroFilter" class="hc-select">
+            <option value="">Tất cả</option>
+            <option value="Mua">Mua</option>
+            <option value="Thuê">Thuê</option>
+        </select>
+      </div>
+      <div class="col-md-3" style="display:flex;gap:5px;">
+        <button onclick="loadData()" class="btn-hc-primary flex-fill" style="justify-content:center;"><i class="fas fa-search"></i></button>
+        <button onclick="resetFilters()" class="btn-ghost flex-fill" style="justify-content:center;"><i class="fas fa-sync"></i></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="table-card">
+  <div class="table-card-header">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <input type="checkbox" id="selectAllChk" style="accent-color:var(--primary);width:16px;height:16px;">
+      <label for="selectAllChk" style="cursor:pointer;font-weight:600;">Chọn tất cả</label>
+    </div>
+    <div style="display:flex;gap:10px;">
+        <button type="button" class="btn-tbl btn-tbl-edit" id="btnApprove" style="display:none;background:#dcfce7;color:#15803d;border-color:#15803d;" onclick="bulkStatus('true')"><i class="fas fa-check"></i> Duyệt</button>
+        <button type="button" class="btn-tbl btn-tbl-edit" id="btnCancel" style="display:none;background:#fee2e2;color:#b91c1c;border-color:#b91c1c;" onclick="bulkStatus('false')"><i class="fas fa-times"></i> Hủy</button>
+        <button type="button" class="btn-tbl btn-tbl-delete" id="btnBulkDelete" style="display:none;" onclick="bulkDelete()"><i class="fas fa-trash"></i> Xóa</button>
+    </div>
+  </div>
+
+  <div id="searchMessageArea" style="display:none; background:#fffbe8; border-bottom:1px solid #fde68a; padding:12px 20px; color:#92400e; font-weight:600; font-size:.85rem;"></div>
+
+  <div style="overflow-x:auto;">
+    <table style="width:100%;border-collapse:collapse;min-width:1000px;">
+      <thead>
+        <tr style="background:var(--bg-soft);border-bottom:1px solid var(--border-light);">
+          <th style="padding:12px 16px;width:40px;"></th>
+          <th style="padding:12px 16px;font-size:.75rem;color:var(--text-muted);">MÃ HĐ</th>
+          <th style="padding:12px 16px;font-size:.75rem;color:var(--text-muted);">KHÁCH HÀNG</th>
+          <th style="padding:12px 16px;font-size:.75rem;color:var(--text-muted);">CĂN HỘ</th>
+          <th style="padding:12px 16px;font-size:.75rem;color:var(--text-muted);">LOẠI / VAI TRÒ</th>
+          <th style="padding:12px 16px;font-size:.75rem;color:var(--text-muted);text-align:right;">GIÁ TRỊ</th>
+          <th style="padding:12px 16px;font-size:.75rem;color:var(--text-muted);">TRẠNG THÁI</th>
+          <th style="padding:12px 16px;font-size:.75rem;color:var(--text-muted);text-align:right;">THAO TÁC</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"><tr><td colspan="8" style="padding:40px;text-align:center;"><i class="fas fa-circle-notch fa-spin fa-2x text-muted"></i></td></tr></tbody>
+    </table>
+  </div>
+</div>
+<div id="paginationArea" style="display:flex;justify-content:center;gap:6px;margin-top:16px;"></div>
+
+<script>
+let currentPage = 1;
+
+document.addEventListener('DOMContentLoaded', async () => {
+    // Load dropdown LoaiHD
+    const res = await fetch('/admin/hop-dong/api/form-data');
+    const json = await res.json();
+    if(json.success) {
+        document.getElementById('loaiHDFilter').innerHTML = '<option value="">Tất cả</option>' + json.data.loaiHDs.map(l => `<option value="${l.maLoaiHD}">${l.tenLoai}</option>`).join('');
+    }
+
+    loadData();
+
+    document.getElementById('statusFilter').addEventListener('change', () => { currentPage = 1; loadData(); });
+    document.getElementById('loaiHDFilter').addEventListener('change', () => { currentPage = 1; loadData(); });
+    document.getElementById('vaiTroFilter').addEventListener('change', () => { currentPage = 1; loadData(); });
+
+    const searchInput = document.getElementById('searchInput');
+    const suggestionBox = document.getElementById('suggestionBox');
+    
+    searchInput.addEventListener('input', async (e) => {
+        const val = e.target.value.trim();
+        if(val.length === 0) { suggestionBox.style.display = 'none'; return; }
+        const res = await fetch(`/admin/hop-dong/api/suggestions?term=${encodeURIComponent(val)}`);
+        const data = await res.json();
+        if(data.success && data.data.length > 0) {
+            suggestionBox.innerHTML = data.data.map(d => `
+                <div class="suggestion-item" onclick="selectSuggestion('${d.MaHopDong}')">
+                    <img src="${d.UrlAnhHD || 'https://via.placeholder.com/32'}" class="suggestion-image">
+                    <div>
+                        <div style="font-size:.85rem;font-weight:600;color:#333;">${d.KhachHang?.TenKH || 'N/A'} (HĐ #${d.MaHopDong})</div>
+                        <div style="font-size:.75rem;color:#888;">${d.CanHo?.TenCanHo || 'N/A'}</div>
+                    </div>
+                </div>`).join('');
+            suggestionBox.style.display = 'block';
+        } else suggestionBox.style.display = 'none';
+    });
+
+    document.addEventListener('click', (e) => { if(!searchInput.contains(e.target) && !suggestionBox.contains(e.target)) suggestionBox.style.display = 'none'; });
+    document.getElementById('selectAllChk').addEventListener('change', (e) => { document.querySelectorAll('.row-check').forEach(chk => chk.checked = e.target.checked); toggleBulk(); });
+});
+
+function selectSuggestion(id) { document.getElementById('searchInput').value = id; document.getElementById('suggestionBox').style.display = 'none'; currentPage = 1; loadData(); }
+function resetFilters() { document.getElementById('searchInput').value = ''; document.getElementById('statusFilter').value = 'tatCa'; document.getElementById('loaiHDFilter').value = ''; document.getElementById('vaiTroFilter').value = ''; currentPage = 1; loadData(); }
+
+async function loadData() {
+    const s = document.getElementById('searchInput').value;
+    const tt = document.getElementById('statusFilter').value;
+    const lhd = document.getElementById('loaiHDFilter').value;
+    const vt = document.getElementById('vaiTroFilter').value;
+    
+    document.getElementById('tableBody').innerHTML = `<tr><td colspan="8" style="padding:40px;text-align:center;"><i class="fas fa-circle-notch fa-spin fa-2x text-muted"></i></td></tr>`;
+    
+    const res = await fetch(`/admin/hop-dong/api/list?page=${currentPage}&search=${encodeURIComponent(s)}&trangThai=${tt}&loaiHD=${lhd}&vaiTro=${vt}`);
+    const result = await res.json();
+    if(result.success) {
+        document.getElementById('totalItemsDisplay').innerText = result.totalItems;
+        const msgArea = document.getElementById('searchMessageArea');
+        if(result.message) {
+            msgArea.style.display = 'block'; msgArea.innerHTML = `<i class="fas fa-info-circle me-2"></i>${result.message}`;
+            if(result.suggestions?.length) result.data = result.suggestions;
+        } else msgArea.style.display = 'none';
+        
+        renderTable(result.data);
+        renderPagination(result.totalPages);
+        document.getElementById('selectAllChk').checked = false;
+        toggleBulk();
+    }
+}
+
+function getBadge(val) {
+    if(val === true) return '<span class="badge-hd b-ky"><i class="fas fa-check"></i>Đã ký</span>';
+    if(val === false) return '<span class="badge-hd b-huy"><i class="fas fa-times"></i>Đã hủy</span>';
+    return '<span class="badge-hd b-cho"><i class="fas fa-clock"></i>Chờ duyệt</span>';
+}
+
+function renderTable(data) {
+    const tbody = document.getElementById('tableBody');
+    if(!data.length) return tbody.innerHTML = `<tr><td colspan="8" style="padding:40px;text-align:center;color:#888;"><i class="fas fa-file-contract fa-3x mb-3 opacity-25"></i><br>Không có hợp đồng nào</td></tr>`;
+    
+    tbody.innerHTML = data.map(item => `
+        <tr style="border-bottom:1px solid #eee;">
+            <td style="padding:12px 16px;"><input type="checkbox" value="${item.MaHopDong}" class="row-check" onchange="toggleBulk()"></td>
+            <td style="padding:12px 16px;"><span style="background:var(--primary-light);color:var(--primary);padding:3px 8px;border-radius:6px;font-weight:700;font-size:.8rem;">#${item.MaHopDong}</span></td>
+            <td style="padding:12px 16px;">
+                <div style="font-weight:700;">${item.KhachHang?.TenKH || '-'}</div>
+                <div style="font-size:.75rem;color:#888;">${item.KhachHang?.DTKH || ''}</div>
+            </td>
+            <td style="padding:12px 16px;">
+                <div style="font-weight:700;">${item.CanHo?.TenCanHo || '-'}</div>
+                <div style="font-size:.75rem;color:#888;">${item.CanHo?.Tang?.ToaNha?.TenToaNha || ''} / Tầng ${item.CanHo?.Tang?.TenTang || ''}</div>
+            </td>
+            <td style="padding:12px 16px;">
+                <div style="font-size:.8rem;font-weight:600;color:var(--primary);">${item.LoaiHopDong?.TenLoai || '-'}</div>
+                <div style="font-size:.75rem;color:#64748b;">Vai trò: <b>${item.VaiTroHD?.TenVaiTro || '-'}</b></div>
+            </td>
+            <td class="price-col" style="padding:12px 16px;">
+                <div style="font-weight:800;color:var(--danger);">${item.GiaThoaThuan ? Number(item.GiaThoaThuan).toLocaleString()+'đ' : '—'}</div>
+                ${item.GiaTriCanHo ? `<div style="font-size:.7rem;color:#aaa;text-decoration:line-through;">Gốc: ${Number(item.GiaTriCanHo).toLocaleString()}đ</div>` : ''}
+            </td>
+            <td style="padding:12px 16px;text-align:center;">${getBadge(item.TrangThaiHD)}</td>
+            <td style="padding:12px 16px;text-align:right;">
+                <a href="/admin/hop-dong/display/${item.MaHopDong}" class="btn-tbl btn-tbl-view"><i class="fas fa-eye"></i></a>
+                <a href="/admin/hop-dong/update/${item.MaHopDong}" class="btn-tbl btn-tbl-edit"><i class="fas fa-edit"></i></a>
+                <button onclick="deleteSingle(${item.MaHopDong})" class="btn-tbl btn-tbl-delete"><i class="fas fa-trash"></i></button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+function renderPagination(t) {
+    if(t <= 1) return document.getElementById('paginationArea').innerHTML = '';
+    let html = '';
+    for(let i=1; i<=t; i++) html += `<button onclick="currentPage=${i};loadData()" class="pg-btn ${currentPage===i?'active':''}">${i}</button>`;
+    document.getElementById('paginationArea').innerHTML = html;
+}
+
+function toggleBulk() {
+    const c = document.querySelectorAll('.row-check:checked').length > 0;
+    document.getElementById('btnBulkDelete').style.display = c ? 'inline-flex' : 'none';
+    document.getElementById('btnApprove').style.display = c ? 'inline-flex' : 'none';
+    document.getElementById('btnCancel').style.display = c ? 'inline-flex' : 'none';
+}
+
+function deleteSingle(id) {
+    Swal.fire({ title: 'Xóa hợp đồng?', icon: 'warning', showCancelButton: true, confirmButtonColor: '#dc2626', confirmButtonText: 'Xóa' }).then(async r => {
+        if(r.isConfirmed) {
+            const res = await fetch(`/admin/hop-dong/api/delete-multiple`, { method: 'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ids: [id]}) });
+            if((await res.json()).success) { Swal.toast({title:'Đã xóa', icon:'success', toast:true, position:'top-end', timer:1500}); loadData(); }
+        }
+    });
+}
+
+function bulkDelete() {
+    const ids = Array.from(document.querySelectorAll('.row-check:checked')).map(c => c.value);
+    Swal.fire({ title: `Xóa ${ids.length} hợp đồng?`, icon: 'warning', showCancelButton: true, confirmButtonColor: '#dc2626', confirmButtonText: 'Xóa' }).then(async r => {
+        if(r.isConfirmed) {
+            const res = await fetch(`/admin/hop-dong/api/delete-multiple`, { method: 'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ids}) });
+            if((await res.json()).success) { Swal.toast({title:'Đã xóa', icon:'success', toast:true, position:'top-end', timer:1500}); loadData(); }
+        }
+    });
+}
+
+function bulkStatus(status) {
+    const ids = Array.from(document.querySelectorAll('.row-check:checked')).map(c => c.value);
+    Swal.fire({ title: `Đổi trạng thái ${ids.length} hợp đồng?`, icon: 'question', showCancelButton: true, confirmButtonColor: '#0061ff', confirmButtonText: 'Đồng ý' }).then(async r => {
+        if(r.isConfirmed) {
+            const res = await fetch(`/admin/hop-dong/api/update-status-batch`, { method: 'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ids, status}) });
+            if((await res.json()).success) { Swal.toast({title:'Thành công', icon:'success', toast:true, position:'top-end', timer:1500}); loadData(); }
+        }
+    });
+}
+</script>

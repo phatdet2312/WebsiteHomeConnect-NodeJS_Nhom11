@@ -1,0 +1,65 @@
+<div class="admin-page-header">
+  <div>
+    <h4>Cổng Quản Lý Gán Thanh Toán Hợp Đồng</h4>
+    <p>Chọn một loại thanh toán hợp đồng để cấu hình kỳ hạn và đơn giá cho các căn hộ</p>
+  </div>
+</div>
+
+<div id="serviceGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px; margin-top: 20px;">
+    <div style="grid-column: 1 / -1; text-align: center; padding: 40px;">
+        <i class="fas fa-circle-notch fa-spin fa-2x text-primary"></i>
+    </div>
+</div>
+
+<style>
+.service-card {
+    background: #fff; border-radius: 16px; padding: 24px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid var(--border-light);
+    display: flex; align-items: center; gap: 20px; cursor: pointer;
+    transition: all 0.3s ease; text-decoration: none; color: inherit;
+    position: relative; overflow: hidden;
+}
+.service-card::before {
+    content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%;
+    background: #10b981; transform: scaleY(0); transition: transform 0.3s ease;
+}
+.service-card:hover {
+    transform: translateY(-5px); box-shadow: 0 8px 25px rgba(16, 185, 129, 0.1);
+}
+.service-card:hover::before { transform: scaleY(1); }
+.sc-icon {
+    width: 65px; height: 65px; border-radius: 14px; background: #dcfce7;
+    display: flex; align-items: center; justify-content: center; overflow: hidden;
+    color: #10b981; font-size: 1.8rem; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.15);
+}
+.sc-icon img { width: 100%; height: 100%; object-fit: cover; }
+.sc-title { font-size: 1.2rem; font-weight: 800; margin-bottom: 6px; color: var(--text); }
+.sc-subtitle { font-size: 0.85rem; color: var(--text-muted); font-weight: 600; display:flex; align-items:center; gap:5px; }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+    try {
+        const res = await fetch('/admin/ct-thanh-toan/api/services');
+        const json = await res.json();
+        if(json.success) {
+            const grid = document.getElementById('serviceGrid');
+            if(json.data.length === 0) {
+                grid.innerHTML = `<div style="grid-column: 1/-1; text-align:center; color:#888; padding:50px;"><i class="fas fa-box-open fa-3x mb-3 opacity-50"></i><br>Chưa có loại thanh toán nào đang hiển thị.</div>`;
+                return;
+            }
+            grid.innerHTML = json.data.map(d => `
+                <a href="/admin/ct-thanh-toan/chi-tiet/${d.MaLoaiTT}" class="service-card">
+                    <div class="sc-icon">
+                        ${d.UrlIcon ? `<img src="${d.UrlIcon}">` : `<i class="fas fa-file-invoice-dollar"></i>`}
+                    </div>
+                    <div>
+                        <div class="sc-title">${d.TenLoaiTT}</div>
+                        <div class="sc-subtitle"><span style="color:#10b981;">Truy cập Workspace</span> <i class="fas fa-arrow-right"></i></div>
+                    </div>
+                </a>
+            `).join('');
+        }
+    } catch(err) { console.error(err); }
+});
+</script>

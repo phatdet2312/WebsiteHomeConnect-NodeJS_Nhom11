@@ -1,0 +1,42 @@
+<!-- views/admin/pttt/update.ejs -->
+<div class="admin-page-header">
+  <div><h4>Cập nhật Phương thức <span style="color:var(--primary);">#<%= item.MaPT %></span></h4><p><%= item.TenPT %></p></div>
+  <div style="display:flex;gap:8px;">
+    <a href="/admin/pttt/display/<%= item.MaPT %>" class="btn-ghost"><i class="fas fa-eye me-2"></i>Xem</a>
+    <a href="/admin/pttt" class="btn-ghost"><i class="fas fa-arrow-left me-2"></i>Quay lại</a>
+  </div>
+</div>
+<% if (errors && errors.length > 0) { %>
+<div class="hc-toast hc-toast-danger" style="position:static;margin-bottom:16px;">
+  <i class="fas fa-exclamation-circle"></i>
+  <div><% errors.forEach(e => { %><div><%= e %></div><% }) %></div>
+</div>
+<% } %>
+<div style="max-width:560px;">
+  <div class="table-card">
+    <div class="table-card-header">
+      <div class="table-card-title"><i class="fas fa-credit-card me-2" style="color:#0061ff;"></i>Thông tin</div>
+    </div>
+    <div style="padding:24px;">
+      <form method="POST" action="/admin/pttt/update/<%= item.MaPT %>">
+        <div style="margin-bottom:16px;">
+          <label class="filter-label">Mã Phương thức</label>
+          <input type="text" class="hc-input" value="<%= item.MaPT %>" disabled style="opacity:.6;cursor:not-allowed;">
+        </div>
+        <div style="margin-bottom:16px;">
+          <label class="filter-label">Tên Phương thức <span style="color:var(--danger);">*</span></label>
+          <input type="text" name="TenPT" class="hc-input" value="<%= item.TenPT %>" required>
+        </div>
+        <div style="margin-bottom:24px;">
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:.875rem;font-weight:600;color:var(--text);">
+            <input type="checkbox" name="TTHienThi" <%= item.TTHienThi ? 'checked' : '' %> style="accent-color:var(--primary);width:17px;height:17px;">Hiển thị
+          </label>
+        </div>
+        <div style="display:flex;gap:10px;">
+          <button type="submit" class="btn-hc-primary"><i class="fas fa-save me-2"></i>Cập nhật</button>
+          <a href="/admin/pttt" class="btn-ghost"><i class="fas fa-times me-2"></i>Hủy</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

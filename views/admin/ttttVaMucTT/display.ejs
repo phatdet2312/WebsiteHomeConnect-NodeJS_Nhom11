@@ -1,0 +1,48 @@
+<!-- views/admin/ttttVaMucTT/display.ejs -->
+<div class="admin-page-header">
+  <div><h4>Chi tiết Mức Thanh toán <span style="color:var(--primary);">#<%= item.MaMucTT %></span></h4><p><%= item.Ten %></p></div>
+  <div style="display:flex;gap:8px;">
+    <a href="/admin/tttt-muc-tt/update/<%= item.MaMucTT %>" class="btn-hc-primary"><i class="fas fa-edit me-2"></i>Chỉnh sửa</a>
+    <a href="/admin/tttt-muc-tt" class="btn-ghost"><i class="fas fa-arrow-left me-2"></i>Quay lại</a>
+  </div>
+</div>
+<div style="max-width:500px;display:flex;flex-direction:column;gap:14px;">
+  <div class="table-card">
+    <div class="table-card-header">
+      <div class="table-card-title"><i class="fas fa-tasks me-2" style="color:#0061ff;"></i>Thông tin</div>
+    </div>
+    <div style="padding:20px 24px;">
+      <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:20px;">
+        <span style="background:var(--primary-light);color:var(--primary);padding:4px 12px;border-radius:8px;font-size:.8rem;font-weight:700;">#<%= item.MaMucTT %></span>
+        <% if (item.TTHienThi) { %>
+          <span style="background:#dcfce7;color:#15803d;padding:4px 12px;border-radius:8px;font-size:.8rem;font-weight:700;"><i class="fas fa-eye me-1"></i>Hiển thị</span>
+        <% } else { %>
+          <span style="background:var(--bg-soft);color:var(--text-muted);padding:4px 12px;border-radius:8px;font-size:.8rem;font-weight:600;"><i class="fas fa-eye-slash me-1"></i>Đang ẩn</span>
+        <% } %>
+      </div>
+      <div style="margin-bottom:20px;">
+        <div style="font-size:.72rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px;">Tên</div>
+        <div style="font-size:1.15rem;font-weight:800;color:var(--text);"><%= item.Ten %></div>
+      </div>
+      <div>
+        <div style="font-size:.72rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px;">Mức độ</div>
+        <% if (item.MucDo !== null && item.MucDo !== undefined) { %>
+          <% const c = item.MucDo >= 80 ? '#16a34a' : item.MucDo >= 50 ? '#ca8a04' : '#dc2626'; %>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div style="flex:1;height:12px;background:var(--border-light);border-radius:6px;overflow:hidden;">
+              <div style="height:100%;width:<%= item.MucDo %>%;background:<%= c %>;border-radius:6px;"></div>
+            </div>
+            <span style="font-size:1.1rem;font-weight:800;color:<%= c %>;min-width:48px;text-align:right;"><%= item.MucDo %>%</span>
+          </div>
+        <% } else { %>
+          <span style="color:var(--text-muted);font-size:.85rem;">Chưa xác định</span>
+        <% } %>
+      </div>
+    </div>
+  </div>
+  <div style="display:flex;gap:10px;">
+    <a href="/admin/tttt-muc-tt/update/<%= item.MaMucTT %>" class="btn-hc-primary"><i class="fas fa-edit me-2"></i>Chỉnh sửa</a>
+    <a href="/admin/tttt-muc-tt/delete/<%= item.MaMucTT %>" class="btn-ghost" style="color:var(--danger);border-color:var(--danger);"><i class="fas fa-trash me-2"></i>Xóa</a>
+    <a href="/admin/tttt-muc-tt" class="btn-ghost" style="margin-left:auto;"><i class="fas fa-arrow-left me-2"></i>Quay lại</a>
+  </div>
+</div>

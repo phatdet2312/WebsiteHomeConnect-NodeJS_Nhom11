@@ -1,0 +1,44 @@
+<!-- views/admin/hopDong/delete.ejs -->
+<div style="max-width:520px;margin:0 auto;">
+  <div class="table-card" style="overflow:hidden;">
+    <div style="background:linear-gradient(135deg,#dc2626,#b91c1c);padding:24px;text-align:center;">
+      <div style="width:60px;height:60px;background:rgba(255,255,255,.2);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;">
+        <i class="fas fa-trash-alt" style="font-size:1.4rem;color:white;"></i>
+      </div>
+      <h5 style="color:white;font-weight:800;margin:0;font-size:1.1rem;">Xác nhận xóa hợp đồng</h5>
+    </div>
+    <div style="padding:28px;text-align:center;">
+      <div style="width:72px;height:72px;background:var(--bg-soft);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+        <i class="fas fa-file-contract" style="font-size:1.8rem;color:var(--text-muted);opacity:.5;"></i>
+      </div>
+      <p style="color:var(--text-muted);font-size:.875rem;margin-bottom:6px;">Bạn có chắc muốn xóa hợp đồng?</p>
+      <p style="font-weight:800;font-size:1.1rem;color:var(--text);margin-bottom:12px;">Hợp đồng #<%= item.MaHopDong %></p>
+      <div style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-bottom:20px;">
+        <span style="background:var(--bg-soft);color:var(--text-muted);padding:3px 10px;border-radius:6px;font-size:.75rem;font-weight:600;">
+          <i class="fas fa-user me-1"></i><%= item.KhachHang ? item.KhachHang.TenKH : ('KH#' + item.MaKH) %>
+        </span>
+        <span style="background:var(--bg-soft);color:var(--text-muted);padding:3px 10px;border-radius:6px;font-size:.75rem;font-weight:600;">
+          <i class="fas fa-home me-1"></i><%= item.CanHo ? item.CanHo.TenCanHo : ('CH#' + item.MaCanHo) %>
+        </span>
+        <% if (item.GiaThoaThuan) { %>
+          <span style="background:#dcfce7;color:#15803d;padding:3px 10px;border-radius:6px;font-size:.75rem;font-weight:700;"><%= Number(item.GiaThoaThuan).toLocaleString('vi-VN') %>đ</span>
+        <% } %>
+      </div>
+      <div style="background:#fef2f2;border:1.5px solid #fecaca;border-radius:var(--radius-md);padding:14px 16px;text-align:left;margin-bottom:24px;">
+        <p style="color:#b91c1c;font-size:.84rem;margin:0;line-height:1.5;">
+          <i class="fas fa-exclamation-triangle me-2"></i>
+          <strong>Lưu ý:</strong> Xóa hợp đồng này sẽ xóa vĩnh viễn toàn bộ dữ liệu thanh toán liên quan. Không thể hoàn tác!
+        </p>
+      </div>
+      <div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap;">
+        <a href="/admin/hop-dong" class="btn-ghost"><i class="fas fa-times me-2"></i>Hủy</a>
+        <a href="/admin/hop-dong/display/<%= item.MaHopDong %>" class="btn-ghost"><i class="fas fa-eye me-2"></i>Xem chi tiết</a>
+        <form method="POST" action="/admin/hop-dong/delete/<%= item.MaHopDong %>" style="display:inline;">
+          <button type="submit" class="btn-hc-primary" style="background:#dc2626;border-color:#dc2626;">
+            <i class="fas fa-trash me-2"></i>Xác nhận xóa
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
