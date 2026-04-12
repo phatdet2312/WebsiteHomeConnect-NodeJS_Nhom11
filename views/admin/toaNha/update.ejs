@@ -1,0 +1,59 @@
+<!-- views/admin/toaNha/update.ejs -->
+<div class="admin-page-header">
+  <div>
+    <h4>Cập nhật Tòa nhà <span style="color:var(--primary);">#<%= item.MaToaNha %></span></h4>
+    <p><%= item.TenToaNha %></p>
+  </div>
+  <div style="display:flex;gap:8px;">
+    <a href="/admin/toa-nha/display/<%= item.MaToaNha %>" class="btn-ghost"><i class="fas fa-eye me-2"></i>Xem chi tiết</a>
+    <a href="/admin/toa-nha" class="btn-ghost"><i class="fas fa-arrow-left me-2"></i>Quay lại</a>
+  </div>
+</div> 
+
+<% if (errors && errors.length > 0) { %>
+<div class="hc-toast hc-toast-danger" style="position:static;margin-bottom:16px;">
+  <i class="fas fa-exclamation-circle"></i>
+  <div><% errors.forEach(e => { %><div><%= e %></div><% }) %></div>
+</div>
+<% } %>
+
+<div style="max-width:600px;">
+  <div class="table-card">
+    <div class="table-card-header">
+      <div class="table-card-title"><i class="fas fa-building me-2" style="color:var(--primary);"></i>Thông tin tòa nhà</div>
+    </div>
+    <div style="padding:24px;">
+      <form method="POST" action="/admin/toa-nha/update/<%= item.MaToaNha %>">
+        <div style="margin-bottom:16px;">
+          <label class="filter-label">Mã Tòa nhà</label>
+          <input type="text" class="hc-input" value="<%= item.MaToaNha %>" disabled style="opacity:.6;cursor:not-allowed;">
+        </div>
+        <div style="margin-bottom:16px;">
+          <label class="filter-label">Tên Tòa nhà <span style="color:var(--danger);">*</span></label>
+          <input type="text" name="TenToaNha" class="hc-input" value="<%= item.TenToaNha %>" required>
+        </div>
+
+        <div style="display:flex;gap:32px;margin-bottom:24px;flex-wrap:wrap;">
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:.875rem;font-weight:600;color:var(--text);">
+            <input type="checkbox" name="TTHienThi" id="ttHienThi"
+              <%= item.TTHienThi ? 'checked' : '' %>
+              style="accent-color:var(--primary);width:17px;height:17px;">
+            Hiển thị trên website
+          </label>
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:.875rem;font-weight:600;color:var(--text);">
+            <input type="checkbox" name="TTDeXuat" id="ttDeXuat"
+              <%= item.TTDeXuat ? 'checked' : '' %>
+              style="accent-color:#f59e0b;width:17px;height:17px;">
+            Đề xuất nổi bật
+          </label>
+        </div>
+
+        <div style="display:flex;gap:10px;">
+          <button type="submit" class="btn-hc-primary"><i class="fas fa-save me-2"></i>Cập nhật</button>
+          <a href="/admin/toa-nha/display/<%= item.MaToaNha %>" class="btn-ghost"><i class="fas fa-eye me-2"></i>Xem chi tiết</a>
+          <a href="/admin/toa-nha" class="btn-ghost"><i class="fas fa-times me-2"></i>Hủy</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

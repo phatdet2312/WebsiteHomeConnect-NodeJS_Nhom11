@@ -1,0 +1,120 @@
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<div class="admin-page-header">
+  <div><h4>Thông tin Căn hộ <span class="text-primary">#<%= id %></span></h4></div>
+  <div style="display:flex;gap:8px;">
+    <a href="/admin/can-ho/update/<%= id %>" class="btn-hc-primary"><i class="fas fa-edit me-2"></i>Sửa</a>
+    <button onclick="deleteThis()" class="btn-hc-primary" style="background:var(--danger);border-color:var(--danger);"><i class="fas fa-trash me-2"></i>Xóa</button>
+    <a href="/admin/can-ho" class="btn-ghost"><i class="fas fa-arrow-left me-2"></i>Quay lại</a>
+  </div>
+</div>
+ 
+<div id="loader" style="padding:50px;text-align:center;"><i class="fas fa-circle-notch fa-spin fa-2x text-primary"></i></div>
+
+<div id="displayArea" style="display:none; flex-direction:column; gap:20px;">
+    
+    <div style="display:flex; gap:20px; flex-wrap:wrap;">
+        <div style="flex:1; min-width:300px; background:#fff; border-radius:12px; overflow:hidden; border:1px solid #e2e8f0; box-shadow:0 2px 10px rgba(0,0,0,0.02);">
+            <img id="mainImg" src="https://via.placeholder.com/600x300" style="width:100%; height:250px; object-fit:cover;">
+            <div style="padding:20px;">
+                <div style="display:flex; gap:10px; margin-bottom:15px;" id="badges"></div>
+                <h3 id="chName" style="font-weight:800; color:var(--text); margin-bottom:5px;"></h3>
+                <p id="chLocation" style="color:var(--text-muted); font-weight:600; margin-bottom:20px;"><i class="fas fa-map-marker-alt me-1"></i> </p>
+                <div style="display:flex; gap:20px;">
+                    <div><span style="font-size:.75rem; color:#888; text-transform:uppercase; font-weight:700;">Giá Bán</span><div id="chGia" style="font-size:1.2rem; font-weight:800; color:var(--success);"></div></div>
+                    <div><span style="font-size:.75rem; color:#888; text-transform:uppercase; font-weight:700;">Giá Thuê</span><div id="chThue" style="font-size:1.2rem; font-weight:800; color:var(--primary);"></div></div>
+                </div>
+            </div>
+        </div>
+
+        <div style="flex:1; min-width:300px; display:flex; flex-direction:column; gap:20px;">
+            <div style="background:#fff; padding:20px; border-radius:12px; border:1px solid #e2e8f0; flex:1;">
+                <h6 style="color:var(--primary); font-weight:800; margin-bottom:15px;"><i class="fas fa-user-check me-2"></i>Khách Đang Trú Ngụ</h6>
+                <div id="khInfo"></div>
+            </div>
+            <div style="background:#fff; padding:20px; border-radius:12px; border:1px solid #e2e8f0; flex:1;">
+                <h6 style="color:#f59e0b; font-weight:800; margin-bottom:15px;"><i class="fas fa-clipboard-list me-2"></i>Chi Tiết Kỹ Thuật</h6>
+                <table style="width:100%; font-size:.9rem;">
+                    <tbody id="tblTech"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div style="background:#fff; padding:20px; border-radius:12px; border:1px solid #e2e8f0;" id="roomArea">
+        <h6 style="color:#0ea5e9; font-weight:800; margin-bottom:15px;"><i class="fas fa-door-open me-2"></i>Danh Sách Phòng</h6>
+        <div id="roomGrid" style="display:flex; gap:15px; flex-wrap:wrap;"></div>
+    </div>
+
+    <div style="background:#fff; padding:20px; border-radius:12px; border:1px solid #e2e8f0;" id="imgArea">
+        <h6 style="color:#8b5cf6; font-weight:800; margin-bottom:15px;"><i class="fas fa-images me-2"></i>Thư viện Ảnh</h6>
+        <div id="imgGrid" style="display:flex; gap:10px; flex-wrap:wrap;"></div>
+    </div>
+</div>
+
+<script>
+const chId = parseInt("<%= id %>");
+document.addEventListener('DOMContentLoaded', async () => {
+    const res = await fetch('/admin/can-ho/api/detail/' + chId);
+    const json = await res.json();
+    if(json.success) {
+        const d = json.data;
+        
+        if(d.UrlAnh) document.getElementById('mainImg').src = d.UrlAnh;
+        document.getElementById('chName').innerText = d.TenCanHo;
+        document.getElementById('chLocation').innerHTML += (d.Tang?.ToaNha?.TenToaNha || '?') + ' - Tầng ' + (d.Tang?.TenTang || '?');
+        document.getElementById('chGia').innerText = d.Gia ? Number(d.Gia).toLocaleString()+'đ' : '—';
+        document.getElementById('chThue').innerText = d.GiaThue ? Number(d.GiaThue).toLocaleString()+'đ' : '—';
+
+        let badges = '';
+        if(d.TTHienThi) badges += '<span style="background:#dcfce7;color:#15803d;padding:4px 12px;border-radius:6px;font-size:.75rem;font-weight:700;"><i class="fas fa-eye me-1"></i>Hiển thị</span>';
+        else badges += '<span style="background:#f1f5f9;color:#64748b;padding:4px 12px;border-radius:6px;font-size:.75rem;font-weight:700;"><i class="fas fa-eye-slash me-1"></i>Đang ẩn</span>';
+        if(d.TTDeXuat) badges += '<span style="background:#fef3c7;color:#b45309;padding:4px 12px;border-radius:6px;font-size:.75rem;font-weight:700;"><i class="fas fa-star me-1"></i>HOT</span>';
+        document.getElementById('badges').innerHTML = badges;
+
+        let khHTML = '<div style="color:#888;">Căn hộ hiện đang trống.</div>';
+        if(d.HopDongs && d.HopDongs.length > 0) {
+            const hd = d.HopDongs[0];
+            khHTML = `
+                <div style="font-weight:800; font-size:1.1rem; margin-bottom:5px;">${hd.KhachHang?.TenKH || 'Khách Vô Danh'}</div>
+                <div style="color:#64748b; margin-bottom:5px;"><i class="fas fa-file-contract me-2"></i>Hợp đồng: #${hd.MaHopDong} - ${hd.VaiTroHD?.TenVaiTro || '?'}</div>
+            `;
+        }
+        document.getElementById('khInfo').innerHTML = khHTML;
+
+        // Bảng kỹ thuật màu mè đẹp mắt
+        document.getElementById('tblTech').innerHTML = `
+            <tr style="border-bottom:1px dashed #eee;"><th style="padding:12px 0; color:var(--text-muted); width:40%;"><div style="display:flex;align-items:center;gap:10px;"><div style="width:32px;height:32px;border-radius:8px;background:#e0f2fe;color:#0ea5e9;display:flex;align-items:center;justify-content:center;"><i class="fas fa-ruler-combined"></i></div> Kích thước</div></th><td style="font-weight:800; font-size:1.05rem; padding:12px 0;">${d.Dai||'?'}m <span style="color:#cbd5e1;">x</span> ${d.Rong||'?'}m <span style="color:#cbd5e1;">x</span> ${d.Cao||'?'}m</td></tr>
+            <tr style="border-bottom:1px dashed #eee;"><th style="padding:12px 0; color:var(--text-muted);"><div style="display:flex;align-items:center;gap:10px;"><div style="width:32px;height:32px;border-radius:8px;background:#ede9fe;color:#8b5cf6;display:flex;align-items:center;justify-content:center;"><i class="fas fa-eye"></i></div> Tầm nhìn</div></th><td style="font-weight:800; color:var(--text); padding:12px 0;">${d.TamNhin || '—'}</td></tr>
+            <tr style="border-bottom:1px dashed #eee;"><th style="padding:12px 0; color:var(--text-muted);"><div style="display:flex;align-items:center;gap:10px;"><div style="width:32px;height:32px;border-radius:8px;background:#ffe4e6;color:#f43f5e;display:flex;align-items:center;justify-content:center;"><i class="fas fa-map-marker-alt"></i></div> Vị trí dãy</div></th><td style="padding:12px 0;"><span style="font-weight:800;">Dãy ${d.ViTriDay || '?'}</span> <span style="background:#fee2e2;color:#b91c1c;padding:3px 8px;border-radius:6px;font-size:.75rem;font-weight:700;margin-left:8px;">Top ${d.ThuTu || '?'}</span></td></tr>
+            <tr style="border-bottom:1px dashed #eee;"><th style="padding:12px 0; color:var(--text-muted);"><div style="display:flex;align-items:center;gap:10px;"><div style="width:32px;height:32px;border-radius:8px;background:#fef3c7;color:#f59e0b;display:flex;align-items:center;justify-content:center;"><i class="fas fa-clipboard-check"></i></div> Hiện trạng</div></th><td style="font-weight:800; color:var(--text); padding:12px 0;">${d.HienTrang?.TenHienTrang || '—'}</td></tr>
+            <tr><th style="padding:12px 0; color:var(--text-muted);"><div style="display:flex;align-items:center;gap:10px;"><div style="width:32px;height:32px;border-radius:8px;background:#dcfce7;color:#10b981;display:flex;align-items:center;justify-content:center;"><i class="fas fa-percentage"></i></div> Mức thanh toán</div></th><td style="font-weight:800; color:var(--text); padding:12px 0;">${d.TTTTvaMucTT?.Ten || '—'} <span style="color:#10b981;font-size:.85rem;">(${d.TTTTvaMucTT?.MucDo || 0}%)</span></td></tr>
+        `;
+
+        if(d.Phongs && d.Phongs.length > 0) {
+            document.getElementById('roomGrid').innerHTML = d.Phongs.map(p => `
+                <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:15px; width:160px; text-align:center;">
+                    ${p.DSA_Phongs?.length ? `<img src="${p.DSA_Phongs[0].UrlAnh}" style="width:100%; height:80px; object-fit:cover; border-radius:6px; margin-bottom:10px;">` : `<div style="width:100%;height:80px;background:#e2e8f0;border-radius:6px;display:flex;align-items:center;justify-content:center;margin-bottom:10px;"><i class="fas fa-door-open text-muted"></i></div>`}
+                    <div style="font-weight:700; font-size:.9rem; color:var(--text);">${p.TenPhong}</div>
+                </div>
+            `).join('');
+        } else document.getElementById('roomArea').style.display = 'none';
+
+        if(d.DSA_CanHos && d.DSA_CanHos.length > 0) {
+            document.getElementById('imgGrid').innerHTML = d.DSA_CanHos.map(a => `<img src="${a.UrlAnh}" style="height:100px; border-radius:8px; border:1px solid #e2e8f0; object-fit:cover;">`).join('');
+        } else document.getElementById('imgArea').style.display = 'none';
+
+        document.getElementById('loader').style.display = 'none';
+        document.getElementById('displayArea').style.display = 'flex';
+    }
+});
+
+// Xóa căn hộ (Xác nhận)
+function deleteThis() {
+    Swal.fire({ title: 'Xóa Căn hộ?', text:'Dữ liệu liên quan sẽ bị xóa sạch!', icon: 'warning', showCancelButton: true, confirmButtonColor: '#dc2626', confirmButtonText: 'Xóa ngay' }).then(async r => {
+        if(r.isConfirmed) {
+            const res = await fetch(`/admin/can-ho/api/delete-multiple`, { method: 'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ids: [chId]}) });
+            if((await res.json()).success) { Swal.fire({toast:true, position:'top-end', icon:'success', title:'Đã xóa', showConfirmButton:false, timer:1500}); window.location.href = '/admin/can-ho'; }
+        }
+    });
+}
+</script>

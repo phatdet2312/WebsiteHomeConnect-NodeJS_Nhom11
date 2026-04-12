@@ -1,0 +1,229 @@
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<style>
+.filter-label { display:block; font-size:.75rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; margin-bottom:5px; }
+.card-block { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); border: 1px solid #e2e8f0; margin-bottom:20px;}
+.card-title-sub { font-size: 1.05rem; font-weight: 800; color: var(--primary); margin-bottom: 15px; display:flex; align-items:center; gap:8px; border-bottom:1px solid #eee; padding-bottom:10px;}
+.room-box { background:#f8fafc; border:1px dashed #cbd5e1; border-radius:8px; padding:15px; margin-bottom:15px; position:relative; }
+.room-box .btn-remove { position:absolute; top:10px; right:10px; background:#fee2e2; color:#dc2626; border:none; border-radius:6px; width:30px; height:30px; cursor:pointer; }
+.img-preview-box { display:flex; flex-wrap:wrap; gap:10px; margin-top:10px; }
+.img-preview-item { position:relative; width:80px; height:80px; border-radius:8px; border:1px solid #ddd; overflow:hidden; }
+.img-preview-item img { width:100%; height:100%; object-fit:cover; }
+.img-preview-item button { position:absolute; top:2px; right:2px; background:rgba(220,38,38,0.9); color:#fff; border:none; border-radius:50%; width:20px; height:20px; font-size:.7rem; cursor:pointer; }
+</style>
+ 
+<div class="admin-page-header">
+  <div><h4>Cập nhật Căn hộ <span class="text-primary">#<%= id %></span></h4></div>
+  <div style="display:flex;gap:10px;">
+      <a href="/admin/can-ho/display/<%= id %>" class="btn-ghost"><i class="fas fa-eye me-2"></i>Xem</a>
+      <a href="/admin/can-ho" class="btn-ghost"><i class="fas fa-arrow-left me-2"></i>Quay lại</a>
+  </div>
+</div>
+
+<div id="loader" style="padding:50px;text-align:center;"><i class="fas fa-circle-notch fa-spin fa-2x text-primary"></i></div>
+
+<form id="updateForm" style="display:none;" onsubmit="submitUpdate(event)">
+  <div class="row">
+    <div class="col-lg-8">
+      <div class="card-block">
+        <div class="card-title-sub"><i class="fas fa-info-circle"></i>Thông tin cơ bản</div>
+        <div class="row g-3">
+          <div class="col-md-8">
+            <label class="filter-label">Tên Căn hộ <b class="text-danger">*</b></label>
+            <input type="text" id="TenCanHo" name="TenCanHo" class="hc-input" required>
+          </div>
+          <div class="col-md-4">
+            <label class="filter-label">Tầng <b class="text-danger">*</b></label>
+            <select id="MaTang" name="MaTang" class="hc-select" required></select>
+          </div>
+          <div class="col-md-3"><label class="filter-label">Dài (m)</label><input type="number" id="Dai" name="Dai" class="hc-input" step="0.01"></div>
+          <div class="col-md-3"><label class="filter-label">Rộng (m)</label><input type="number" id="Rong" name="Rong" class="hc-input" step="0.01"></div>
+          <div class="col-md-3"><label class="filter-label">Cao (m)</label><input type="number" id="Cao" name="Cao" class="hc-input" step="0.01"></div>
+          <div class="col-md-3"><label class="filter-label">Tầm nhìn</label><input type="text" id="TamNhin" name="TamNhin" class="hc-input"></div>
+          <div class="col-md-6"><label class="filter-label">Vị trí dãy (1-10)</label><input type="number" id="ViTriDay" name="ViTriDay" class="hc-input"></div>
+          <div class="col-md-6"><label class="filter-label">Thứ tự hiển thị</label><input type="number" id="ThuTu" name="ThuTu" class="hc-input"></div>
+          <div class="col-md-12"><label class="filter-label">Mô tả chi tiết</label><textarea id="MoTa" name="MoTa" class="hc-input" rows="3"></textarea></div>
+        </div>
+      </div>
+
+      <div class="card-block">
+        <div class="card-title-sub"><i class="fas fa-tags text-success"></i>Báo giá & Tình trạng</div>
+        <div class="row g-3">
+          <div class="col-md-6"><label class="filter-label">Giá Bán (VNĐ)</label><input type="number" id="Gia" name="Gia" class="hc-input"></div>
+          <div class="col-md-6"><label class="filter-label">Giá Thuê (VNĐ/Tháng)</label><input type="number" id="GiaThue" name="GiaThue" class="hc-input"></div>
+          <div class="col-md-6"><label class="filter-label">Hiện trạng</label><select id="MaHienTrang" name="MaHienTrang" class="hc-select"><option value="">-- Không --</option></select></div>
+          <div class="col-md-6"><label class="filter-label">Mức TT</label><select id="MaMucTT" name="MaMucTT" class="hc-select"><option value="">-- Không --</option></select></div>
+        </div>
+      </div>
+
+      <div class="card-block">
+        <div class="card-title-sub" style="justify-content:space-between;">
+            <span><i class="fas fa-door-open text-warning"></i>Quản lý Phòng</span>
+            <button type="button" class="btn-hc-primary" style="padding:4px 12px; font-size:.8rem;" onclick="addRoom()"><i class="fas fa-plus"></i> Thêm phòng</button>
+        </div>
+        <div id="roomContainer"></div>
+      </div>
+    </div>
+
+    <div class="col-lg-4">
+      <div class="card-block">
+        <div class="card-title-sub"><i class="fas fa-image text-info"></i>Ảnh Đại Diện</div>
+        <input type="file" id="UrlAnh" accept="image/*" class="hc-input" onchange="previewMain(this)">
+        <img id="mainPreview" style="width:100%; height:200px; object-fit:cover; border-radius:8px; margin-top:15px; display:none; border:2px dashed var(--primary);">
+      </div>
+
+      <div class="card-block">
+        <div class="card-title-sub"><i class="fas fa-images text-primary"></i>Bộ ảnh Căn Hộ</div>
+        <input type="file" id="galleryInput" multiple accept="image/*" class="hc-input" onchange="previewGallery(this)">
+        <div class="img-preview-box" id="galleryPreviewBox"></div>
+      </div>
+
+      <div class="card-block">
+        <div class="card-title-sub"><i class="fas fa-sliders-h text-danger"></i>Thiết lập</div>
+        <label style="display:flex;align-items:center;gap:10px; font-weight:600; margin-bottom:15px;">
+            <input type="checkbox" id="TTHienThi" style="width:18px;height:18px;accent-color:var(--primary);"> Hiển thị công khai
+        </label>
+        <label style="display:flex;align-items:center;gap:10px; font-weight:600;">
+            <input type="checkbox" id="TTDeXuat" style="width:18px;height:18px;accent-color:#f59e0b;"> Đề xuất (HOT)
+        </label>
+      </div>
+      
+      <button type="submit" id="submitBtn" class="btn-hc-primary w-100" style="padding:15px;font-size:1.1rem;background:#f59e0b;border-color:#f59e0b;"><i class="fas fa-save me-2"></i>Lưu Thay Đổi</button>
+    </div>
+  </div>
+</form>
+
+<script>
+const chId = parseInt("<%= id %>");
+let galleryFiles = [];
+let deleteDSA = [];
+let deletePhong = [];
+let deleteDSAPhong = [];
+let roomIndex = 1000;
+
+document.addEventListener('DOMContentLoaded', async () => {
+    const [resMeta, resDetail] = await Promise.all([ fetch('/admin/can-ho/api/metadata'), fetch('/admin/can-ho/api/detail/' + chId) ]);
+    const jsonMeta = await resMeta.json();
+    const jsonDetail = await resDetail.json();
+
+    if(jsonMeta.success && jsonDetail.success) {
+        document.getElementById('MaTang').innerHTML += jsonMeta.tangs.map(t => `<option value="${t.maTang}">${t.tenTang} (${t.tenToaNha})</option>`).join('');
+        document.getElementById('MaHienTrang').innerHTML += jsonMeta.hienTrangs.map(h => `<option value="${h.maHT}">${h.tenHT} (${h.mucDo}%)</option>`).join('');
+        document.getElementById('MaMucTT').innerHTML += jsonMeta.mucTTs.map(m => `<option value="${m.maMucTT}">${m.ten} (${m.mucDo}%)</option>`).join('');
+        
+        const d = jsonDetail.data;
+        document.getElementById('TenCanHo').value = d.TenCanHo;
+        document.getElementById('MaTang').value = d.MaTang;
+        document.getElementById('Dai').value = d.Dai || '';
+        document.getElementById('Rong').value = d.Rong || '';
+        document.getElementById('Cao').value = d.Cao || '';
+        document.getElementById('TamNhin').value = d.TamNhin || '';
+        document.getElementById('ViTriDay').value = d.ViTriDay || '';
+        document.getElementById('ThuTu').value = d.ThuTu || '';
+        document.getElementById('MoTa').value = d.MoTa || '';
+        document.getElementById('Gia').value = d.Gia || '';
+        document.getElementById('GiaThue').value = d.GiaThue || '';
+        document.getElementById('MaHienTrang').value = d.MaHienTrang || '';
+        document.getElementById('MaMucTT').value = d.MaMucTT || '';
+        document.getElementById('TTHienThi').checked = d.TTHienThi;
+        document.getElementById('TTDeXuat').checked = d.TTDeXuat;
+
+        if(d.UrlAnh) { document.getElementById('mainPreview').src = d.UrlAnh; document.getElementById('mainPreview').style.display = 'block'; }
+        
+        if(d.DSA_CanHos) {
+            document.getElementById('galleryPreviewBox').innerHTML = d.DSA_CanHos.map(a => `
+                <div class="img-preview-item" id="oldDsa_${a.MaAnh}">
+                    <img src="${a.UrlAnh}"><button type="button" onclick="removeOldDSA(${a.MaAnh})"><i class="fas fa-trash"></i></button>
+                </div>
+            `).join('');
+        }
+
+        if(d.Phongs) {
+            document.getElementById('roomContainer').innerHTML = d.Phongs.map((p, idx) => `
+                <div class="room-box" id="oldRoom_${p.MaPhong}">
+                    <input type="hidden" name="MaPhongList" value="${p.MaPhong}">
+                    <button type="button" class="btn-remove" onclick="removeOldRoom(${p.MaPhong})"><i class="fas fa-trash"></i></button>
+                    <div class="row g-2">
+                        <div class="col-md-6"><label class="filter-label">Tên phòng</label><input type="text" name="TenPhongList" value="${p.TenPhong}" class="hc-input" required></div>
+                        <div class="col-md-6"><label class="filter-label">Thêm ảnh phòng này</label><input type="file" name="AnhPhong_${idx}" multiple accept="image/*" class="hc-input" style="padding:6px;"></div>
+                        <div class="col-md-12">
+                            <div class="img-preview-box">
+                                ${p.DSA_Phongs.map(a => `<div class="img-preview-item" id="oldDsaP_${a.MaAnh}"><img src="${a.UrlAnh}"><button type="button" onclick="removeOldDSAPhong(${a.MaAnh})"><i class="fas fa-times"></i></button></div>`).join('')}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            roomIndex = d.Phongs.length; 
+        }
+
+        document.getElementById('loader').style.display = 'none';
+        document.getElementById('updateForm').style.display = 'block';
+    }
+});
+
+function previewMain(input) { if(input.files[0]) { const r = new FileReader(); r.onload = e => { document.getElementById('mainPreview').src = e.target.result; document.getElementById('mainPreview').style.display = 'block'; }; r.readAsDataURL(input.files[0]); } }
+function previewGallery(input) {
+    if(input.files) {
+        Array.from(input.files).forEach(file => {
+            galleryFiles.push(file);
+            const r = new FileReader(); const idx = galleryFiles.length - 1;
+            r.onload = e => { document.getElementById('galleryPreviewBox').innerHTML += `<div class="img-preview-item" id="g_${idx}" style="border-color:var(--primary);"><img src="${e.target.result}"><button type="button" onclick="removeGallery(${idx})"><i class="fas fa-times"></i></button></div>`; };
+            r.readAsDataURL(file);
+        });
+        input.value = '';
+    }
+}
+
+function removeGallery(idx) { galleryFiles[idx] = null; document.getElementById('g_' + idx).style.display = 'none'; }
+function removeOldDSA(id) { deleteDSA.push(id); document.getElementById('oldDsa_' + id).style.display = 'none'; }
+function removeOldDSAPhong(id) { deleteDSAPhong.push(id); document.getElementById('oldDsaP_' + id).style.display = 'none'; }
+function removeOldRoom(id) { deletePhong.push(id); document.getElementById('oldRoom_' + id).style.display = 'none'; document.getElementById('oldRoom_' + id).innerHTML = ''; } 
+
+function addRoom() {
+    const html = `
+    <div class="room-box" id="room_${roomIndex}">
+        <input type="hidden" name="MaPhongList" value="new">
+        <button type="button" class="btn-remove" onclick="document.getElementById('room_${roomIndex}').remove()"><i class="fas fa-trash"></i></button>
+        <div class="row g-2">
+            <div class="col-md-6"><label class="filter-label">Tên phòng</label><input type="text" name="TenPhongList" class="hc-input" required></div>
+            <div class="col-md-6"><label class="filter-label">Bộ ảnh</label><input type="file" name="AnhPhong_${roomIndex}" multiple accept="image/*" class="hc-input" style="padding:6px;"></div>
+        </div>
+    </div>`;
+    document.getElementById('roomContainer').insertAdjacentHTML('beforeend', html);
+    roomIndex++;
+}
+
+async function submitUpdate(e) {
+    e.preventDefault();
+    const result = await Swal.fire({ title:'Lưu thay đổi?', text:'Thông tin căn hộ sẽ được cập nhật.', icon:'question', showCancelButton:true, confirmButtonColor:'#f59e0b', confirmButtonText:'Lưu' });
+    if(!result.isConfirmed) return;
+
+    const btn = document.getElementById('submitBtn');
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Đang lưu...'; btn.disabled = true;
+
+    const fd = new FormData(document.getElementById('updateForm'));
+    fd.append('TTHienThi', document.getElementById('TTHienThi').checked);
+    fd.append('TTDeXuat', document.getElementById('TTDeXuat').checked);
+
+    const mainFile = document.getElementById('UrlAnh').files[0];
+    if(mainFile) fd.append('UrlAnh', mainFile);
+
+    galleryFiles.filter(f => f !== null).forEach(f => fd.append('additionalImages', f));
+    deleteDSA.forEach(id => fd.append('DSA_CanHoToDelete', id));
+    deletePhong.forEach(id => fd.append('PhongToDelete', id));
+    deleteDSAPhong.forEach(id => fd.append('DSA_PhongToDelete', id));
+
+    try {
+        const res = await fetch('/admin/can-ho/api/update/' + chId, { method: 'POST', body: fd });
+        const json = await res.json();
+        if(json.success) {
+            Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'Cập nhật thành công!', showConfirmButton: false, timer: 1500 });
+            setTimeout(() => window.location.href = '/admin/can-ho/display/' + chId, 1000);
+        }
+        else throw new Error(json.message);
+    } catch(err) {
+        Swal.fire('Lỗi', err.message, 'error');
+        btn.innerHTML = '<i class="fas fa-save me-2"></i>Lưu Thay Đổi'; btn.disabled = false;
+    }
+}
+</script>

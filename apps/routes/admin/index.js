@@ -60,10 +60,15 @@ router.get('/dashboard', async (req, res) => {
     });
   }
 });
-
+ 
 router.use('/banner', require('./banner'));
 router.use('/quan-ly-nguoi-dung', require('./quanLyNguoiDung'));
 router.use('/dich-vu', require('./dichVu'));
 router.use('/ct-dich-vu', require('./ctDichVu'));
+router.use('/toa-nha', require('./toaNha'));
+router.use('/tang', require('./tang'));
+router.use('/can-ho', require('./canho'));
+router.use('/danh-muc-noi-that', require('./danhMucNoiThat'));
+router.use('/hien-trang', require('./hienTrang'));
 
 module.exports = router;
