@@ -67,6 +67,7 @@ const khamPhaRoutes = require('./apps/routes/khamPha');
 const hoaDonDichVuRoutes = require('./apps/routes/hoaDonDichVu');
 const hoaDonHopDongRoutes = require('./apps/routes/hoaDonHopDong');
 const thanhToanMuaThueRoutes = require('./apps/routes/thanhToanMuaThue');
+const quanLyLichRoutes = require('./apps/routes/quanLyLich');
 const shoppingCartRoutes = require('./apps/routes/shoppingCart');
 const adminRoutes = require('./apps/routes/admin/index');
 const apiRoutes = require('./apps/routes/api');
@@ -80,6 +81,7 @@ app.use('/kham-pha', khamPhaRoutes);
 app.use('/hoa-don-dich-vu', hoaDonDichVuRoutes);
 app.use('/hoa-don-hop-dong', hoaDonHopDongRoutes);
 app.use('/thanh-toan-mua-thue', thanhToanMuaThueRoutes);
+app.use('/quan-ly-lich', quanLyLichRoutes);
 app.use('/gio-hang', shoppingCartRoutes);
 app.use('/admin', adminRoutes);
 
