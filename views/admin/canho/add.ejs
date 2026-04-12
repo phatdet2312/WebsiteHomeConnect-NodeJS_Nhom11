@@ -1,0 +1,189 @@
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<style>
+.filter-label { display:block; font-size:.75rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; margin-bottom:5px; }
+.card-block { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); border: 1px solid #e2e8f0; margin-bottom:20px;}
+.card-title-sub { font-size: 1.05rem; font-weight: 800; color: var(--primary); margin-bottom: 15px; display:flex; align-items:center; gap:8px; border-bottom:1px solid #eee; padding-bottom:10px;}
+.room-box { background:#f8fafc; border:1px dashed #cbd5e1; border-radius:8px; padding:15px; margin-bottom:15px; position:relative; }
+.room-box .btn-remove { position:absolute; top:10px; right:10px; background:#fee2e2; color:#dc2626; border:none; border-radius:6px; width:30px; height:30px; cursor:pointer; }
+.img-preview-box { display:flex; flex-wrap:wrap; gap:10px; margin-top:10px; }
+.img-preview-item { position:relative; width:80px; height:80px; border-radius:8px; border:1px solid #ddd; overflow:hidden; }
+.img-preview-item img { width:100%; height:100%; object-fit:cover; }
+</style>
+ 
+<div class="admin-page-header">
+  <div><h4>Tạo Căn hộ mới</h4><p>Thiết lập thông tin và bộ sưu tập ảnh</p></div>
+  <a href="/admin/can-ho" class="btn-ghost"><i class="fas fa-arrow-left me-2"></i>Quay lại</a>
+</div>
+
+<div id="loader" style="padding:50px;text-align:center;"><i class="fas fa-circle-notch fa-spin fa-2x text-primary"></i></div>
+
+<form id="addForm" style="display:none;" onsubmit="submitForm(event)">
+  <div class="row">
+    <div class="col-lg-8">
+      <div class="card-block">
+        <div class="card-title-sub"><i class="fas fa-info-circle"></i>Thông tin cơ bản</div>
+        <div class="row g-3">
+          <div class="col-md-8">
+            <label class="filter-label">Tên Căn hộ <b class="text-danger">*</b></label>
+            <input type="text" id="TenCanHo" name="TenCanHo" class="hc-input" required>
+          </div>
+          <div class="col-md-4">
+            <label class="filter-label">Tầng <b class="text-danger">*</b></label>
+            <select id="MaTang" name="MaTang" class="hc-select" required><option value="">-- Chọn --</option></select>
+          </div>
+          <div class="col-md-3"><label class="filter-label">Dài (m)</label><input type="number" id="Dai" class="hc-input" step="0.01"></div>
+          <div class="col-md-3"><label class="filter-label">Rộng (m)</label><input type="number" id="Rong" class="hc-input" step="0.01"></div>
+          <div class="col-md-3"><label class="filter-label">Cao (m)</label><input type="number" id="Cao" class="hc-input" step="0.01"></div>
+          <div class="col-md-3"><label class="filter-label">Tầm nhìn</label><input type="text" id="TamNhin" class="hc-input"></div>
+          <div class="col-md-6"><label class="filter-label">Vị trí dãy (1-10)</label><input type="number" id="ViTriDay" class="hc-input" value="1"></div>
+          <div class="col-md-6"><label class="filter-label">Thứ tự hiển thị</label><input type="number" id="ThuTu" class="hc-input" value="1"></div>
+          <div class="col-md-12">
+            <label class="filter-label">Mô tả chi tiết</label>
+            <textarea id="MoTa" class="hc-input" rows="3" style="height:auto;resize:vertical;"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-block">
+        <div class="card-title-sub"><i class="fas fa-tags text-success"></i>Báo giá & Tình trạng</div>
+        <div class="row g-3">
+          <div class="col-md-6"><label class="filter-label">Giá Bán (VNĐ)</label><input type="number" id="Gia" class="hc-input" min="0"></div>
+          <div class="col-md-6"><label class="filter-label">Giá Thuê (VNĐ/Tháng)</label><input type="number" id="GiaThue" class="hc-input" min="0"></div>
+          <div class="col-md-6">
+            <label class="filter-label">Hiện trạng</label>
+            <select id="MaHienTrang" class="hc-select"><option value="">-- Không --</option></select>
+          </div>
+          <div class="col-md-6">
+            <label class="filter-label">Mức thanh toán quy định</label>
+            <select id="MaMucTT" class="hc-select"><option value="">-- Không --</option></select>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-block">
+        <div class="card-title-sub" style="justify-content:space-between;">
+            <span><i class="fas fa-door-open text-warning"></i>Danh sách Phòng</span>
+            <button type="button" class="btn-hc-primary" style="padding:4px 12px; font-size:.8rem;" onclick="addRoom()"><i class="fas fa-plus"></i> Thêm phòng</button>
+        </div>
+        <div id="roomContainer"></div>
+      </div>
+    </div>
+
+    <div class="col-lg-4">
+      <div class="card-block">
+        <div class="card-title-sub"><i class="fas fa-image text-info"></i>Ảnh Đại Diện</div>
+        <input type="file" id="UrlAnh" accept="image/*" class="hc-input" onchange="previewMain(this)">
+        <img id="mainPreview" style="width:100%; height:200px; object-fit:cover; border-radius:8px; margin-top:15px; display:none; border:2px dashed var(--primary);">
+      </div>
+
+      <div class="card-block">
+        <div class="card-title-sub"><i class="fas fa-images text-primary"></i>Bộ ảnh Căn Hộ</div>
+        <input type="file" id="galleryInput" multiple accept="image/*" class="hc-input" onchange="previewGallery(this)">
+        <div class="img-preview-box" id="galleryPreviewBox"></div>
+      </div>
+
+      <div class="card-block">
+        <div class="card-title-sub"><i class="fas fa-sliders-h text-danger"></i>Thiết lập</div>
+        <label style="display:flex;align-items:center;gap:10px; font-weight:600; margin-bottom:15px;">
+            <input type="checkbox" id="TTHienThi" checked style="width:18px;height:18px;accent-color:var(--primary);"> Hiển thị công khai
+        </label>
+        <label style="display:flex;align-items:center;gap:10px; font-weight:600;">
+            <input type="checkbox" id="TTDeXuat" style="width:18px;height:18px;accent-color:#f59e0b;"> Căn hộ Đề xuất (HOT)
+        </label>
+      </div>
+      
+      <button type="submit" id="submitBtn" class="btn-hc-primary w-100" style="padding:15px;font-size:1.1rem;"><i class="fas fa-save me-2"></i>Lưu Căn Hộ</button>
+    </div>
+  </div>
+</form>
+
+<script>
+let galleryFiles = [];
+let roomIndex = 0;
+
+document.addEventListener('DOMContentLoaded', async () => {
+    const res = await fetch('/admin/can-ho/api/metadata');
+    const json = await res.json();
+    if(json.success) {
+        document.getElementById('MaTang').innerHTML += json.tangs.map(t => `<option value="${t.maTang}">${t.tenTang} (${t.tenToaNha})</option>`).join('');
+        document.getElementById('MaHienTrang').innerHTML += json.hienTrangs.map(h => `<option value="${h.maHT}">${h.tenHT} (${h.mucDo}%)</option>`).join('');
+        document.getElementById('MaMucTT').innerHTML += json.mucTTs.map(m => `<option value="${m.maMucTT}">${m.ten} (${m.mucDo}%)</option>`).join('');
+        
+        document.getElementById('loader').style.display = 'none';
+        document.getElementById('addForm').style.display = 'block';
+    }
+});
+
+function previewMain(input) {
+    if(input.files && input.files[0]) {
+        const r = new FileReader();
+        r.onload = e => { document.getElementById('mainPreview').src = e.target.result; document.getElementById('mainPreview').style.display = 'block'; }
+        r.readAsDataURL(input.files[0]);
+    }
+}
+
+function previewGallery(input) {
+    if(input.files) {
+        Array.from(input.files).forEach(file => {
+            galleryFiles.push(file);
+            const r = new FileReader();
+            const idx = galleryFiles.length - 1;
+            r.onload = e => {
+                document.getElementById('galleryPreviewBox').innerHTML += `<div class="img-preview-item" id="g_${idx}"><img src="${e.target.result}"><button type="button" onclick="removeGallery(${idx})"><i class="fas fa-times"></i></button></div>`;
+            };
+            r.readAsDataURL(file);
+        });
+        input.value = '';
+    }
+}
+function removeGallery(idx) { galleryFiles[idx] = null; document.getElementById('g_' + idx).style.display = 'none'; }
+
+function addRoom() {
+    const html = `
+    <div class="room-box" id="room_${roomIndex}">
+        <button type="button" class="btn-remove" onclick="document.getElementById('room_${roomIndex}').remove()"><i class="fas fa-trash"></i></button>
+        <div class="row g-2">
+            <div class="col-md-6">
+                <label class="filter-label">Tên phòng (VD: Phòng ngủ 1)</label>
+                <input type="text" name="TenPhongList" class="hc-input" required>
+            </div>
+            <div class="col-md-6">
+                <label class="filter-label">Bộ ảnh phòng này</label>
+                <input type="file" name="AnhPhong_${roomIndex}" multiple accept="image/*" class="hc-input" style="padding:6px;">
+            </div>
+        </div>
+    </div>`;
+    document.getElementById('roomContainer').insertAdjacentHTML('beforeend', html);
+    roomIndex++;
+}
+
+async function submitForm(e) {
+    e.preventDefault();
+    const result = await Swal.fire({ title:'Xác nhận tạo mới?', text:'Căn hộ sẽ được thêm vào hệ thống.', icon:'question', showCancelButton:true, confirmButtonColor:'#0061ff', confirmButtonText:'Đồng ý' });
+    if(!result.isConfirmed) return;
+
+    const btn = document.getElementById('submitBtn');
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Đang xử lý...'; btn.disabled = true;
+
+    const fd = new FormData(document.getElementById('addForm'));
+    fd.append('TTHienThi', document.getElementById('TTHienThi').checked);
+    fd.append('TTDeXuat', document.getElementById('TTDeXuat').checked);
+
+    const mainFile = document.getElementById('UrlAnh').files[0];
+    if(mainFile) fd.append('UrlAnh', mainFile);
+
+    galleryFiles.filter(f => f !== null).forEach(f => fd.append('additionalImages', f));
+
+    try {
+        const res = await fetch('/admin/can-ho/api/add', { method: 'POST', body: fd });
+        const json = await res.json();
+        if(json.success) {
+            Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'Thêm thành công!', showConfirmButton: false, timer: 1500 });
+            setTimeout(() => window.location.href = '/admin/can-ho/display/' + json.id, 1000);
+        } else throw new Error(json.message);
+    } catch(err) {
+        Swal.fire('Lỗi', err.message, 'error');
+        btn.innerHTML = '<i class="fas fa-save me-2"></i>Lưu Căn Hộ'; btn.disabled = false;
+    }
+}
+</script>

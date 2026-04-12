@@ -1,0 +1,68 @@
+<!-- views/admin/tang/add.ejs -->
+<div class="admin-page-header">
+  <div>
+    <h4>Thêm Tầng mới</h4>
+    <p>Tạo tầng cho tòa nhà</p>
+  </div>
+  <a href="/admin/tang" class="btn-ghost"><i class="fas fa-arrow-left me-2"></i>Quay lại</a>
+</div>
+
+<% if (errors && errors.length > 0) { %>
+<div class="hc-toast hc-toast-danger" style="position:static;margin-bottom:16px;">
+  <i class="fas fa-exclamation-circle"></i>
+  <div><% errors.forEach(e => { %><div><%= e %></div><% }) %></div>
+</div>
+<% } %> 
+
+<div style="max-width:600px;">
+  <div class="table-card">
+    <div class="table-card-header">
+      <div class="table-card-title"><i class="fas fa-layer-group me-2" style="color:#7c3aed;"></i>Thông tin tầng</div>
+    </div>
+    <div style="padding:24px;">
+      <form method="POST" action="/admin/tang/add">
+        <div class="row g-3">
+          <div class="col-md-12">
+            <label class="filter-label">Tên Tầng <span style="color:var(--danger);">*</span></label>
+            <input type="text" name="TenTang" class="hc-input" placeholder="Ví dụ: Tầng 1, Tầng trệt..."
+              value="<%= item ? item.TenTang : '' %>" required>
+          </div>
+          <div class="col-md-12">
+            <label class="filter-label">Tòa nhà <span style="color:var(--danger);">*</span></label>
+            <select name="MaToaNha" class="hc-select" required>
+              <option value="">-- Chọn tòa nhà --</option>
+              <% if (toaNhaList) { toaNhaList.forEach(tn => { %>
+                <option value="<%= tn.MaToaNha %>" <%= (item && item.MaToaNha == tn.MaToaNha) ? 'selected' : '' %>><%= tn.TenToaNha %></option>
+              <% }) } %>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="filter-label">Số hành lang</label>
+            <input type="number" name="SoHanhLang" class="hc-input" min="0" placeholder="0"
+              value="<%= item ? item.SoHanhLang : '' %>">
+          </div>
+        </div>
+
+        <div style="display:flex;gap:32px;margin:20px 0 24px;flex-wrap:wrap;">
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:.875rem;font-weight:600;color:var(--text);">
+            <input type="checkbox" name="TTHienThi" id="ttHienThi"
+              <%= !item || item.TTHienThi !== false ? 'checked' : '' %>
+              style="accent-color:var(--primary);width:17px;height:17px;">
+            Hiển thị
+          </label>
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:.875rem;font-weight:600;color:var(--text);">
+            <input type="checkbox" name="TTDeXuat" id="ttDeXuat"
+              <%= item && item.TTDeXuat ? 'checked' : '' %>
+              style="accent-color:#f59e0b;width:17px;height:17px;">
+            Đề xuất nổi bật
+          </label>
+        </div>
+
+        <div style="display:flex;gap:10px;">
+          <button type="submit" class="btn-hc-primary"><i class="fas fa-save me-2"></i>Lưu</button>
+          <a href="/admin/tang" class="btn-ghost"><i class="fas fa-times me-2"></i>Hủy</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

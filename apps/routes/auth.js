@@ -16,7 +16,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'DayLaMotSecretKeyRatDaiVaAnToanCho
 router.get('/login', (req, res) => {
   if (req.isAuthenticated()) return res.redirect('/');
   res.render('auth/login', { title: 'Đăng nhập - HomeConnect', layout: 'layouts/main' });
-});
+}); 
 
 // Chuyển thành API JSON
 router.post('/api/login', (req, res, next) => {
