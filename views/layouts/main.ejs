@@ -70,6 +70,10 @@
                   <div style="font-size:.78rem;color:var(--text-muted);"><%= user.Email || '' %></div>
                 </div>
               </li>
+              <li><a class="dropdown-item" href="/can-ho"><i class="fas fa-home me-2 text-primary"></i>Căn hộ của tôi</a></li>
+              <li><a class="dropdown-item" href="/hoa-don-dich-vu"><i class="fas fa-receipt me-2 text-primary"></i>Hóa đơn</a></li>
+              <li><a class="dropdown-item" href="/quan-ly-lich"><i class="fas fa-calendar me-2 text-primary"></i>Lịch của tôi</a></li>
+              <li><hr class="dropdown-divider"></li>
               <li><a class="dropdown-item" href="/auth/change-password"><i class="fas fa-key me-2 text-muted"></i>Đổi mật khẩu</a></li>
               <li><a class="dropdown-item text-danger" href="/auth/logout"><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</a></li>
             </ul>
@@ -88,6 +92,12 @@
     <div id="mobileNav" style="display:none;border-top:1px solid var(--border-light);background:var(--bg-white);">
       <div style="padding:12px 20px;display:flex;flex-direction:column;gap:4px;">
         <a href="/" class="nav-link" style="padding:10px 12px;">🏠 Trang chủ</a>
+        <a href="/kham-pha" class="nav-link" style="padding:10px 12px;">🔍 Khám phá</a>
+        <a href="/dich-vu" class="nav-link" style="padding:10px 12px;">🍸 Dịch vụ</a>
+        <% if (isAuthenticated) { %>
+          <a href="/can-ho" class="nav-link" style="padding:10px 12px;">📄 Hợp đồng</a>
+          <a href="/quan-ly-lich" class="nav-link" style="padding:10px 12px;">📅 Lịch</a>
+        <% } %>
       </div>
     </div>
   </header>
@@ -131,6 +141,9 @@
           <h6 class="footer-heading">Khám phá</h6>
           <ul class="footer-links">
             <li><a href="/">Trang chủ</a></li>
+            <li><a href="/kham-pha">Tìm căn hộ</a></li>
+            <li><a href="/dich-vu">Dịch vụ</a></li>
+            <li><a href="/lien-he">Liên hệ</a></li>
           </ul>
         </div>
         <div class="col-lg-2 col-md-6 col-6">
@@ -138,6 +151,8 @@
           <ul class="footer-links">
             <li><a href="/auth/login">Đăng nhập</a></li>
             <li><a href="/auth/register">Đăng ký</a></li>
+            <li><a href="/can-ho">Hợp đồng</a></li>
+            <li><a href="/gio-hang">Giỏ hàng</a></li>
           </ul>
         </div>
         <div class="col-lg-4 col-md-6">

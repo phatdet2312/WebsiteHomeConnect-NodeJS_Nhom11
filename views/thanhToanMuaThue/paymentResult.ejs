@@ -1,0 +1,61 @@
+
+<!-- views/thanhToanMuaThue/paymentResult.ejs -->
+<div class="container text-center py-5" style="max-width:560px;">
+  <div class="card border-0 shadow-lg" style="border-radius:20px; overflow:hidden;">
+    <% if (success) { %>
+      <div style="background:linear-gradient(135deg,#43a047,#66bb6a); padding:40px;">
+        <div style="width:80px;height:80px;background:rgba(255,255,255,.2);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;">
+          <i class="fas fa-home fa-2x text-white"></i>
+        </div>
+        <h3 class="text-white fw-bold mb-1 mt-3">&#272;&#7863;t h&#224;ng th&#224;nh c&#244;ng!</h3>
+        <p class="text-white-75 mb-0">Y&#234;u c&#7847;u c&#7911;a b&#7841;n &#273;&#227; &#273;&#432;&#7907;c ti&#7871;p nh&#7853;n</p>
+      </div>
+    <% } else { %>
+      <div style="background:linear-gradient(135deg,#e53935,#ef5350); padding:40px;">
+        <div style="width:80px;height:80px;background:rgba(255,255,255,.2);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;">
+          <i class="fas fa-times fa-2x text-white"></i>
+        </div>
+        <h3 class="text-white fw-bold mb-1 mt-3">Thanh to&#225;n th&#7845;t b&#7841;i</h3>
+        <p class="text-white-75 mb-0">Giao d&#7883;ch kh&#244;ng th&#224;nh c&#244;ng</p>
+      </div>
+    <% } %>
+    <div class="card-body p-4">
+      <% if (typeof result !== 'undefined' && result) { %>
+        <div class="table-responsive mb-4">
+          <table class="table table-sm text-start">
+            <% if (result.responseCode) { %>
+              <tr><td class="text-muted small">M&#227; ph&#7843;n h&#7891;i</td><td class="fw-semibold small"><%= result.responseCode %></td></tr>
+            <% } %>
+            <% if (result.amount) { %>
+              <tr><td class="text-muted small">S&#7889; ti&#7873;n</td><td class="fw-semibold small"><%= Number(result.amount/100).toLocaleString('vi-VN') %> &#273;</td></tr>
+            <% } %>
+            <% if (result.txnRef) { %>
+              <tr><td class="text-muted small">M&#227; giao d&#7883;ch</td><td class="fw-semibold small"><%= result.txnRef %></td></tr>
+            <% } %>
+          </table>
+        </div>
+      <% } %>
+      <% if (typeof error !== 'undefined' && error) { %>
+        <div class="alert alert-danger text-start small"><%= error %></div>
+      <% } %> 
+      <% if (success) { %>
+        <div class="alert alert-info border-0 text-start small mb-4" style="border-radius:10px; background:#e3f2fd;">
+          <i class="fas fa-info-circle text-primary me-2"></i>
+          &#272;&#7897;i ng&#361; s&#7869; li&#234;n h&#7879; b&#7841;n trong v&#242;ng 24 gi&#7901; &#273;&#7875; x&#225;c nh&#7853;n h&#7907;p &#273;&#7891;ng.
+        </div>
+      <% } %>
+      <div class="d-grid gap-2">
+        <% if (success) { %>
+          <a href="/can-ho" class="btn btn-primary py-2 fw-semibold" style="border-radius:10px;">
+            <i class="fas fa-home me-2"></i>Xem c&#259;n h&#7897; c&#7911;a t&#244;i
+          </a>
+        <% } else { %>
+          <a href="/gio-hang" class="btn btn-danger py-2 fw-semibold" style="border-radius:10px;">
+            <i class="fas fa-redo me-2"></i>Th&#7917; l&#7841;i
+          </a>
+        <% } %>
+        <a href="/" class="btn btn-link text-muted">V&#7873; trang ch&#7911;</a>
+      </div>
+    </div>
+  </div>
+</div>
