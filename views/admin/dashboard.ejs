@@ -1,0 +1,193 @@
+<!-- views/admin/dashboard.ejs -->
+<div class="row g-3 mb-4">
+  <div class="col-sm-6 col-xl-3">
+    <div class="hc-stat-card" style="--sc-color:#0061ff;">
+      <div class="sc-icon"><i class="fas fa-users"></i></div>
+      <div class="sc-body">
+        <div class="sc-label">Khách hàng</div>
+        <div class="sc-value"><%= stats.tongKH || 0 %></div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-xl-3">
+    <div class="hc-stat-card" style="--sc-color:#00875a;">
+      <div class="sc-icon" style="background:rgba(0,135,90,.15);"><i class="fas fa-home" style="color:#00875a;"></i></div>
+      <div class="sc-body">
+        <div class="sc-label">Căn hộ</div>
+        <div class="sc-value" style="color:#00875a;"><%= stats.tongCanHo || 0 %></div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-xl-3">
+    <div class="hc-stat-card" style="--sc-color:#ff6b35;">
+      <div class="sc-icon" style="background:rgba(255,107,53,.15);"><i class="fas fa-file-contract" style="color:#ff6b35;"></i></div>
+      <div class="sc-body">
+        <div class="sc-label">Hợp đồng active</div>
+        <div class="sc-value" style="color:#ff6b35;"><%= stats.tongHD || 0 %></div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-xl-3">
+    <div class="hc-stat-card" style="--sc-color:#7c3aed;">
+      <div class="sc-icon" style="background:rgba(124,58,237,.15);"><i class="fas fa-concierge-bell" style="color:#7c3aed;"></i></div>
+      <div class="sc-body">
+        <div class="sc-label">Dịch vụ</div>
+        <div class="sc-value" style="color:#7c3aed;"><%= stats.tongDV || 0 %></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-sm-6 col-xl-3">
+    <div class="hc-stat-card">
+      <div class="sc-icon" style="background:rgba(0,135,90,.12);"><i class="fas fa-building" style="color:#00875a;"></i></div>
+      <div class="sc-body">
+        <div class="sc-label">Tòa nhà</div>
+        <div class="sc-value" style="color:#00875a;"><%= stats.tongToaNha || 0 %></div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-xl-3">
+    <div class="hc-stat-card">
+      <div class="sc-icon" style="background:rgba(222,53,11,.12);"><i class="fas fa-door-open" style="color:#de350b;"></i></div>
+      <div class="sc-body">
+        <div class="sc-label">Căn hộ trống</div>
+        <div class="sc-value" style="color:#de350b;"><%= stats.canHoTrong || 0 %></div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-xl-3">
+    <div class="hc-stat-card">
+      <div class="sc-icon" style="background:rgba(0,97,255,.12);"><i class="fas fa-clock" style="color:#0061ff;"></i></div>
+      <div class="sc-body">
+        <div class="sc-label">Hợp đồng chờ duyệt</div>
+        <div class="sc-value"><%= stats.hdChoDuyet || 0 %></div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-xl-3">
+    <div class="hc-stat-card">
+      <div class="sc-icon" style="background:rgba(202,138,4,.15);"><i class="fas fa-image" style="color:#ca8a04;"></i></div>
+      <div class="sc-body">
+        <div class="sc-label">Banner active</div>
+        <div class="sc-value" style="color:#ca8a04;"><%= stats.tongBanner || 0 %></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Quick access -->
+<div class="mb-4">
+  <div style="font-size:.82rem;font-weight:700;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px;">Truy cập nhanh</div>
+  <div class="row g-3">
+    <% const quickLinks = [
+      {href:'/admin/can-ho',             icon:'fa-home',             label:'Căn hộ',         c:'#0061ff'},
+      {href:'/admin/hop-dong',           icon:'fa-file-contract',    label:'Hợp đồng',       c:'#00875a'},
+      {href:'/admin/dich-vu',            icon:'fa-concierge-bell',   label:'Dịch vụ',        c:'#ff6b35'},
+      {href:'/admin/toa-nha',            icon:'fa-building',         label:'Tòa nhà',        c:'#0061ff'},
+      {href:'/admin/tang',               icon:'fa-layer-group',      label:'Tầng',           c:'#7c3aed'},
+      {href:'/admin/banner',             icon:'fa-images',           label:'Banner',         c:'#00875a'},
+      {href:'/admin/quan-ly-nguoi-dung', icon:'fa-users',            label:'Người dùng',     c:'#de350b'},
+      {href:'/admin/thong-ke',           icon:'fa-chart-bar',        label:'Thống kê',       c:'#0061ff'},
+    ] %>
+    <% quickLinks.forEach(link => { %>
+    <div class="col-6 col-md-4 col-xl-3">
+      <a href="<%= link.href %>" class="quick-link-card">
+        <div class="ql-icon" style="background:<%= link.c %>22;color:<%= link.c %>;"><i class="fas <%= link.icon %>"></i></div>
+        <span><%= link.label %></span>
+      </a>
+    </div>
+    <% }) %>
+  </div>
+</div>
+
+<!-- Recent data tables -->
+<div class="row g-3">
+  <div class="col-lg-6">
+    <div class="table-card">
+      <div class="table-card-header">
+        <div class="table-card-title"><i class="fas fa-file-contract me-2" style="color:#00875a;"></i>Hợp đồng gần đây</div>
+        <a href="/admin/hop-dong" class="btn-tbl btn-tbl-view">Xem tất cả</a>
+      </div>
+      <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;">
+          <thead>
+            <tr style="background:rgba(255,255,255,.03);border-bottom:1px solid rgba(255,255,255,.07);">
+              <th style="padding:10px 16px;font-size:.72rem;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.04em;">Mã HĐ</th>
+              <th style="padding:10px 16px;font-size:.72rem;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.04em;">Khách hàng</th>
+              <th style="padding:10px 16px;font-size:.72rem;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.04em;">Trạng thái</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (recentHopDong && recentHopDong.length > 0) { %>
+              <% recentHopDong.forEach(hd => { %>
+              <tr style="border-bottom:1px solid rgba(255,255,255,.05);">
+                <td style="padding:11px 16px;"><span style="background:rgba(0,97,255,.2);color:#93c5fd;padding:2px 8px;border-radius:6px;font-size:.75rem;font-weight:600;">#<%= hd.MaHD %></span></td>
+                <td style="padding:11px 16px;font-size:.84rem;color:rgba(255,255,255,.85);"><%= hd.HoTen || hd.MaKH %></td>
+                <td style="padding:11px 16px;">
+                  <% if (hd.TTHopDong === true) { %>
+                    <span style="background:#dcfce720;color:#86efac;padding:2px 9px;border-radius:20px;font-size:.72rem;font-weight:700;">Đã ký</span>
+                  <% } else if (hd.TTHopDong === false) { %>
+                    <span style="background:#fee2e220;color:#fca5a5;padding:2px 9px;border-radius:20px;font-size:.72rem;font-weight:700;">Đã hủy</span>
+                  <% } else { %>
+                    <span style="background:#fef9c320;color:#fde047;padding:2px 9px;border-radius:20px;font-size:.72rem;font-weight:700;">Chờ duyệt</span>
+                  <% } %>
+                </td>
+              </tr>
+              <% }) %>
+            <% } else { %>
+              <tr><td colspan="3" style="padding:20px;text-align:center;color:rgba(255,255,255,.35);font-size:.84rem;">Chưa có dữ liệu</td></tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="table-card">
+      <div class="table-card-header">
+        <div class="table-card-title"><i class="fas fa-home me-2" style="color:#93c5fd;"></i>Căn hộ mới đăng</div>
+        <a href="/admin/can-ho" class="btn-tbl btn-tbl-view">Xem tất cả</a>
+      </div>
+      <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;">
+          <thead>
+            <tr style="background:rgba(255,255,255,.03);border-bottom:1px solid rgba(255,255,255,.07);">
+              <th style="padding:10px 16px;font-size:.72rem;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.04em;">Mã CH</th>
+              <th style="padding:10px 16px;font-size:.72rem;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.04em;">Tên căn hộ</th>
+              <th style="padding:10px 16px;font-size:.72rem;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.04em;">Giá bán</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (recentCanHo && recentCanHo.length > 0) { %>
+              <% recentCanHo.forEach(ch => { %>
+              <tr style="border-bottom:1px solid rgba(255,255,255,.05);">
+                <td style="padding:11px 16px;"><span style="background:rgba(0,97,255,.2);color:#93c5fd;padding:2px 8px;border-radius:6px;font-size:.75rem;font-weight:600;">#<%= ch.MaCanHo %></span></td>
+                <td style="padding:11px 16px;font-size:.84rem;color:rgba(255,255,255,.85);"><%= ch.TenCanHo %></td>
+                <td style="padding:11px 16px;font-size:.84rem;font-weight:600;color:#93c5fd;"><%= ch.Gia ? Number(ch.Gia).toLocaleString('vi-VN') + 'đ' : '—' %></td>
+              </tr>
+              <% }) %>
+            <% } else { %>
+              <tr><td colspan="3" style="padding:20px;text-align:center;color:rgba(255,255,255,.35);font-size:.84rem;">Chưa có dữ liệu</td></tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+/* Stat cards */
+.hc-stat-card { background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08); border-radius:var(--radius-lg); padding:20px; display:flex; align-items:center; gap:16px; transition:background .2s; }
+.hc-stat-card:hover { background:rgba(255,255,255,.08); }
+.sc-icon { width:48px; height:48px; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:1.1rem; flex-shrink:0; background:rgba(0,97,255,.15); color:var(--primary); }
+.sc-body { flex:1; min-width:0; }
+.sc-label { font-size:.75rem; color:rgba(255,255,255,.5); font-weight:500; margin-bottom:4px; }
+.sc-value { font-size:1.6rem; font-weight:800; color:var(--primary); line-height:1; }
+/* Quick links */
+.quick-link-card { display:flex; align-items:center; gap:12px; padding:14px 16px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08); border-radius:var(--radius-md); text-decoration:none; color:rgba(255,255,255,.85); font-weight:600; font-size:.875rem; transition:background .2s,transform .2s; }
+.quick-link-card:hover { background:rgba(255,255,255,.1); transform:translateY(-2px); color:white; }
+.ql-icon { width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:.9rem; flex-shrink:0; }
+</style>

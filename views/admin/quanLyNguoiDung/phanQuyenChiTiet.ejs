@@ -1,0 +1,176 @@
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<style>
+.filter-label { display:block; font-size:.75rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; margin-bottom:5px; }
+.card-block { background: #fff; border-radius: 12px; padding: 24px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid #e2e8f0; margin-bottom:20px;}
+.card-title-sub { font-size: 1.1rem; font-weight: 800; color: var(--text); margin-bottom: 20px; display:flex; align-items:center; gap:8px;}
+
+/* Avatar lớn */
+.avatar-lg { width:80px; height:80px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800; font-size:2rem; text-transform:uppercase; box-shadow:0 4px 15px rgba(0,0,0,0.1); }
+
+/* Switch Toggle Box cho Roles */
+.role-box { display:flex; align-items:center; justify-content:space-between; cursor:pointer; background:var(--bg-soft); padding:15px 20px; border-radius:10px; border:1.5px solid var(--border-light); transition:all 0.2s; margin-bottom:10px; }
+.role-box:hover { border-color:var(--primary); background:#fff; box-shadow:0 4px 10px rgba(0,97,255,0.05); transform:translateY(-2px); }
+.role-box .role-name { font-weight:700; font-size:.95rem; color:var(--text); }
+.role-box .role-desc { font-size:.75rem; color:var(--text-muted); margin-top:2px; }
+
+/* Custom Switch Toggle CSS */
+.switch { position: relative; display: inline-block; width: 44px; height: 24px; flex-shrink:0; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; transition: .3s; border-radius: 24px; }
+.slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; box-shadow:0 2px 4px rgba(0,0,0,0.2);}
+input:checked + .slider { background-color: var(--primary); }
+input:checked + .slider:before { transform: translateX(20px); }
+</style>
+
+<div class="admin-page-header" style="margin-bottom:20px;">
+  <div><h4>Hồ sơ Người dùng</h4><p>Phân quyền truy cập và quản lý vai trò hệ thống</p></div>
+  <div style="display:flex;gap:10px;">
+      <a href="/admin/quan-ly-nguoi-dung/phan-quyen" class="btn-ghost"><i class="fas fa-arrow-left me-2"></i>Quay lại danh sách</a>
+  </div>
+</div>
+
+<div id="loader" style="padding:50px;text-align:center;"><i class="fas fa-circle-notch fa-spin fa-2x text-primary"></i></div>
+
+<div id="mainData" style="display:none;">
+    <div class="row">
+        <div class="col-lg-4">
+            <div class="card-block" style="text-align:center; padding-top:40px;">
+                <div id="uAvatar" style="display:flex; justify-content:center; margin-bottom:20px;"></div>
+                <h4 id="uName" style="font-weight:800; color:var(--text); margin-bottom:5px;"></h4>
+                <p id="uEmail" style="color:var(--text-muted); font-weight:600; margin-bottom:20px;"></p>
+                <div id="badges" style="display:flex; justify-content:center; gap:8px; flex-wrap:wrap; margin-bottom:30px;"></div>
+
+                <div style="text-align:left; border-top:1px dashed #eee; padding-top:20px;">
+                    <div style="margin-bottom:12px;">
+                        <span class="filter-label">ID Người dùng</span>
+                        <span style="font-weight:700; color:#475569; font-size:.85rem; word-break:break-all;" id="uId"></span>
+                    </div>
+                    <div style="margin-bottom:12px;">
+                        <span class="filter-label">Số điện thoại liên hệ</span>
+                        <span style="font-weight:700; color:var(--text); font-size:.9rem;" id="uPhone"></span>
+                    </div>
+                    <div style="margin-bottom:12px;">
+                        <span class="filter-label">Trạng thái hiện tại</span>
+                        <div style="display:flex; align-items:center; gap:8px; margin-top:4px;" id="uStatus"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <div class="card-block">
+                <div class="card-title-sub"><i class="fas fa-user-shield text-primary"></i> Thiết lập Vai trò (Roles)</div>
+                <p style="color:#64748b; font-size:.9rem; margin-bottom:25px; line-height:1.5;">Gán hoặc gỡ bỏ các vai trò hệ thống đối với tài khoản này. Việc cấp sai vai trò có thể ảnh hưởng đến dữ liệu và bảo mật của phần mềm.</p>
+                
+                <form id="roleForm" onsubmit="submitRoles(event)">
+                    <div class="row g-3" id="rolesGrid"></div>
+                    
+                    <div style="margin-top:30px; padding-top:20px; border-top:1px solid #eee; display:flex; gap:10px; justify-content:flex-end;">
+                        <a href="/admin/quan-ly-nguoi-dung/phan-quyen" class="btn-ghost" style="padding:10px 24px;">Hủy bỏ</a>
+                        <button type="submit" id="submitBtn" class="btn-hc-primary" style="padding:10px 24px; font-size:1rem;"><i class="fas fa-check-circle me-2"></i>Lưu Phân Quyền</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const userId = "<%= userId %>";
+
+function getInitials(name) {
+    if(!name) return 'U';
+    const parts = name.trim().split(' ');
+    if(parts.length === 1) return parts[0].charAt(0).toUpperCase();
+    return (parts[0].charAt(0) + parts[parts.length-1].charAt(0)).toUpperCase();
+}
+function getColor(name) {
+    const colors = ['#f59e0b', '#10b981', '#3b82f6', '#ef4444', '#0ea5e9', '#8b5cf6'];
+    let sum = 0; for(let i=0; i<(name||'').length; i++) sum += name.charCodeAt(i);
+    return colors[sum % colors.length];
+}
+
+const roleDescriptions = {
+    'Admin': 'Toàn quyền quản trị hệ thống, thêm/sửa/xóa mọi dữ liệu.',
+    'Manager': 'Quản lý duyệt hợp đồng, quản lý căn hộ, nhân viên.',
+    'Staff': 'Nhân viên kinh doanh, tư vấn, tạo mới hợp đồng.',
+    'Accountant': 'Kế toán, xem và quản lý trạng thái thanh toán.',
+    'Support': 'Hỗ trợ khách hàng, xem thông tin nhưng không được sửa.'
+};
+
+document.addEventListener('DOMContentLoaded', async () => {
+    const res = await fetch('/admin/quan-ly-nguoi-dung/api/detail/' + userId);
+    const json = await res.json();
+    
+    if(json.success) {
+        const u = json.data;
+        const nameDisplay = u.HoTen || u.UserName || 'Vô Danh';
+        
+        document.getElementById('uAvatar').innerHTML = `<div class="avatar-lg" style="background:${getColor(nameDisplay)}">${getInitials(nameDisplay)}</div>`;
+        document.getElementById('uName').innerText = nameDisplay;
+        document.getElementById('uEmail').innerHTML = `<i class="fas fa-envelope me-1"></i> ${u.Email || '—'}`;
+        document.getElementById('uPhone').innerText = u.SDT || u.PhoneNumber || 'Chưa cập nhật';
+        document.getElementById('uId').innerText = u.Id;
+
+        const isLocked = u.LockoutEnd && new Date(u.LockoutEnd) > new Date();
+        document.getElementById('uStatus').innerHTML = isLocked 
+            ? `<div class="status-dot offline"></div> <span style="font-weight:700; color:#dc2626;">Tài khoản đang bị khóa</span>`
+            : `<div class="status-dot online"></div> <span style="font-weight:700; color:#10b981;">Đang hoạt động bình thường</span>`;
+
+        let badges = '';
+        if(u.IsSuperAdmin) badges += '<span style="background:#fef9c3;color:#a16207;padding:4px 12px;border-radius:20px;font-size:.75rem;font-weight:700;"><i class="fas fa-crown me-1"></i>Super Admin</span>';
+        if(u.KhachHang) badges += '<span style="background:#dcfce7;color:#15803d;padding:4px 12px;border-radius:20px;font-size:.75rem;font-weight:700;"><i class="fas fa-user me-1"></i>Khách hàng</span>';
+        document.getElementById('badges').innerHTML = badges;
+
+        // Render Roles Switch
+        const allRoles = u.AllRoles;
+        const currentRoles = u.CurrentRoles;
+        document.getElementById('rolesGrid').innerHTML = allRoles.map(role => `
+            <div class="col-md-6">
+                <label class="role-box">
+                    <div>
+                        <div class="role-name">${role}</div>
+                        <div class="role-desc">${roleDescriptions[role] || 'Vai trò chức năng hệ thống.'}</div>
+                    </div>
+                    <div class="switch">
+                        <input type="checkbox" name="roles" value="${role}" ${currentRoles.includes(role) ? 'checked' : ''}>
+                        <span class="slider"></span>
+                    </div>
+                </label>
+            </div>
+        `).join('');
+
+        document.getElementById('loader').style.display = 'none';
+        document.getElementById('mainData').style.display = 'block';
+    } else {
+        Swal.fire('Lỗi', json.message, 'error').then(() => window.location.href = '/admin/quan-ly-nguoi-dung/phan-quyen');
+    }
+});
+
+async function submitRoles(e) {
+    e.preventDefault();
+    const result = await Swal.fire({ title:'Lưu phân quyền?', text:'Hệ thống sẽ cập nhật lại toàn bộ quyền hạn truy cập của tài khoản này.', icon:'warning', showCancelButton:true, confirmButtonColor:'#0061ff', confirmButtonText:'Đồng ý' });
+    if(!result.isConfirmed) return;
+
+    const btn = document.getElementById('submitBtn');
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Đang xử lý...'; btn.disabled = true;
+
+    const checkedRoles = Array.from(document.querySelectorAll('input[name="roles"]:checked')).map(cb => cb.value);
+
+    try {
+        const res = await fetch('/admin/quan-ly-nguoi-dung/api/update-roles', { 
+            method: 'POST', headers: { 'Content-Type': 'application/json' }, 
+            body: JSON.stringify({ userId, roles: checkedRoles }) 
+        });
+        const json = await res.json();
+        
+        if(json.success) {
+            Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'Cập nhật thành công!', showConfirmButton: false, timer: 1500 });
+            setTimeout(() => window.location.href = '/admin/quan-ly-nguoi-dung/phan-quyen', 1000);
+        } else throw new Error(json.message);
+    } catch(err) {
+        Swal.fire('Lỗi', err.message, 'error');
+        btn.innerHTML = '<i class="fas fa-check-circle me-2"></i>Lưu Phân Quyền'; btn.disabled = false;
+    }
+}
+</script>

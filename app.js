@@ -2,32 +2,29 @@ require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const passport = require('passport');
+const flash = require('connect-flash');
 const methodOverride = require('method-override');
 const expressLayouts = require('express-ejs-layouts');
-const cookieParser = require('cookie-parser');
+const cookieParser = require('cookie-parser'); 
 
 const app = express();
 
-// View engine
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.use(expressLayouts);
 app.set('layout', 'layouts/main');
 
-// Static files
 app.use(express.static(path.join(__dirname, 'public')));
-
-// Body & Cookie parser
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-app.use(cookieParser());
+app.use(express.json({ limit: '1gb' }));
+app.use(express.urlencoded({ extended: true, limit: '1gb' }));
+app.use(cookieParser()); 
 app.use(methodOverride('_method'));
 
-// Passport Initialization
+// Cấu hình Passport
 require('./apps/config/passport')(passport);
 app.use(passport.initialize());
 
-// Middleware Mock Flash
+// Middleware Mock Flash (Vì không dùng Session)
 app.use((req, res, next) => {
   req.flash = function(type, msg) {
       if (msg) {
@@ -41,7 +38,7 @@ app.use((req, res, next) => {
   next();
 });
 
-// Middleware xác thực JWT toàn cục
+// Middleware lấy user cho các View (Render UI) thông qua Passport JWT
 app.use((req, res, next) => {
     passport.authenticate('jwt', { session: false }, (err, user) => {
         req.user = user || null;
@@ -58,28 +55,24 @@ app.use((req, res, next) => {
     })(req, res, next);
 });
 
-// ================= ROUTES =================
+const activityMiddleware = require('./apps/middleware/activityTracker');
+app.use(activityMiddleware);
+
+// Routes
+const homeRoutes = require('./apps/routes/home');
 const authRoutes = require('./apps/routes/auth');
+const adminRoutes = require('./apps/routes/admin/index');
 
-// Trang chủ (Bắt buộc đăng nhập mới được vào)
-app.get('/', (req, res) => {
-    if (!req.isAuthenticated()) {
-        req.flash('error_msg', 'Vui lòng đăng nhập để truy cập hệ thống.');
-        return res.redirect('/auth/login');
-    }
-    res.render('home/index', { title: 'Trang chủ - HomeConnect' });
-});
 
-// Route Auth (Đăng nhập, Đăng ký, Đổi mật khẩu)
+
+app.use('/', homeRoutes);
 app.use('/auth', authRoutes);
-// ==========================================
+app.use('/admin', adminRoutes);
 
-// 404 handler
 app.use((req, res) => {
   res.status(404).render('errors/404', { title: 'Không tìm thấy trang', layout: 'layouts/main' });
 });
 
-// Error handler
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).render('errors/500', { title: 'Lỗi server', layout: 'layouts/main', error: err.message });
