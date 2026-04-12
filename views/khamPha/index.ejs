@@ -1,0 +1,273 @@
+<!-- views/khamPha/index.ejs -->
+<div style="background:linear-gradient(135deg,var(--primary-dark) 0%,var(--primary) 100%);padding:36px 0 28px;">
+  <div class="container">
+    <div style="color:rgba(255,255,255,.7);font-size:.8rem;margin-bottom:6px;">
+      <a href="/" style="color:rgba(255,255,255,.7);text-decoration:none;">Trang chủ</a>
+      <i class="fas fa-chevron-right mx-2" style="font-size:.6rem;"></i>Khám phá
+    </div>
+    <h1 style="font-size:1.6rem;font-weight:800;color:white;margin:0 0 4px;">Khám phá căn hộ</h1>
+    <p style="color:rgba(255,255,255,.7);margin:0;font-size:.875rem;" id="resultCount">Đang tải...</p>
+  </div>
+</div>
+ 
+<div class="container py-4">
+  <div class="row g-4">
+    <!-- ── SIDEBAR FILTERS ── -->
+    <div class="col-lg-3">
+      <div class="hc-filter-card sticky-top" style="top:80px;">
+        <div class="filter-header">
+          <i class="fas fa-sliders-h me-2" style="color:var(--primary);"></i>Bộ lọc tìm kiếm
+        </div>
+        <div class="filter-body">
+          <div class="filter-group">
+            <label class="filter-label">Tìm kiếm</label>
+            <div style="position:relative;">
+              <i class="fas fa-search" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:.8rem;"></i>
+              <input type="text" id="searchInput" class="hc-input" style="padding-left:36px;" placeholder="Tên căn hộ...">
+            </div>
+          </div>
+          <div class="filter-group">
+            <label class="filter-label">Tòa nhà</label>
+            <select id="toaNhaSelect" class="hc-select">
+              <option value="">Tất cả tòa nhà</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label class="filter-label">Loại giao dịch</label>
+            <div style="display:flex;gap:8px;">
+              <button class="filter-tab active" id="tabAll" onclick="setLoai('')">Tất cả</button>
+              <button class="filter-tab" id="tabMua" onclick="setLoai('mua')">Mua</button>
+              <button class="filter-tab" id="tabThue" onclick="setLoai('thue')">Thuê</button>
+            </div>
+          </div>
+          <div class="filter-group">
+            <label class="filter-label">Khoảng giá</label>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <input type="number" id="minGia" class="hc-input" style="font-size:.8rem;" placeholder="Từ (đ)">
+              <span style="color:var(--text-muted);font-size:.9rem;">—</span>
+              <input type="number" id="maxGia" class="hc-input" style="font-size:.8rem;" placeholder="Đến (đ)">
+            </div>
+          </div>
+          <button onclick="applyFilter(1)" class="btn-hc-primary w-100" style="justify-content:center;margin-top:4px;">
+            <i class="fas fa-search me-2"></i>Tìm kiếm
+          </button>
+          <button onclick="resetFilter()" class="btn-ghost w-100" style="justify-content:center;margin-top:8px;font-size:.8rem;">
+            <i class="fas fa-times me-1"></i>Xóa bộ lọc
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── MAIN GRID ── -->
+    <div class="col-lg-9">
+      <div id="loadingState" class="text-center py-5">
+        <div class="hc-loading"><div class="hc-spinner"></div><p>Đang tải căn hộ...</p></div>
+      </div>
+      <div id="errorState" class="hc-toast hc-toast-danger d-none" style="position:static;margin-bottom:16px;"></div>
+      <div id="canHoGrid" class="row g-4"></div>
+      <div id="pagination" class="d-flex justify-content-center mt-4 gap-2 flex-wrap"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Cart toast -->
+<div id="cartToast" style="position:fixed;bottom:24px;right:24px;z-index:9999;display:none;max-width:300px;" class="hc-toast hc-toast-success">
+  <i class="fas fa-check-circle" style="color:var(--success);font-size:1rem;flex-shrink:0;margin-top:2px;"></i>
+  <span id="cartMsg" style="font-size:.875rem;color:var(--text);"></span>
+</div>
+
+<style>
+.hc-filter-card { background:var(--bg-white); border-radius:var(--radius-lg); border:1px solid var(--border-light); box-shadow:var(--shadow-sm); overflow:hidden; }
+.filter-header { padding:16px 20px; font-size:.875rem; font-weight:700; color:var(--text); border-bottom:1px solid var(--border-light); background:var(--bg-soft); }
+.filter-body { padding:20px; display:flex; flex-direction:column; gap:16px; }
+.filter-group { display:flex; flex-direction:column; gap:6px; }
+.filter-label { font-size:.78rem; font-weight:600; color:var(--text-secondary); text-transform:uppercase; letter-spacing:.04em; }
+.filter-tab { flex:1; padding:7px 4px; border-radius:8px; border:1.5px solid var(--border); background:transparent;
+  color:var(--text-secondary); font-size:.78rem; font-weight:600; cursor:pointer; transition:var(--transition-fast); }
+.filter-tab.active { background:var(--primary); border-color:var(--primary); color:white; }
+.filter-tab:hover:not(.active) { border-color:var(--primary); color:var(--primary); }
+
+/* Property card */
+.prop-card { background:var(--bg-white); border-radius:var(--radius-lg); overflow:hidden;
+  box-shadow:var(--shadow-sm); border:1px solid var(--border-light);
+  transition:transform .2s, box-shadow .2s; cursor:pointer; height:100%; display:flex; flex-direction:column; }
+.prop-card:hover { transform:translateY(-4px); box-shadow:var(--shadow-md); }
+.prop-img-wrap { position:relative; height:200px; overflow:hidden; flex-shrink:0; }
+.prop-img-wrap img { width:100%; height:100%; object-fit:cover; transition:transform .35s; }
+.prop-card:hover .prop-img-wrap img { transform:scale(1.04); }
+.prop-badges { position:absolute; top:12px; left:12px; display:flex; gap:6px; flex-wrap:wrap; }
+.prop-badge { padding:3px 10px; border-radius:20px; font-size:.7rem; font-weight:700; }
+.prop-badge-buy { background:var(--primary); color:white; }
+.prop-badge-rent { background:var(--success); color:white; }
+.prop-badge-feat { background:var(--accent); color:white; }
+.prop-body { padding:14px 16px; flex:1; display:flex; flex-direction:column; }
+.prop-name { font-size:.9rem; font-weight:700; color:var(--text); margin-bottom:4px; line-height:1.3; }
+.prop-loc { font-size:.78rem; color:var(--text-muted); margin-bottom:10px; }
+.prop-price { font-size:.95rem; font-weight:700; color:var(--primary); }
+.prop-price-rent { font-size:.82rem; font-weight:600; color:var(--success); }
+.prop-meta { display:flex; gap:6px; flex-wrap:wrap; margin-top:8px; }
+.prop-meta span { font-size:.72rem; color:var(--text-muted); background:var(--bg); border-radius:6px; padding:2px 8px; }
+.prop-footer { padding:10px 16px; border-top:1px solid var(--border-light); display:flex; gap:8px; flex-shrink:0; }
+.pg-btn { padding:7px 13px; border-radius:8px; border:1.5px solid var(--border); background:var(--bg-white);
+  color:var(--text-secondary); font-size:.82rem; font-weight:600; cursor:pointer; transition:var(--transition-fast); }
+.pg-btn:hover { border-color:var(--primary); color:var(--primary); }
+.pg-btn.active { background:var(--primary); border-color:var(--primary); color:white; }
+</style>
+
+<script>
+const isAuth = document.querySelector('meta[name="is-auth"]')?.content === 'true';
+let currentPage = 1;
+let currentLoai = '';
+
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.get('search')) document.getElementById('searchInput').value = urlParams.get('search');
+if (urlParams.get('minGia'))  document.getElementById('minGia').value = urlParams.get('minGia');
+if (urlParams.get('maxGia'))  document.getElementById('maxGia').value = urlParams.get('maxGia');
+if (urlParams.get('page'))    currentPage = parseInt(urlParams.get('page')) || 1;
+if (urlParams.get('loai'))    setLoai(urlParams.get('loai'));
+if (urlParams.get('maToaNha')) {/* set after load */}
+
+fetch('/api/toa-nha').then(r=>r.json()).then(list=>{
+  const sel = document.getElementById('toaNhaSelect');
+  list.forEach(t=>{
+    const opt = document.createElement('option');
+    opt.value = t.MaToaNha; opt.textContent = t.TenToaNha;
+    if (urlParams.get('maToaNha') == t.MaToaNha) opt.selected = true;
+    sel.appendChild(opt);
+  });
+});
+
+function setLoai(val) {
+  currentLoai = val;
+  document.getElementById('tabAll').className  = 'filter-tab' + (val==='' ? ' active' : '');
+  document.getElementById('tabMua').className  = 'filter-tab' + (val==='mua' ? ' active' : '');
+  document.getElementById('tabThue').className = 'filter-tab' + (val==='thue' ? ' active' : '');
+}
+
+function buildQuery(page) {
+  const p = new URLSearchParams();
+  const s = document.getElementById('searchInput').value.trim();
+  const tn = document.getElementById('toaNhaSelect').value;
+  const mn = document.getElementById('minGia').value;
+  const mx = document.getElementById('maxGia').value;
+  if (s)  p.set('search', s);
+  if (tn) p.set('maToaNha', tn);
+  if (currentLoai) p.set('loai', currentLoai);
+  if (mn) p.set('minGia', mn);
+  if (mx) p.set('maxGia', mx);
+  p.set('page', page);
+  return p.toString();
+}
+
+function applyFilter(page) {
+  currentPage = page || 1;
+  const q = buildQuery(currentPage);
+  history.replaceState(null, '', '/kham-pha?' + q);
+  loadCanHo(q);
+}
+
+function resetFilter() {
+  document.getElementById('searchInput').value = '';
+  document.getElementById('toaNhaSelect').value = '';
+  document.getElementById('minGia').value = '';
+  document.getElementById('maxGia').value = '';
+  setLoai('');
+  applyFilter(1);
+}
+
+function loadCanHo(query) {
+  document.getElementById('loadingState').style.display = 'block';
+  document.getElementById('canHoGrid').innerHTML = '';
+  document.getElementById('errorState').classList.add('d-none');
+
+  fetch('/api/kham-pha?' + query)
+    .then(r=>r.json())
+    .then(data=>{
+      document.getElementById('loadingState').style.display = 'none';
+      document.getElementById('resultCount').textContent = 'Tìm thấy ' + (data.total||0) + ' căn hộ';
+      if (!data.canHos || data.canHos.length === 0) {
+        document.getElementById('canHoGrid').innerHTML = `<div class="col-12"><div class="hc-empty"><div class="empty-icon"><i class="fas fa-search"></i></div><div class="empty-title">Không tìm thấy căn hộ nào</div><div class="empty-desc">Thử điều chỉnh bộ lọc tìm kiếm</div><button onclick="resetFilter()" class="btn-hc-primary mt-3" style="margin:12px auto 0;">Xóa bộ lọc</button></div></div>`;
+        document.getElementById('pagination').innerHTML = '';
+        return;
+      }
+      document.getElementById('canHoGrid').innerHTML = data.canHos.map(c=>{
+        const img = c.DSA_CanHos&&c.DSA_CanHos.length>0 ? c.DSA_CanHos[0].UrlAnh : '/images/no-image.jpg';
+        const tang = c.Tang ? c.Tang.TenTang : '';
+        const toa = c.Tang&&c.Tang.ToaNha ? c.Tang.ToaNha.TenToaNha : '';
+        const loc = [toa, tang?'Tầng '+tang:''].filter(Boolean).join(' · ');
+        const gia = c.Gia ? Number(c.Gia).toLocaleString('vi-VN')+'đ' : '';
+        const giaThue = c.GiaThue ? Number(c.GiaThue).toLocaleString('vi-VN')+'đ/tháng' : '';
+        const dim = c.Dai&&c.Rong ? `<span><i class="fas fa-expand-alt me-1"></i>${c.Dai}×${c.Rong}m</span>` : '';
+        const ht = c.HienTrang ? `<span>${esc(c.HienTrang.TenHienTrang)}</span>` : '';
+        return `<div class="col-sm-6 col-xl-4">
+          <div class="prop-card" onclick="location.href='/chi-tiet-can-ho/${c.MaCanHo}'">
+            <div class="prop-img-wrap">
+              <img src="${img}" alt="${esc(c.TenCanHo)}" loading="lazy">
+              <div class="prop-badges">
+                ${c.Gia ? '<span class="prop-badge prop-badge-buy">Mua</span>' : ''}
+                ${c.GiaThue ? '<span class="prop-badge prop-badge-rent">Thuê</span>' : ''}
+                ${c.TTDeXuat ? '<span class="prop-badge prop-badge-feat"><i class="fas fa-star me-1"></i>Nổi bật</span>' : ''}
+              </div>
+            </div>
+            <div class="prop-body">
+              <div class="prop-name">${esc(c.TenCanHo)}</div>
+              ${loc ? `<div class="prop-loc"><i class="fas fa-building me-1"></i>${esc(loc)}</div>` : ''}
+              ${gia ? `<div class="prop-price">${gia}</div>` : ''}
+              ${giaThue ? `<div class="prop-price-rent"><i class="fas fa-key me-1"></i>${giaThue}</div>` : ''}
+              <div class="prop-meta">${dim}${ht}</div>
+            </div>
+            <div class="prop-footer">
+              <a href="/chi-tiet-can-ho/${c.MaCanHo}" class="btn-ghost flex-fill text-center" style="font-size:.78rem;padding:7px;" onclick="event.stopPropagation()">Chi tiết</a>
+              ${isAuth ? `<button class="btn-hc-primary" style="font-size:.78rem;padding:7px 12px;" onclick="event.stopPropagation();addToCart(${c.MaCanHo},'mua')"><i class="fas fa-cart-plus"></i></button>` : ''}
+            </div>
+          </div>
+        </div>`;
+      }).join('');
+
+      // Pagination
+      if (data.totalPages > 1) {
+        let pg = '';
+        if (data.currentPage > 1) pg += `<button class="pg-btn" onclick="applyFilter(${data.currentPage-1})"><i class="fas fa-chevron-left"></i></button>`;
+        const start = Math.max(1, data.currentPage-2);
+        const end = Math.min(data.totalPages, data.currentPage+2);
+        if (start > 1) pg += `<button class="pg-btn" onclick="applyFilter(1)">1</button>${start>2?'<span style="align-self:center;color:var(--text-muted);">…</span>':''}`;
+        for (let i=start; i<=end; i++) pg += `<button class="pg-btn${i===data.currentPage?' active':''}" onclick="applyFilter(${i})">${i}</button>`;
+        if (end < data.totalPages) pg += `${end<data.totalPages-1?'<span style="align-self:center;color:var(--text-muted);">…</span>':''}<button class="pg-btn" onclick="applyFilter(${data.totalPages})">${data.totalPages}</button>`;
+        if (data.currentPage < data.totalPages) pg += `<button class="pg-btn" onclick="applyFilter(${data.currentPage+1})"><i class="fas fa-chevron-right"></i></button>`;
+        document.getElementById('pagination').innerHTML = pg;
+      } else {
+        document.getElementById('pagination').innerHTML = '';
+      }
+    })
+    .catch(()=>{
+      document.getElementById('loadingState').style.display = 'none';
+      const e = document.getElementById('errorState');
+      e.innerHTML = '<i class="fas fa-exclamation-circle" style="color:var(--danger);"></i><span>Lỗi tải dữ liệu, vui lòng thử lại.</span>';
+      e.classList.remove('d-none');
+    });
+}
+
+document.getElementById('searchInput').addEventListener('keydown', e=>{ if(e.key==='Enter') applyFilter(1); });
+
+async function addToCart(maCanHo, loai) {
+  try {
+    const res = await fetch('/gio-hang/add', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({maCanHo,loai})});
+    const data = await res.json();
+    const t = document.getElementById('cartToast');
+    const m = document.getElementById('cartMsg');
+    if (data.success) {
+      t.className = 'hc-toast hc-toast-success';
+      m.textContent = 'Đã thêm vào giỏ hàng! (' + data.count + ' món)';
+    } else {
+      t.className = 'hc-toast hc-toast-danger';
+      m.textContent = data.message || 'Lỗi!';
+    }
+    t.style.display = 'flex';
+    setTimeout(()=>{ t.style.display='none'; }, 3000);
+  } catch(e){}
+}
+
+applyFilter(currentPage);
+</script>

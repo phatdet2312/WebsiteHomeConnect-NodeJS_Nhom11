@@ -61,14 +61,25 @@ app.use(activityMiddleware);
 // Routes
 const homeRoutes = require('./apps/routes/home');
 const authRoutes = require('./apps/routes/auth');
-const adminRoutes = require('./apps/routes/admin/index');
+const canhoRoutes = require('./apps/routes/canho');
+const chiTietCanHoRoutes = require('./apps/routes/chiTietCanHo');
+const khamPhaRoutes = require('./apps/routes/khamPha');
 const hoaDonDichVuRoutes = require('./apps/routes/hoaDonDichVu');
+const thanhToanMuaThueRoutes = require('./apps/routes/thanhToanMuaThue');
+const shoppingCartRoutes = require('./apps/routes/shoppingCart');
+const adminRoutes = require('./apps/routes/admin/index');
+const apiRoutes = require('./apps/routes/api');
 
-
+app.use('/api', apiRoutes);
 app.use('/', homeRoutes);
 app.use('/auth', authRoutes);
-app.use('/admin', adminRoutes);
+app.use('/can-ho', canhoRoutes);
+app.use('/chi-tiet-can-ho', chiTietCanHoRoutes);
+app.use('/kham-pha', khamPhaRoutes);
 app.use('/hoa-don-dich-vu', hoaDonDichVuRoutes);
+app.use('/thanh-toan-mua-thue', thanhToanMuaThueRoutes);
+app.use('/gio-hang', shoppingCartRoutes);
+app.use('/admin', adminRoutes);
 
 app.use((req, res) => {
   res.status(404).render('errors/404', { title: 'Không tìm thấy trang', layout: 'layouts/main' });

@@ -1,0 +1,168 @@
+<!-- views/shoppingCart/index.ejs -->
+<div style="background:linear-gradient(135deg,var(--primary-dark),var(--primary));padding:36px 0 28px;">
+  <div class="container">
+    <h1 style="font-size:1.6rem;font-weight:800;color:white;margin:0 0 4px;"><i class="fas fa-shopping-bag me-3" style="opacity:.8;"></i>Giỏ hàng</h1>
+    <p style="color:rgba(255,255,255,.7);margin:0;font-size:.875rem;">Các căn hộ bạn đã chọn</p>
+  </div>
+</div>
+
+<div class="container py-4" style="max-width:960px;">
+  <div id="loadingState" class="text-center py-5">
+    <div class="hc-loading"><div class="hc-spinner"></div><p>Đang tải...</p></div>
+  </div>
+  <div id="errorState" class="hc-toast hc-toast-danger d-none" style="position:static;margin-bottom:16px;"></div>
+  <div id="emptyState" class="d-none">
+    <div class="hc-empty">
+      <div class="empty-icon"><i class="fas fa-shopping-bag"></i></div>
+      <div class="empty-title">Giỏ hàng trống</div>
+      <div class="empty-desc">Hãy khám phá và thêm căn hộ vào giỏ hàng</div>
+      <a href="/kham-pha" class="btn-hc-primary mt-3" style="margin:12px auto 0;">Khám phá căn hộ</a>
+    </div>
+  </div>
+  <div id="cartContent" class="d-none">
+    <div class="table-card mb-4">
+      <div class="table-card-header">
+        <div class="table-card-title"><i class="fas fa-shopping-bag me-2" style="color:var(--primary);"></i>Danh sách căn hộ</div>
+        <div class="d-flex gap-2 align-items-center">
+          <label style="display:flex;align-items:center;gap:6px;font-size:.82rem;color:var(--text-secondary);cursor:pointer;">
+            <input type="checkbox" id="selectAll" onchange="toggleSelectAll(this)" style="accent-color:var(--primary);"> Chọn tất cả
+          </label>
+        </div>
+      </div>
+      <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;">
+          <thead>
+            <tr style="background:var(--bg-soft);border-bottom:1px solid var(--border-light);">
+              <th style="width:40px;padding:12px 16px;"></th>
+              <th style="padding:12px 16px;font-size:.75rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;text-align:left;">Căn hộ</th>
+              <th style="padding:12px 16px;font-size:.75rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;">Vị trí</th>
+              <th style="padding:12px 16px;font-size:.75rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;">Loại</th>
+              <th style="padding:12px 16px;font-size:.75rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;text-align:right;">Giá</th>
+              <th style="padding:12px 16px;width:80px;"></th>
+            </tr>
+          </thead>
+          <tbody id="cartBody"></tbody>
+          <tfoot>
+            <tr style="background:var(--bg-soft);border-top:2px solid var(--border-light);">
+              <td colspan="4" style="padding:14px 16px;font-weight:700;color:var(--text);">Tổng cộng (<span id="countItems">0</span> căn hộ)</td>
+              <td style="padding:14px 16px;text-align:right;font-size:1.1rem;font-weight:800;color:var(--primary);" id="totalPrice"></td>
+              <td></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+      <button onclick="removeSelected()" style="display:flex;align-items:center;gap:8px;padding:10px 18px;border-radius:var(--radius-md);border:1.5px solid var(--danger);background:transparent;color:var(--danger);font-size:.875rem;font-weight:600;cursor:pointer;">
+        <i class="fas fa-trash"></i>Xóa đã chọn
+      </button>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <a href="/kham-pha" class="btn-ghost" style="font-size:.875rem;padding:10px 18px;">
+          <i class="fas fa-plus me-2"></i>Tiếp tục chọn
+        </a>
+        <a href="/thanh-toan-mua-thue" class="btn-hc-primary" id="checkoutBtn" style="display:none;font-size:.875rem;padding:10px 22px;">
+          <i class="fas fa-credit-card me-2"></i>Tiến hành thanh toán
+        </a>
+        <a href="/auth/login" class="btn-hc-primary" id="loginBtn" style="display:none;font-size:.875rem;padding:10px 22px;">
+          <i class="fas fa-sign-in-alt me-2"></i>Đăng nhập để thanh toán
+        </a>
+      </div>
+    </div> 
+  </div>
+</div>
+
+<style>
+.table-card { background:var(--bg-white); border-radius:var(--radius-lg); box-shadow:var(--shadow-sm); border:1px solid var(--border-light); overflow:hidden; }
+.table-card-header { padding:16px 20px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--border-light); background:var(--bg-soft); gap:12px; }
+.table-card-title { font-size:.92rem; font-weight:700; color:var(--text); }
+.cart-row td { padding:14px 16px; border-bottom:1px solid var(--border-light); vertical-align:middle; }
+.cart-row:last-child td { border-bottom:none; }
+.cart-img { width:64px; height:48px; object-fit:cover; border-radius:8px; }
+.cart-img-ph { width:64px; height:48px; background:var(--bg); border-radius:8px; display:flex; align-items:center; justify-content:center; color:var(--border); }
+.cart-badge { padding:3px 10px; border-radius:20px; font-size:.72rem; font-weight:700; }
+.cart-badge-buy { background:var(--primary-light); color:var(--primary); }
+.cart-badge-rent { background:#dcfce7; color:#15803d; }
+.cart-del-btn { width:32px; height:32px; border-radius:8px; border:1.5px solid var(--danger); background:transparent; color:var(--danger); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:.8rem; transition:var(--transition-fast); }
+.cart-del-btn:hover { background:var(--danger); color:white; }
+</style>
+
+<script>
+const isAuth = document.querySelector('meta[name="is-auth"]')?.content === 'true';
+let cartData = [];
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+fetch('/api/gio-hang')
+  .then(r=>{ if(r.status===401){ showGuest(); return null; } return r.json(); })
+  .then(data=>{
+    if(!data) return;
+    document.getElementById('loadingState').classList.add('d-none');
+    cartData = data;
+    if(!data.length){ document.getElementById('emptyState').classList.remove('d-none'); return; }
+    renderCart(data);
+  })
+  .catch(()=>{
+    document.getElementById('loadingState').classList.add('d-none');
+    const e = document.getElementById('errorState');
+    e.innerHTML = '<i class="fas fa-exclamation-circle" style="color:var(--danger);"></i><span>Lỗi tải dữ liệu</span>';
+    e.classList.remove('d-none');
+  });
+
+function showGuest(){
+  document.getElementById('loadingState').classList.add('d-none');
+  document.getElementById('emptyState').classList.remove('d-none');
+}
+
+function renderCart(data){
+  let total = 0;
+  document.getElementById('cartBody').innerHTML = data.map((item,idx)=>{
+    total += (item.Gia||0);
+    const imgHtml = item.UrlAnh
+      ? `<img src="${esc(item.UrlAnh)}" class="cart-img" alt="">`
+      : `<div class="cart-img-ph"><i class="fas fa-home"></i></div>`;
+    const badgeCls = item.loai==='mua' ? 'cart-badge-buy' : 'cart-badge-rent';
+    const badgeTxt = item.loai==='mua' ? 'Mua' : 'Thuê';
+    const gia = item.Gia ? Number(item.Gia).toLocaleString('vi-VN')+'đ' : 'Liên hệ';
+    return `<tr class="cart-row" id="row-${idx}">
+      <td style="padding:14px 16px;width:40px;"><input type="checkbox" class="cart-check" data-idx="${idx}" data-ma="${item.MaCanHo}" data-loai="${item.loai}" style="accent-color:var(--primary);width:16px;height:16px;"></td>
+      <td style="padding:14px 16px;">
+        <div style="display:flex;align-items:center;gap:12px;">
+          ${imgHtml}
+          <a href="/chi-tiet-can-ho/${item.MaCanHo}" style="font-weight:600;font-size:.875rem;color:var(--text);text-decoration:none;">${esc(item.TenCanHo)}</a>
+        </div>
+      </td>
+      <td style="padding:14px 16px;font-size:.8rem;color:var(--text-muted);">
+        ${item.ToaNha ? `<div><i class="fas fa-building me-1"></i>${esc(item.ToaNha)}</div>` : ''}
+        ${item.Tang ? `<div><i class="fas fa-layer-group me-1"></i>Tầng ${esc(item.Tang)}</div>` : ''}
+      </td>
+      <td style="padding:14px 16px;"><span class="cart-badge ${badgeCls}">${badgeTxt}</span></td>
+      <td style="padding:14px 16px;text-align:right;font-weight:700;color:var(--primary);">${gia}${item.loai==='thue'?'<div style="font-size:.75rem;font-weight:500;color:var(--text-muted);">/tháng</div>':''}</td>
+      <td style="padding:14px 16px;"><button class="cart-del-btn" onclick="removeItem(${item.MaCanHo},'${item.loai}','row-${idx}')"><i class="fas fa-trash"></i></button></td>
+    </tr>`;
+  }).join('');
+  document.getElementById('countItems').textContent = data.length;
+  document.getElementById('totalPrice').textContent = total ? Number(total).toLocaleString('vi-VN')+'đ' : '';
+  document.getElementById('cartContent').classList.remove('d-none');
+  document.getElementById(isAuth ? 'checkoutBtn' : 'loginBtn').style.display = 'flex';
+}
+
+function toggleSelectAll(cb){ document.querySelectorAll('.cart-check').forEach(c=>c.checked=cb.checked); }
+
+async function removeItem(maCanHo, loai, rowId){
+  try{
+    const res = await fetch('/gio-hang/remove',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({maCanHo,loai})});
+    const data = await res.json();
+    if(data.success){ document.getElementById(rowId).remove(); document.getElementById('countItems').textContent=data.count; if(data.count===0) location.reload(); }
+  }catch(e){}
+}
+
+async function removeSelected(){
+  const selected = Array.from(document.querySelectorAll('.cart-check:checked')).map(c=>({maCanHo:parseInt(c.dataset.ma),loai:c.dataset.loai}));
+  if(!selected.length){ alert('Vui lòng chọn ít nhất 1 món!'); return; }
+  if(!confirm('Xóa '+selected.length+' món đã chọn?')) return;
+  try{
+    const res = await fetch('/gio-hang/remove-selected',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({items:selected})});
+    const data = await res.json();
+    if(data.success) location.reload();
+  }catch(e){}
+}
+</script>

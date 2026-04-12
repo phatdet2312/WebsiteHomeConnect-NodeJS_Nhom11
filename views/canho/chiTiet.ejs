@@ -1,0 +1,174 @@
+<!-- views/canho/chiTiet.ejs -->
+<div style="background:var(--bg-white);border-bottom:1px solid var(--border-light);padding:14px 0;">
+  <div class="container">
+    <nav style="font-size:.82rem;color:var(--text-muted);display:flex;align-items:center;gap:6px;">
+      <a href="/" style="color:var(--text-muted);text-decoration:none;">Trang chủ</a>
+      <i class="fas fa-chevron-right" style="font-size:.6rem;"></i>
+      <a href="/can-ho" style="color:var(--text-muted);text-decoration:none;">Căn hộ của tôi</a>
+      <i class="fas fa-chevron-right" style="font-size:.6rem;"></i>
+      <span id="breadcrumbName" style="color:var(--text);font-weight:600;">Chi tiết hợp đồng</span>
+    </nav>
+  </div>
+</div>
+
+<div class="container py-4">
+  <div id="loadingState" class="text-center py-5">
+    <div class="hc-loading"><div class="hc-spinner"></div><p>Đang tải...</p></div>
+  </div>
+  <div id="errorState" class="hc-toast hc-toast-danger d-none" style="position:static;margin-bottom:16px;"></div>
+  <div id="mainContent" class="row g-4 d-none">
+    <div class="col-lg-8" id="leftCol"></div>
+    <div class="col-lg-4" id="rightCol"></div>
+  </div>
+</div> 
+
+<style>
+.detail-section { background:var(--bg-white); border-radius:var(--radius-lg); border:1px solid var(--border-light);
+  box-shadow:var(--shadow-sm); padding:24px; margin-bottom:20px; }
+.detail-section-title { font-size:1rem; font-weight:700; color:var(--text); margin-bottom:16px;
+  display:flex; align-items:center; gap:8px; padding-bottom:12px; border-bottom:1px solid var(--border-light); }
+.detail-section-title i { color:var(--primary); }
+.info-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+.info-item { display:flex; flex-direction:column; gap:3px; }
+.info-lbl { font-size:.72rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:.04em; font-weight:600; }
+.info-val { font-size:.875rem; font-weight:600; color:var(--text); }
+.nt-table { width:100%; border-collapse:collapse; font-size:.84rem; }
+.nt-table th { color:var(--text-muted); font-weight:600; font-size:.72rem; text-transform:uppercase; letter-spacing:.04em; padding:8px 12px; border-bottom:2px solid var(--border-light); text-align:left; }
+.nt-table td { padding:9px 12px; border-bottom:1px solid var(--border-light); color:var(--text); }
+.nt-table tr:last-child td { border-bottom:none; }
+.nt-badge { display:inline-block; padding:2px 8px; border-radius:6px; font-size:.72rem; font-weight:600; background:var(--primary-light); color:var(--primary); }
+.status-pill { display:inline-block; padding:4px 12px; border-radius:20px; font-size:.78rem; font-weight:700; }
+.status-active { background:#dcfce7; color:#15803d; }
+.status-ended { background:#fee2e2; color:#b91c1c; }
+.status-pending { background:#fef9c3; color:#a16207; }
+.contract-sidebar { background:var(--bg-white); border-radius:var(--radius-lg); border:1px solid var(--border-light); box-shadow:var(--shadow-md); overflow:hidden; position:sticky; top:80px; }
+.contract-sidebar-header { background:linear-gradient(135deg,var(--primary-dark),var(--primary)); padding:18px 20px; }
+.contract-sidebar-body { padding:20px; }
+.sidebar-row { margin-bottom:14px; }
+.sidebar-row:last-of-type { margin-bottom:0; }
+.img-gallery-main { border-radius:var(--radius-lg); overflow:hidden; height:360px; background:var(--bg); margin-bottom:12px; }
+.img-gallery-main img { width:100%; height:100%; object-fit:cover; }
+.img-thumbs { display:flex; gap:8px; flex-wrap:wrap; }
+.img-thumb { width:78px; height:58px; border-radius:8px; object-fit:cover; cursor:pointer; border:2px solid transparent; transition:border-color .2s; }
+.img-thumb.active { border-color:var(--primary); }
+.dv-chip { display:flex; align-items:center; gap:8px; padding:8px 12px; background:var(--bg); border-radius:8px; font-size:.82rem; }
+.dv-chip i { color:var(--success); }
+</style>
+
+<script>
+const contractId = window.location.pathname.split('/').pop();
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+fetch('/api/my-contracts/' + contractId)
+  .then(r=>{ if(r.status===401){window.location.href='/auth/login';return null;} return r.json(); })
+  .then(hd=>{
+    if(!hd) return;
+    if(hd.error){ showError(hd.error); return; }
+    document.getElementById('loadingState').classList.add('d-none');
+    document.getElementById('mainContent').classList.remove('d-none');
+    document.getElementById('breadcrumbName').textContent = 'Hợp đồng #' + hd.MaHopDong;
+    renderLeft(hd);
+    renderRight(hd);
+  })
+  .catch(()=>showError('Lỗi tải dữ liệu'));
+
+function showError(msg) {
+  document.getElementById('loadingState').classList.add('d-none');
+  const el = document.getElementById('errorState');
+  el.innerHTML = `<i class="fas fa-exclamation-circle" style="color:var(--danger);"></i><span>${esc(msg)}</span>`;
+  el.classList.remove('d-none');
+}
+
+function renderLeft(hd) {
+  const canHo = hd.CanHo||{};
+  const imgs = canHo.DSA_CanHos||[];
+
+  let imgHtml = '';
+  if(imgs.length>0){
+    imgHtml = `<div class="img-gallery-main"><img id="mainImg" src="${imgs[0].UrlAnh}" alt="${esc(canHo.TenCanHo||'')}"></div>`;
+    if(imgs.length>1) imgHtml += `<div class="img-thumbs mb-4">${imgs.map((img,i)=>`<img src="${img.UrlAnh}" class="img-thumb${i===0?' active':''}" onclick="selectImg(this,'${img.UrlAnh}')">`).join('')}</div>`;
+    else imgHtml += '<div class="mb-4"></div>';
+  }
+
+  const tang = canHo.Tang?canHo.Tang.TenTang:'';
+  const toa = canHo.Tang&&canHo.Tang.ToaNha?canHo.Tang.ToaNha.TenToaNha:'';
+  let infoItems = '';
+  if(canHo.TenCanHo) infoItems += `<div class="info-item"><div class="info-lbl">Tên căn hộ</div><div class="info-val">${esc(canHo.TenCanHo)}</div></div>`;
+  if(tang||toa) infoItems += `<div class="info-item"><div class="info-lbl">Vị trí</div><div class="info-val">${esc(toa)}${tang?' · Tầng '+esc(tang):''}</div></div>`;
+  if(canHo.Dai||canHo.Rong) infoItems += `<div class="info-item"><div class="info-lbl">Kích thước</div><div class="info-val">${canHo.Dai||'?'}×${canHo.Rong||'?'}m</div></div>`;
+  if(canHo.TamNhin) infoItems += `<div class="info-item"><div class="info-lbl">Hướng nhìn</div><div class="info-val">${esc(canHo.TamNhin)}</div></div>`;
+  if(canHo.HienTrang) infoItems += `<div class="info-item"><div class="info-lbl">Hiện trạng</div><div class="info-val"><span class="nt-badge">${esc(canHo.HienTrang.TenHienTrang)}</span></div></div>`;
+  let canHoCard = `<div class="detail-section"><div class="detail-section-title"><i class="fas fa-home"></i>Thông tin căn hộ</div><div class="info-grid">${infoItems}</div></div>`;
+
+  let phongHtml = '';
+  if(canHo.Phongs&&canHo.Phongs.length>0){
+    phongHtml = `<div class="detail-section"><div class="detail-section-title"><i class="fas fa-door-open"></i>Phòng trong căn hộ <span style="font-size:.8rem;color:var(--text-muted);font-weight:500;">(${canHo.Phongs.length})</span></div>
+      <div class="row g-3">${canHo.Phongs.map(p=>{
+        const pImg=p.DSA_Phongs&&p.DSA_Phongs.length>0?p.DSA_Phongs[0].UrlAnh:null;
+        return `<div class="col-sm-6"><div style="background:var(--bg);border-radius:var(--radius-md);overflow:hidden;">
+          ${pImg?`<img src="${pImg}" style="width:100%;height:100px;object-fit:cover;">`:``}
+          <div style="padding:8px 12px;font-size:.84rem;font-weight:600;color:var(--text);">${esc(p.TenPhong)}</div>
+        </div></div>`;
+      }).join('')}</div></div>`;
+  }
+
+  let ntHtml = '';
+  if(canHo.CT_NoiThats&&canHo.CT_NoiThats.length>0){
+    const rows = canHo.CT_NoiThats.map(nt=>{
+      const ten=nt.NoiThat?esc(nt.NoiThat.TenNoiThat):'';
+      const dm=nt.NoiThat&&nt.NoiThat.DanhMucNoiThat?esc(nt.NoiThat.DanhMucNoiThat.TenDanhMuc):'';
+      const ht=nt.HienTrangCT?`<span class="nt-badge">${esc(nt.HienTrangCT.TenHienTrang)}</span>`:'';
+      return `<tr><td><strong>${ten}</strong></td><td style="color:var(--text-muted);">${dm}</td><td>${ht}</td><td style="text-align:center;">${nt.SoLuong||1}</td></tr>`;
+    }).join('');
+    ntHtml = `<div class="detail-section"><div class="detail-section-title"><i class="fas fa-couch"></i>Nội thất</div>
+      <div style="overflow-x:auto;"><table class="nt-table"><thead><tr><th>Tên</th><th>Danh mục</th><th>Hiện trạng</th><th style="text-align:center;">SL</th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
+  }
+
+  let dvHtml = '';
+  if(canHo.CT_DichVus&&canHo.CT_DichVus.filter(cd=>cd.DichVu).length>0){
+    dvHtml = `<div class="detail-section"><div class="detail-section-title"><i class="fas fa-concierge-bell"></i>Dịch vụ</div>
+      <div class="row g-2">${canHo.CT_DichVus.filter(cd=>cd.DichVu).map(cd=>`<div class="col-sm-6"><div class="dv-chip"><i class="fas fa-check-circle"></i><div><div style="font-weight:600;">${esc(cd.DichVu.TenDV)}</div>${cd.DichVu.DonGia?`<div style="font-size:.72rem;color:var(--text-muted);">${Number(cd.DichVu.DonGia).toLocaleString('vi-VN')}đ</div>`:''}</div></div></div>`).join('')}</div></div>`;
+  }
+
+  document.getElementById('leftCol').innerHTML = imgHtml + canHoCard + phongHtml + ntHtml + dvHtml;
+}
+
+function renderRight(hd) {
+  const statusCls = hd.TrangThaiHD===true ? 'status-active' : hd.TrangThaiHD===false ? 'status-ended' : 'status-pending';
+  const statusTxt = hd.TrangThaiHD===true ? 'Đang hoạt động' : hd.TrangThaiHD===false ? 'Đã kết thúc' : 'Chờ phê duyệt';
+
+  let rows = `<div class="sidebar-row"><div class="info-lbl" style="font-size:.72rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;font-weight:600;margin-bottom:3px;">Trạng thái</div><span class="status-pill ${statusCls}">${statusTxt}</span></div>`;
+  if(hd.LoaiHopDong) rows+=`<div class="sidebar-row"><div class="info-lbl" style="font-size:.72rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;font-weight:600;margin-bottom:3px;">Loại hợp đồng</div><div style="font-weight:600;font-size:.875rem;">${esc(hd.LoaiHopDong.TenLoai)}</div></div>`;
+  if(hd.NgayLap) rows+=`<div class="sidebar-row"><div class="info-lbl" style="font-size:.72rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;font-weight:600;margin-bottom:3px;">Ngày lập</div><div style="font-weight:600;font-size:.875rem;">${new Date(hd.NgayLap).toLocaleDateString('vi-VN')}</div></div>`;
+  if(hd.NgayHieuLuc) rows+=`<div class="sidebar-row"><div class="info-lbl" style="font-size:.72rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;font-weight:600;margin-bottom:3px;">Hiệu lực từ</div><div style="font-weight:600;font-size:.875rem;">${new Date(hd.NgayHieuLuc).toLocaleDateString('vi-VN')}</div></div>`;
+  if(hd.NgayHetHan) rows+=`<div class="sidebar-row"><div class="info-lbl" style="font-size:.72rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;font-weight:600;margin-bottom:3px;">Hết hạn</div><div style="font-weight:600;font-size:.875rem;">${new Date(hd.NgayHetHan).toLocaleDateString('vi-VN')}</div></div>`;
+  if(hd.GiaThoaThuan) rows+=`<div class="sidebar-row"><div class="info-lbl" style="font-size:.72rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;font-weight:600;margin-bottom:3px;">Giá thỏa thuận</div><div style="font-size:1.2rem;font-weight:800;color:var(--primary);">${Number(hd.GiaThoaThuan).toLocaleString('vi-VN')}đ</div></div>`;
+  if(hd.NhanVien) rows+=`<div class="sidebar-row"><div class="info-lbl" style="font-size:.72rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;font-weight:600;margin-bottom:3px;">Nhân viên phụ trách</div><div style="font-weight:600;font-size:.875rem;">${esc(hd.NhanVien.TenNV||'N/A')}</div></div>`;
+
+  let btns = '';
+  if(hd.TrangThaiHD===true){
+    btns += `<a href="/hoa-don-dich-vu/thanh-toan" class="btn-hc-primary w-100" style="justify-content:center;margin-bottom:8px;text-decoration:none;"><i class="fas fa-credit-card me-2"></i>Thanh toán dịch vụ</a>`;
+    btns += `<a href="/hoa-don-hop-dong/thanh-toan" class="w-100" style="justify-content:center;margin-bottom:8px;display:flex;align-items:center;gap:8px;padding:11px;background:var(--success);color:white;border:none;border-radius:var(--radius-md);font-weight:600;font-size:.875rem;text-decoration:none;"><i class="fas fa-file-invoice-dollar me-2"></i>Thanh toán hợp đồng</a>`;
+  }
+  btns += `<a href="/can-ho" class="btn-ghost w-100" style="justify-content:center;text-decoration:none;font-size:.82rem;"><i class="fas fa-arrow-left me-2"></i>Danh sách căn hộ</a>`;
+
+  document.getElementById('rightCol').innerHTML = `
+    <div class="contract-sidebar">
+      <div class="contract-sidebar-header">
+        <div style="font-size:.78rem;color:rgba(255,255,255,.7);margin-bottom:2px;">Hợp đồng</div>
+        <div style="font-size:1.1rem;font-weight:800;color:white;">#${hd.MaHopDong}</div>
+      </div>
+      <div class="contract-sidebar-body">
+        ${rows}
+        <hr style="margin:16px 0;border-color:var(--border-light);">
+        <div style="display:flex;flex-direction:column;gap:0;">${btns}</div>
+      </div>
+    </div>`;
+}
+
+function selectImg(el, src) {
+  document.getElementById('mainImg').src = src;
+  document.querySelectorAll('.img-thumb').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+}
+</script>

@@ -1,0 +1,352 @@
+<!-- views/chiTietCanHo/index.ejs -->
+<div style="background:var(--bg-white);border-bottom:1px solid var(--border-light);padding:14px 0;">
+  <div class="container">
+    <nav style="font-size:.82rem;color:var(--text-muted);display:flex;align-items:center;gap:6px;">
+      <a href="/" style="color:var(--text-muted);text-decoration:none;">Trang chủ</a>
+      <i class="fas fa-chevron-right" style="font-size:.6rem;"></i>
+      <a href="/kham-pha" style="color:var(--text-muted);text-decoration:none;">Khám phá</a>
+      <i class="fas fa-chevron-right" style="font-size:.6rem;"></i>
+      <span id="breadcrumbName" style="color:var(--text);font-weight:600;">Đang tải...</span>
+    </nav>
+  </div>
+</div> 
+
+<div class="container py-4">
+  <div id="loadingState" class="text-center py-5">
+    <div class="hc-loading">
+      <div class="hc-spinner"></div>
+      <p>Đang tải thông tin căn hộ...</p>
+    </div>
+  </div>
+  <div id="errorState" class="hc-toast hc-toast-danger d-none" style="position:static;margin-bottom:16px;"></div>
+  <div id="mainContent" class="row g-4 d-none">
+    <div class="col-lg-8" id="leftCol"></div>
+    <div class="col-lg-4" id="rightCol"></div>
+  </div>
+</div>
+
+<style>
+  .detail-section {
+    background: var(--bg-white);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-light);
+    box-shadow: var(--shadow-sm);
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+
+  .detail-section-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border-light);
+  }
+
+  .detail-section-title i {
+    color: var(--primary);
+  }
+
+  .img-gallery-main {
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    height: 420px;
+    background: var(--bg);
+    margin-bottom: 12px;
+  }
+
+  .img-gallery-main img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .img-thumbs {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .img-thumb {
+    width: 80px;
+    height: 60px;
+    border-radius: 8px;
+    object-fit: cover;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: border-color .2s;
+  }
+
+  .img-thumb.active {
+    border-color: var(--primary);
+  }
+
+  .stat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .stat-chip {
+    background: var(--bg);
+    border-radius: var(--radius-md);
+    padding: 12px;
+    text-align: center;
+  }
+
+  .stat-chip-icon {
+    color: var(--primary);
+    font-size: 1rem;
+    margin-bottom: 4px;
+  }
+
+  .stat-chip-val {
+    font-size: .875rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .stat-chip-lbl {
+    font-size: .72rem;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+
+  .nt-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: .84rem;
+  }
+
+  .nt-table th {
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: .75rem;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    padding: 8px 12px;
+    border-bottom: 2px solid var(--border-light);
+    text-align: left;
+  }
+
+  .nt-table td {
+    padding: 9px 12px;
+    border-bottom: 1px solid var(--border-light);
+    color: var(--text);
+  }
+
+  .nt-table tr:last-child td {
+    border-bottom: none;
+  }
+
+  .nt-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: .72rem;
+    font-weight: 600;
+    background: var(--primary-light);
+    color: var(--primary);
+  }
+
+  .sticky-card {
+    background: var(--bg-white);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-light);
+    box-shadow: var(--shadow-md);
+    padding: 24px;
+    position: sticky;
+    top: 80px;
+  }
+
+  .price-main {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--primary);
+  }
+
+  .price-rent {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--success);
+    margin-top: 4px;
+  }
+
+  .loc-tag {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: .84rem;
+    color: var(--text-secondary);
+    margin-bottom: 16px;
+  }
+
+  .loc-tag i {
+    color: var(--primary);
+  }
+
+  .dv-chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: var(--bg);
+    border-radius: 8px;
+    font-size: .82rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .dv-chip i {
+    color: var(--success);
+  }
+</style>
+
+<script>
+  const canHoId = window.location.pathname.split('/').pop();
+  const isAuth = document.querySelector('meta[name="is-auth"]')?.content === 'true';
+
+  function esc(s) { return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+
+  fetch('/api/can-ho/' + canHoId)
+    .then(r => r.json())
+    .then(c => {
+      if (c.error) { showError(c.error); return; }
+      document.getElementById('loadingState').classList.add('d-none');
+      document.getElementById('mainContent').classList.remove('d-none');
+      document.getElementById('breadcrumbName').textContent = c.TenCanHo;
+      document.title = c.TenCanHo + ' — HomeConnect';
+      renderLeft(c);
+      renderRight(c);
+    })
+    .catch(() => showError('Không thể tải thông tin căn hộ'));
+
+  function showError(msg) {
+    document.getElementById('loadingState').classList.add('d-none');
+    const el = document.getElementById('errorState');
+    el.innerHTML = `<i class="fas fa-exclamation-circle" style="color:var(--danger);"></i><span>${esc(msg)}</span>`;
+    el.classList.remove('d-none');
+  }
+
+  function renderLeft(c) {
+    const images = c.DSA_CanHos || [];
+    let imgHtml = '';
+    if (images.length > 0) {
+      imgHtml = `<div class="img-gallery-main"><img id="mainImg" src="${images[0].UrlAnh}" alt="${esc(c.TenCanHo)}"></div>`;
+      if (images.length > 1) {
+        imgHtml += `<div class="img-thumbs mb-4">${images.map((img, i) => `<img src="${img.UrlAnh}" class="img-thumb${i === 0 ? ' active' : ''}" onclick="selectImg(this,'${img.UrlAnh}')" alt="">`).join('')}</div>`;
+      }
+    } else {
+      imgHtml = `<div class="img-gallery-main" style="display:flex;align-items:center;justify-content:center;"><i class="fas fa-image fa-4x" style="color:var(--border);"></i></div><div class="mb-4"></div>`;
+    }
+
+    let descHtml = c.MoTa ? `<div class="detail-section"><div class="detail-section-title"><i class="fas fa-align-left"></i>Mô tả căn hộ</div><p style="color:var(--text-secondary);line-height:1.8;white-space:pre-line;margin:0;">${esc(c.MoTa)}</p></div>` : '';
+
+    let phongHtml = '';
+    if (c.Phongs && c.Phongs.length > 0) {
+      phongHtml = `<div class="detail-section"><div class="detail-section-title"><i class="fas fa-door-open"></i>Danh sách phòng <span style="font-size:.8rem;color:var(--text-muted);font-weight:500;">(${c.Phongs.length})</span></div>
+      <div class="row g-3">${c.Phongs.map(p => {
+        const pImg = p.DSA_Phongs && p.DSA_Phongs.length > 0 ? p.DSA_Phongs[0].UrlAnh : null;
+        return `<div class="col-sm-6"><div style="background:var(--bg);border-radius:var(--radius-md);overflow:hidden;">
+          ${pImg ? `<img src="${pImg}" style="width:100%;height:110px;object-fit:cover;">` : ``}
+          <div style="padding:8px 12px;font-size:.84rem;font-weight:600;color:var(--text);">${esc(p.TenPhong)}</div>
+        </div></div>`;
+      }).join('')}</div></div>`;
+    }
+
+    let ntHtml = '';
+    if (c.CT_NoiThats && c.CT_NoiThats.length > 0) {
+      const rows = c.CT_NoiThats.map(nt => {
+        const ten = nt.NoiThat ? esc(nt.NoiThat.TenNoiThat) : '';
+        const dm = nt.NoiThat && nt.NoiThat.DanhMucNoiThat ? esc(nt.NoiThat.DanhMucNoiThat.TenDanhMuc) : '';
+        const ht = nt.HienTrangCT ? `<span class="nt-badge">${esc(nt.HienTrangCT.TenHienTrang)}</span>` : '';
+        return `<tr><td><strong>${ten}</strong></td><td style="color:var(--text-muted);">${dm}</td><td>${ht}</td><td style="text-align:center;">${nt.SoLuong || 1}</td></tr>`;
+      }).join('');
+      ntHtml = `<div class="detail-section"><div class="detail-section-title"><i class="fas fa-couch"></i>Nội thất <span style="font-size:.8rem;color:var(--text-muted);font-weight:500;">(${c.CT_NoiThats.length})</span></div>
+      <div style="overflow-x:auto;"><table class="nt-table"><thead><tr><th>Tên</th><th>Danh mục</th><th>Hiện trạng</th><th style="text-align:center;">SL</th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
+    }
+
+    let dvHtml = '';
+    if (c.CT_DichVus && c.CT_DichVus.filter(cd => cd.DichVu).length > 0) {
+      dvHtml = `<div class="detail-section"><div class="detail-section-title"><i class="fas fa-concierge-bell"></i>Dịch vụ tiêu chuẩn</div>
+      <div class="row g-2">${c.CT_DichVus.filter(cd => cd.DichVu).map(cd => `<div class="col-sm-6"><div class="dv-chip"><i class="fas fa-check-circle"></i>${esc(cd.DichVu.TenDV)}</div></div>`).join('')}</div></div>`;
+    }
+
+    document.getElementById('leftCol').innerHTML = imgHtml + descHtml + phongHtml + ntHtml + dvHtml;
+  }
+
+  function renderRight(c) {
+    const tang = c.Tang ? c.Tang.TenTang : '';
+    const toa = c.Tang && c.Tang.ToaNha ? c.Tang.ToaNha.TenToaNha : '';
+    const loc = [toa, tang ? 'Tầng ' + tang : ''].filter(Boolean).join(' · ');
+
+    let badges = '';
+    if (c.TTDeXuat) badges += `<span style="display:inline-block;background:var(--accent);color:white;padding:3px 12px;border-radius:20px;font-size:.72rem;font-weight:700;margin-bottom:12px;"><i class="fas fa-star me-1"></i>Nổi bật</span>`;
+    if (c.Gia) badges += `<span style="display:inline-block;background:var(--primary);color:white;padding:3px 12px;border-radius:20px;font-size:.72rem;font-weight:700;margin-bottom:12px;margin-left:6px;">Mua</span>`;
+    if (c.GiaThue) badges += `<span style="display:inline-block;background:var(--success);color:white;padding:3px 12px;border-radius:20px;font-size:.72rem;font-weight:700;margin-bottom:12px;margin-left:6px;">Thuê</span>`;
+
+    let statsHtml = '<div class="stat-grid">';
+    if (c.Dai && c.Rong) statsHtml += `<div class="stat-chip"><div class="stat-chip-icon"><i class="fas fa-expand-alt"></i></div><div class="stat-chip-val">${c.Dai}×${c.Rong}m</div><div class="stat-chip-lbl">Kích thước</div></div>`;
+    if (c.TamNhin) statsHtml += `<div class="stat-chip"><div class="stat-chip-icon"><i class="fas fa-compass"></i></div><div class="stat-chip-val">${esc(c.TamNhin)}</div><div class="stat-chip-lbl">Hướng nhìn</div></div>`;
+    if (c.Phongs) statsHtml += `<div class="stat-chip"><div class="stat-chip-icon"><i class="fas fa-door-open"></i></div><div class="stat-chip-val">${(c.Phongs || []).length} phòng</div><div class="stat-chip-lbl">Số phòng</div></div>`;
+    if (c.HienTrang) statsHtml += `<div class="stat-chip"><div class="stat-chip-icon"><i class="fas fa-star"></i></div><div class="stat-chip-val" style="font-size:.78rem;">${esc(c.HienTrang.TenHienTrang)}</div><div class="stat-chip-lbl">Hiện trạng</div></div>`;
+    statsHtml += '</div>';
+
+    let actionsHtml = '';
+    if (isAuth) {
+      actionsHtml = '<div style="display:flex;flex-direction:column;gap:10px;">';
+      if (c.Gia) actionsHtml += `<button class="btn-hc-primary w-100" style="justify-content:center;padding:13px;" onclick="addToCart(${c.MaCanHo},'mua')"><i class="fas fa-shopping-cart me-2"></i>Đặt mua căn hộ</button>`;
+      if (c.GiaThue) actionsHtml += `<button class="w-100" style="justify-content:center;padding:13px;background:var(--success);color:white;border:none;border-radius:var(--radius-md);font-weight:600;font-size:.875rem;cursor:pointer;display:flex;align-items:center;" onclick="addToCart(${c.MaCanHo},'thue')"><i class="fas fa-key me-2"></i>Đặt thuê căn hộ</button>`;
+      actionsHtml += `<a href="/gio-hang" class="btn-ghost w-100" style="justify-content:center;"><i class="fas fa-shopping-bag me-2"></i>Xem giỏ hàng</a></div>`;
+    } else {
+      actionsHtml = `<a href="/auth/login" class="btn-hc-primary w-100" style="justify-content:center;padding:13px;text-decoration:none;"><i class="fas fa-sign-in-alt me-2"></i>Đăng nhập để đặt</a>`;
+    }
+
+    document.getElementById('rightCol').innerHTML = `
+    <div class="sticky-card">
+      ${badges}
+      <h3 style="font-size:1.2rem;font-weight:800;color:var(--text);margin-bottom:8px;">${esc(c.TenCanHo)}</h3>
+      ${loc ? `<div class="loc-tag"><i class="fas fa-map-marker-alt"></i>${esc(loc)}</div>` : ''}
+      ${c.Gia ? `<div class="price-main">${Number(c.Gia).toLocaleString('vi-VN')}đ</div><div style="font-size:.78rem;color:var(--text-muted);margin-bottom:4px;">Giá mua</div>` : ''}
+      ${c.GiaThue ? `<div class="price-rent"><i class="fas fa-key me-2" style="font-size:.9rem;"></i>${Number(c.GiaThue).toLocaleString('vi-VN')}đ/tháng</div>` : ''}
+      <hr style="margin:18px 0;border-color:var(--border-light);">
+      ${statsHtml}
+      <hr style="margin:18px 0;border-color:var(--border-light);">
+      ${actionsHtml}
+      <hr style="margin:18px 0;border-color:var(--border-light);">
+      <div style="text-align:center;">
+        <p style="font-size:.8rem;color:var(--text-muted);margin-bottom:10px;">Cần tư vấn thêm?</p>
+        <a href="/home/lien-he" class="btn-ghost w-100" style="justify-content:center;font-size:.82rem;"><i class="fas fa-envelope me-2"></i>Gửi yêu cầu tư vấn</a>
+      </div>
+    </div>`;
+  }
+
+  function selectImg(el, src) {
+    document.getElementById('mainImg').src = src;
+    document.querySelectorAll('.img-thumb').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  let cartToastTimer;
+  async function addToCart(maCanHo, loai) {
+    try {
+      const res = await fetch('/gio-hang/add', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ maCanHo, loai }) });
+      const data = await res.json();
+      const t = document.createElement('div');
+      t.style.cssText = 'position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;align-items:center;gap:10px;max-width:300px;';
+      if (data.success) {
+        t.className = 'hc-toast hc-toast-success';
+        t.innerHTML = `<i class="fas fa-check-circle" style="color:var(--success);font-size:1rem;"></i><span style="font-size:.875rem;">Đã thêm vào giỏ hàng! (${data.count} món)</span>`;
+      } else {
+        t.className = 'hc-toast hc-toast-danger';
+        t.innerHTML = `<i class="fas fa-exclamation-circle" style="color:var(--danger);font-size:1rem;"></i><span style="font-size:.875rem;">${esc(data.message || 'Lỗi!')}</span>`;
+      }
+      document.body.appendChild(t);
+      setTimeout(() => t.remove(), 3000);
+    } catch (e) { }
+  }
+</script>
