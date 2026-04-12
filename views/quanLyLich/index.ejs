@@ -1,8 +1,8 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <div style="background:linear-gradient(135deg,var(--primary-dark),var(--primary));padding:36px 0 28px;">
   <div class="container">
-    <h1 style="font-size:1.8rem;font-weight:800;color:white;margin:0 0 4px;"><i class="fas fa-calendar-alt me-3" style="opacity:.8;"></i>Quản lý lịch</h1>
-    <p style="color:rgba(255,255,255,.7);margin:0;font-size:.9rem;">Sắp xếp thời gian và quản lý sự kiện cá nhân của bạn</p>
+    <h1 style="font-size:1.8rem;font-weight:800;color:white;margin:0 0 4px;"><i class="fas fa-calendar-alt me-3" style="opacity:.8;"></i>Quản lý lịch & Cảnh báo Nợ</h1>
+    <p style="color:rgba(255,255,255,.7);margin:0;font-size:.9rem;">Dashboard tổng hợp thời gian cá nhân và các khoản phí chưa thanh toán</p>
   </div>
 </div>
 
@@ -32,7 +32,7 @@
             <span style="background:var(--bg-soft);color:var(--text);padding:2px 10px;border-radius:20px;font-size:.8rem;font-weight:800;" id="statLichs">0</span>
           </div>
           <div style="display:flex;justify-content:space-between;align-items:center;">
-            <span style="font-size:.85rem;color:var(--text-muted);">Sự kiện trong tháng</span>
+            <span style="font-size:.85rem;color:var(--text-muted);">Sự kiện & Hoá đơn</span>
             <span style="background:var(--primary-light);color:var(--primary);padding:2px 10px;border-radius:20px;font-size:.8rem;font-weight:800;" id="statEvents">0</span>
           </div>
         </div>
@@ -40,7 +40,6 @@
 
       <div class="col-lg-9">
         <div style="background:white;border-radius:16px;border:1px solid var(--border-light);box-shadow:var(--shadow-sm);overflow:hidden;">
-          
           <div style="padding:20px 24px;border-bottom:1px solid var(--border-light);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
             <div style="display:flex;align-items:center;gap:12px;">
               <button onclick="goToday()" class="btn btn-outline-primary btn-sm fw-bold px-3 rounded-pill">Hôm nay</button>
@@ -98,8 +97,7 @@
         </div>
         <div class="mb-3">
           <label class="form-label fw-bold text-muted small text-uppercase">Màu sắc</label>
-          <div style="display:flex;gap:10px;flex-wrap:wrap;" id="colorPicker">
-            </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;" id="colorPicker"></div>
           <input type="hidden" id="calColor" value="#0061ff">
         </div>
         <div class="mb-3">
@@ -171,10 +169,14 @@
 .lunar-day { font-size:.7rem; font-weight:600; color:#94a3b8; }
 
 .event-stack { display:flex; flex-direction:column; gap:3px; }
-.event-badge { font-size:.75rem; padding:3px 6px; border-radius:4px; color:white; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; box-shadow:0 1px 2px rgba(0,0,0,0.1); }
+.event-badge { font-size:.75rem; padding:4px 6px; border-radius:4px; color:white; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; box-shadow:0 1px 2px rgba(0,0,0,0.1); cursor: pointer;}
 .event-badge.start { border-top-right-radius:0; border-bottom-right-radius:0; margin-right:-4px; position:relative; z-index:2; }
 .event-badge.middle { border-radius:0; margin:0 -4px; position:relative; z-index:1; padding-left:10px; }
 .event-badge.end { border-top-left-radius:0; border-bottom-left-radius:0; margin-left:-4px; position:relative; z-index:2; padding-left:10px; }
+
+/* Cảnh báo nợ chớp nháy */
+.pulse-warning { animation: pW 1.5s infinite; border: 1px solid white; }
+@keyframes pW { 0% { opacity:1; box-shadow:0 0 0 0 rgba(239,68,68,0.6); } 70% { opacity:0.8; box-shadow:0 0 0 6px rgba(239,68,68,0); } 100% { opacity:1; box-shadow:0 0 0 0 rgba(239,68,68,0); } }
 
 .lich-item { display:flex; align-items:center; gap:12px; padding:12px 14px; border-radius:12px; border:1px solid transparent; cursor:pointer; transition:all .2s; margin-bottom:8px; }
 .lich-item:hover { background:var(--bg-soft); border-color:var(--border-light); }
@@ -185,6 +187,8 @@
 .lich-btn-edit { background:white; color:var(--primary); box-shadow:0 2px 4px rgba(0,0,0,0.05); }
 .lich-btn-del { background:#fee2e2; color:#dc2626; }
 .lich-btn:hover { transform:scale(1.1); }
+.lich-dot { width:12px; height:12px; border-radius:50%; flex-shrink:0; }
+.lich-name { font-size:.875rem; font-weight:700; color:var(--text); flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 
 .color-option { width:32px; height:32px; border-radius:50%; cursor:pointer; border:3px solid transparent; transition:transform .2s; }
 .color-option:hover { transform:scale(1.1); }
@@ -195,9 +199,6 @@
 </style>
 
 <script>
-// ==========================================
-// BỘ CHUYỂN ĐỔI NGÀY ÂM LỊCH (LUNAR CLASS)
-// ==========================================
 class LunarClass {
     static lunarInfo = [0x04bd8,0x04ae0,0x0a570,0x054d5,0x0d260,0x0d950,0x16554,0x056a0,0x09ad0,0x055d2,0x04ae0,0x0a5b6,0x0a4d0,0x0d250,0x1d255,0x0b540,0x0d6a0,0x0ada2,0x095b0,0x14977,0x04970,0x0a4b0,0x0b4b5,0x06a50,0x06d40,0x1ab54,0x02b60,0x09570,0x052f2,0x04970,0x06566,0x0d4a0,0x0ea50,0x06e95,0x05ad0,0x02b60,0x186e3,0x092e0,0x1c8d7,0x0c950,0x0d4a0,0x1d8a6,0x0b550,0x056a0,0x1a5b4,0x025d0,0x092d0,0x0d2b2,0x0a950,0x0b557,0x06ca0,0x0b550,0x15355,0x04da0,0x0a5b0,0x14573,0x052b0,0x0a9a8,0x0e950,0x06aa0,0x0aea6,0x0ab50,0x04b60,0x0aae4,0x0a570,0x05260,0x0f263,0x0d950,0x05b57,0x056a0,0x096d0,0x04dd5,0x04ad0,0x0a4d0,0x0d4d4,0x0d250,0x0d558,0x0b540,0x0b6a0,0x195a6,0x095b0,0x049b0,0x0a974,0x0a4b0,0x0b27a,0x06a50,0x06d40,0x0af46,0x0ab60,0x09570,0x04af5,0x04970,0x064b0,0x074a3,0x0ea50,0x06b58,0x05ac0,0x0ab60,0x096d5,0x092e0,0x0c960,0x0d954,0x0d4a0,0x0da50,0x07552,0x056a0,0x0abb7,0x025d0,0x092d0,0x0cab5,0x0a950,0x0b4a0,0x0baa4,0x0ad50,0x055d9,0x04ba0,0x0a5b0,0x15176,0x052b0,0x0a930,0x07954,0x06aa0,0x0ad50,0x05b52,0x04b60,0x0a6e6,0x0a4e0,0x0d260,0x0ea65,0x0d530,0x05aa0,0x076a3,0x096d0,0x04afb,0x04ad0,0x0a4d0,0x1d0b6,0x0d250,0x0d520,0x0dd45,0x0b5a0,0x056d0,0x055b2,0x049b0,0x0a577,0x0a4b0,0x0aa50,0x1b255,0x06d20,0x0ada0,0x14b63,0x09370,0x049f8,0x04970,0x064b0,0x168a6,0x0ea50,0x06b20,0x1a6c4,0x0aae0,0x0a2e0,0x0d2e3,0x0c960,0x0d557,0x0d4a0,0x0da50,0x05d55,0x056a0,0x0a6d0,0x055d4,0x052d0,0x0a9b8,0x0a950,0x0b4a0,0x0b6a6,0x0ad50,0x055a0,0x0aba4,0x0a5b0,0x052b0,0x0b273,0x06930,0x07337,0x06aa0,0x0ad50,0x14b55,0x04b60,0x0a570,0x054e4,0x0d160,0x0e968,0x0d520,0x0daa0,0x16aa6,0x056d0,0x04ae0,0x0a9d4,0x0a2d0,0x0d150,0x0f252,0x0d520];
     static leapMonth(y) { return this.lunarInfo[y-1900] & 0xf; }
@@ -222,9 +223,6 @@ class LunarClass {
     }
 }
 
-// ==========================================
-// STATE & INITIALIZATION
-// ==========================================
 let currentYear = new Date().getFullYear();
 let currentMonth = new Date().getMonth();
 let selectedLichId = null;
@@ -251,12 +249,13 @@ function selectColor(el, color) {
     document.getElementById('calColor').value = color;
 }
 
-// ==========================================
-// API GỌI LỊCH (CALENDARS) - ĐÃ FIX PATH
-// ==========================================
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
 async function loadCalendars() {
+    const listEl = document.getElementById('lichList');
     try {
         const res = await fetch('/quan-ly-lich/api/lich');
+        if(!res.ok) throw new Error('API Error');
         const json = await res.json();
         if(json.success) {
             calendars = json.data;
@@ -265,10 +264,12 @@ async function loadCalendars() {
             
             const sel = document.getElementById('evtLich');
             sel.innerHTML = '<option value="">-- Chọn lịch --</option>' + calendars.map(c => `<option value="${c.MaLich}">${c.TenLich}</option>`).join('');
-            
-            loadEvents(); 
         }
-    } catch(e) { console.error('Lỗi tải lịch', e); }
+    } catch(e) { 
+        listEl.innerHTML = `<p class="text-danger text-center small">Mất kết nối mạng</p>`;
+    } finally {
+        loadEvents();
+    }
 }
 
 function renderCalendarList() {
@@ -277,16 +278,19 @@ function renderCalendarList() {
         el.innerHTML = '<p class="text-muted text-center my-3 small">Chưa có lịch nào. Hãy tạo mới!</p>';
         return;
     }
-    el.innerHTML = calendars.map(c => `
+    el.innerHTML = calendars.map(c => {
+        // ĐÃ FIX: Chống tàng hình màu triệt để. Nếu chuỗi rỗng lấy màu mặc định
+        const bg = (c.MauSac && c.MauSac.trim() !== '') ? c.MauSac : '#0061ff';
+        return `
         <div class="lich-item ${selectedLichId === c.MaLich ? 'active' : ''}" onclick="filterByCalendar(${c.MaLich})">
-            <div class="lich-dot" style="background:${c.MauSac}"></div>
-            <div class="lich-name">${c.TenLich}</div>
+            <div class="lich-dot" style="background:${bg}; box-shadow: 0 0 4px ${bg}80;"></div>
+            <div class="lich-name">${esc(c.TenLich)}</div>
             <div class="actions">
-                <button class="lich-btn lich-btn-edit" onclick="event.stopPropagation(); openEditCal(${c.MaLich})"><i class="fas fa-pen"></i></button>
-                <button class="lich-btn lich-btn-del" onclick="event.stopPropagation(); deleteCal(${c.MaLich})"><i class="fas fa-trash"></i></button>
+                <button class="lich-btn lich-btn-edit" onclick="event.stopPropagation(); openEditCal(${c.MaLich})" title="Sửa lịch"><i class="fas fa-pen"></i></button>
+                <button class="lich-btn lich-btn-del" onclick="event.stopPropagation(); deleteCal(${c.MaLich})" title="Xóa lịch"><i class="fas fa-trash"></i></button>
             </div>
         </div>
-    `).join('');
+    `}).join('');
 }
 
 function filterByCalendar(id) {
@@ -295,43 +299,30 @@ function filterByCalendar(id) {
     loadEvents();
 }
 
-// ==========================================
-// API GỌI SỰ KIỆN (EVENTS) - ĐÃ FIX PATH
-// ==========================================
 async function loadEvents() {
-    document.getElementById('loadingCalendar').classList.remove('d-none');
+    const loader = document.getElementById('loadingCalendar');
+    loader.classList.remove('d-none');
     try {
         let url = `/quan-ly-lich/api/su-kien?thang=${currentMonth+1}&nam=${currentYear}`;
         if(selectedLichId) url += `&maLich=${selectedLichId}`;
         
         const res = await fetch(url);
+        if(!res.ok) throw new Error('API Error');
         const json = await res.json();
+        
         if(json.success) {
             events = json.data;
             document.getElementById('statEvents').textContent = events.length;
             renderEventsOnGrid();
         }
-    } catch(e) { console.error(e); }
-    document.getElementById('loadingCalendar').classList.add('d-none');
-}
-
-// ==========================================
-// THUẬT TOÁN VẼ LƯỚI & RẢI SỰ KIỆN
-// ==========================================
-function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-
-function parseDateStr(str) {
-    if (!str) return new Date();
-    const parts = str.split('T')[0].split('-');
-    return new Date(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
-}
-function formatDateStr(d) {
-    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+    } catch(e) { } finally {
+        loader.classList.add('d-none');
+    }
 }
 
 function renderCalendarGrid() {
     const monthNames = ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'];
-    document.getElementById('calendarTitle').textContent = `${monthNames[currentMonth]} ${currentYear}`;
+    document.getElementById('calendarTitle').textContent = `${monthNames[currentMonth]} - ${currentYear}`;
     
     const firstDay = new Date(currentYear, currentMonth, 1).getDay();
     const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
@@ -347,22 +338,15 @@ function renderCalendarGrid() {
         for (let col = 0; col < 7; col++) {
             const idx = row * 7 + col;
             let classList = "cal-cell";
-            let dNum = "";
-            let dStr = "";
-            let isCurrentMonth = false;
+            let dNum = "", dStr = "", isCurrentMonth = false;
 
             if (idx < firstDay) {
-                classList += " other-month";
-                dNum = daysInPrevMonth - firstDay + idx + 1;
+                classList += " other-month"; dNum = daysInPrevMonth - firstDay + idx + 1;
             } else if (day > daysInMonth) {
-                classList += " other-month";
-                dNum = nextDay++;
+                classList += " other-month"; dNum = nextDay++;
             } else {
-                isCurrentMonth = true;
-                dNum = day++;
-                if (dNum === today.getDate() && currentMonth === today.getMonth() && currentYear === today.getFullYear()) {
-                    classList += " today";
-                }
+                isCurrentMonth = true; dNum = day++;
+                if (dNum === today.getDate() && currentMonth === today.getMonth() && currentYear === today.getFullYear()) classList += " today";
             }
 
             const realYear = isCurrentMonth ? currentYear : (idx < firstDay ? (currentMonth === 0 ? currentYear - 1 : currentYear) : (currentMonth === 11 ? currentYear + 1 : currentYear));
@@ -392,9 +376,9 @@ function renderEventsOnGrid() {
     document.querySelectorAll('.event-stack').forEach(el => el.innerHTML = '');
 
     events.forEach(ev => {
-        const sd = new Date(ev.ThoiGianBatDau);
-        const ed = new Date(ev.ThoiGIanKetThuc);
-        const color = ev.Lich?.MauSac || '#0061ff';
+        const sd = new Date(ev.start);
+        const ed = new Date(ev.end);
+        const color = ev.color;
 
         let current = new Date(sd.getFullYear(), sd.getMonth(), sd.getDate());
         const endNormalized = new Date(ed.getFullYear(), ed.getMonth(), ed.getDate());
@@ -405,30 +389,61 @@ function renderEventsOnGrid() {
             
             if (cell) {
                 let badgeClass = "event-badge";
-                let prefix = "";
+                let prefixText = "";
+                let iconHtml = "";
 
-                if (current.getTime() !== endNormalized.getTime() || current.getTime() !== new Date(sd.getFullYear(), sd.getMonth(), sd.getDate()).getTime()) {
-                    if (current.getTime() === new Date(sd.getFullYear(), sd.getMonth(), sd.getDate()).getTime()) {
-                        badgeClass += " start"; prefix = ev.TieuDe;
-                    } else if (current.getTime() === endNormalized.getTime()) {
-                        badgeClass += " end"; prefix = "← Kết thúc";
-                    } else {
-                        badgeClass += " middle"; prefix = "↔";
-                    }
+                // ĐÃ FIX: Icon hóa đơn và Click trực tiếp
+                if (ev.type === 'dich-vu') iconHtml = '<i class="fas fa-bolt me-1"></i>';
+                else if (ev.type === 'hop-dong') iconHtml = '<i class="fas fa-file-contract me-1"></i>';
+
+                if(ev.type === 'personal') {
+                    if (current.getTime() !== endNormalized.getTime() || current.getTime() !== new Date(sd.getFullYear(), sd.getMonth(), sd.getDate()).getTime()) {
+                        if (current.getTime() === new Date(sd.getFullYear(), sd.getMonth(), sd.getDate()).getTime()) {
+                            badgeClass += " start"; prefixText = ev.title;
+                        } else if (current.getTime() === endNormalized.getTime()) {
+                            badgeClass += " end"; prefixText = "← Kết thúc";
+                        } else {
+                            badgeClass += " middle"; prefixText = "↔";
+                        }
+                    } else { prefixText = ev.title; }
                 } else {
-                    prefix = ev.TieuDe; 
+                    prefixText = ev.title;
+                    if(ev.isOverdue) badgeClass += " pulse-warning";
                 }
 
-                cell.innerHTML += `<div class="${badgeClass}" style="background:${color}" onclick="event.stopPropagation(); openEditEvt(${ev.MaSuKien})">${prefix}</div>`;
+                // Phân luồng Click: Cá nhân thì mở Sửa. Hóa đơn thì bật Modal Cảnh báo Nợ -> Mở trang Checkout
+                let clickAction = "";
+                if (ev.type === 'personal') {
+                    clickAction = `onclick="event.stopPropagation(); openEditEvt(${ev.originalId})"`;
+                } else {
+                    clickAction = `onclick="event.stopPropagation(); openInvoiceAction('${esc(ev.title)}', '${ev.amount}', '${ev.url}', '${ev.color}')"`;
+                }
+
+                cell.innerHTML += `<div class="${badgeClass}" style="background:${color}" ${clickAction}>${iconHtml}${esc(prefixText)}</div>`;
             }
             current.setDate(current.getDate() + 1);
         }
     });
 }
 
-// ==========================================
-// CÁC HÀM TƯƠNG TÁC LỊCH
-// ==========================================
+// MỞ POPUP THANH TOÁN KHI CLICK LÊN LỊCH
+function openInvoiceAction(title, amount, url, color) {
+    Swal.fire({
+        title: title,
+        html: `Bạn có khoản nợ <strong>${Number(amount).toLocaleString('vi-VN')} ₫</strong>.<br>Vui lòng thanh toán để tránh gián đoạn dịch vụ.`,
+        icon: 'info',
+        showCancelButton: true,
+        confirmButtonColor: color,
+        cancelButtonColor: '#94a3b8',
+        confirmButtonText: '<i class="fas fa-credit-card me-2"></i>Thanh toán ngay',
+        cancelButtonText: 'Để sau'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            window.location.href = url;
+        }
+    });
+}
+
 function prevMonth() { if(currentMonth===0){currentMonth=11;currentYear--;}else{currentMonth--;} renderCalendarGrid(); loadEvents(); }
 function nextMonth() { if(currentMonth===11){currentMonth=0;currentYear++;}else{currentMonth++;} renderCalendarGrid(); loadEvents(); }
 function goToday() { currentYear=new Date().getFullYear(); currentMonth=new Date().getMonth(); renderCalendarGrid(); loadEvents(); }
@@ -436,57 +451,72 @@ function goToday() { currentYear=new Date().getFullYear(); currentMonth=new Date
 function showDayEvents(dateStr, dNum, mNum) {
     const target = new Date(dateStr);
     const dayEvents = events.filter(ev => {
-        const sd = new Date(new Date(ev.ThoiGianBatDau).setHours(0,0,0,0));
-        const ed = new Date(new Date(ev.ThoiGIanKetThuc).setHours(0,0,0,0));
+        const sd = new Date(new Date(ev.start).setHours(0,0,0,0));
+        const ed = new Date(new Date(ev.end).setHours(0,0,0,0));
         return target >= sd && target <= ed;
     });
 
-    document.getElementById('dayEventsTitle').innerHTML = `<i class="bi bi-calendar-event me-2"></i>Sự kiện ngày ${dNum}/${mNum}/${target.getFullYear()} <span class="badge bg-primary ms-2">${dayEvents.length}</span>`;
+    document.getElementById('dayEventsTitle').innerHTML = `<i class="bi bi-calendar-event me-2"></i>Chi tiết ngày ${dNum}/${mNum}/${target.getFullYear()} <span class="badge bg-primary ms-2">${dayEvents.length}</span>`;
     
     const list = document.getElementById('dayEventsList');
     if(!dayEvents.length) {
-        list.innerHTML = `<div class="text-center text-muted py-4"><i class="fas fa-mug-hot fa-2x mb-2 opacity-50"></i><br>Không có lịch trình nào. Bạn có thể nghỉ ngơi!</div>`;
+        list.innerHTML = `<div class="text-center text-muted py-4"><i class="fas fa-mug-hot fa-2x mb-2 opacity-50"></i><br>Không có sự kiện. Bạn có thể nghỉ ngơi!</div>`;
     } else {
         list.innerHTML = dayEvents.map(ev => {
-            const timeSpan = new Date(ev.ThoiGianBatDau).toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'}) + ' - ' + new Date(ev.ThoiGIanKetThuc).toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'});
-            return `
-            <div class="day-event-item">
-                <div class="day-event-dot" style="background:${ev.Lich?.MauSac || '#0061ff'};"></div>
-                <div style="flex:1;">
-                    <div style="font-weight:800;font-size:1.1rem;color:var(--text);">${esc(ev.TieuDe)}</div>
-                    <div style="font-size:.85rem;font-weight:600;color:var(--primary);margin-bottom:4px;"><i class="fas fa-clock me-1"></i>${timeSpanString(ev)}</div>
-                    ${ev.DiaDiem ? `<div style="font-size:.85rem;color:var(--text-muted);"><i class="fas fa-map-marker-alt me-1"></i>${esc(ev.DiaDiem)}</div>` : ''}
-                    ${ev.MoTa ? `<div style="font-size:.85rem;color:var(--text-secondary);margin-top:4px;background:#f8fafc;padding:6px 10px;border-radius:6px;">${esc(ev.MoTa)}</div>` : ''}
-                </div>
-                <div style="display:flex;flex-direction:column;gap:8px;">
-                    <button onclick="openEditEvt(${ev.MaSuKien})" class="btn btn-sm btn-outline-primary"><i class="fas fa-pen"></i></button>
-                    <button onclick="deleteEvt(${ev.MaSuKien})" class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
-                </div>
-            </div>`;
+            if(ev.type === 'personal') {
+                return `
+                <div class="day-event-item">
+                    <div class="day-event-dot" style="background:${ev.color};"></div>
+                    <div style="flex:1;">
+                        <div style="font-weight:800;font-size:1.1rem;color:var(--text);">${esc(ev.title)}</div>
+                        <div style="font-size:.85rem;font-weight:600;color:var(--primary);margin-bottom:4px;"><i class="fas fa-clock me-1"></i>${timeSpanString(ev)}</div>
+                        ${ev.location ? `<div style="font-size:.85rem;color:var(--text-muted);"><i class="fas fa-map-marker-alt me-1"></i>${esc(ev.location)}</div>` : ''}
+                        ${ev.description ? `<div style="font-size:.85rem;color:var(--text-secondary);margin-top:4px;background:#f8fafc;padding:6px 10px;border-radius:6px;">${esc(ev.description)}</div>` : ''}
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:8px;">
+                        <button onclick="openEditEvt(${ev.originalId})" class="btn btn-sm btn-outline-primary"><i class="fas fa-pen"></i></button>
+                        <button onclick="deleteEvt(${ev.originalId})" class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>`;
+            } else {
+                const icon = ev.type === 'dich-vu' ? 'fa-bolt' : 'fa-file-contract';
+                return `
+                <div class="day-event-item" style="border: 1px solid ${ev.color}40; background: ${ev.color}0a;">
+                    <div class="day-event-dot" style="background:${ev.color}; display:flex; align-items:center; justify-content:center; width:32px; height:32px; border-radius:8px;">
+                        <i class="fas ${icon} text-white"></i>
+                    </div>
+                    <div style="flex:1; margin-left: 8px;">
+                        <div style="font-weight:800;font-size:1.05rem;color:${ev.color};">${esc(ev.title)}</div>
+                        <div style="font-size:.9rem;font-weight:800;color:var(--text);margin-bottom:2px;">Số tiền: ${ev.amount.toLocaleString('vi-VN')} ₫</div>
+                        <div style="font-size:.8rem;color:var(--text-secondary);"><i class="fas fa-home me-1"></i>${esc(ev.description)}</div>
+                        ${ev.isOverdue ? `<div style="font-size:.75rem;color:#ef4444;margin-top:4px;font-weight:bold;"><i class="fas fa-exclamation-triangle me-1"></i>Đã quá hạn thanh toán!</div>` : ''}
+                    </div>
+                    <div style="display:flex; align-items:center;">
+                        <a href="${ev.url}" class="btn btn-sm fw-bold text-white shadow-sm" style="background:${ev.color}; padding: 8px 16px; border-radius: 8px; text-decoration:none;">
+                            Thanh toán <i class="fas fa-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>`;
+            }
         }).join('');
     }
     document.getElementById('dayEventsPanel').classList.remove('d-none');
-    document.getElementById('dayEventsPanel').scrollIntoView({behavior: 'smooth', block: 'end'});
+    document.getElementById('dayEventsPanel').scrollIntoView({behavior: 'smooth', block: 'center'});
 }
 
 function timeSpanString(ev) {
-    const s = new Date(ev.ThoiGianBatDau), e = new Date(ev.ThoiGIanKetThuc);
+    const s = new Date(ev.start), e = new Date(ev.end);
     if(s.toDateString() === e.toDateString()) {
         return `${s.toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'})} - ${e.toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'})}`;
     }
     return `${s.toLocaleDateString('vi-VN')} ${s.toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'})} → ${e.toLocaleDateString('vi-VN')} ${e.toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'})}`;
 }
 
-// ==========================================
-// MODAL & CRUD
-// ==========================================
 let calModal, evtModal;
-
 document.addEventListener('DOMContentLoaded', () => {
     calModal = new bootstrap.Modal(document.getElementById('calendarModal'));
     evtModal = new bootstrap.Modal(document.getElementById('eventModal'));
 });
-
 
 function showAddCalendarModal() {
     document.getElementById('calModalTitle').textContent = 'Thêm lịch mới';
@@ -504,134 +534,97 @@ function openEditCal(id) {
     document.getElementById('calId').value = c.MaLich;
     document.getElementById('calTen').value = c.TenLich;
     document.getElementById('calMoTa').value = c.MoTa || '';
-    const colorOpt = document.querySelector(`[data-color="${c.MauSac}"]`) || document.querySelector('.color-option');
-    selectColor(colorOpt, c.MauSac || COLORS[0]);
+    const colorOpt = document.querySelector(`[data-color="${c.MauSac}"]`);
+    if(colorOpt) selectColor(colorOpt, c.MauSac);
     calModal.show();
 }
 
-// ĐÃ FIX PATH: /quan-ly-lich/api/lich
 async function saveCalendar() {
     const id = document.getElementById('calId').value;
-    const body = {
-        TenLich: document.getElementById('calTen').value.trim(),
-        MauSac: document.getElementById('calColor').value,
-        MoTa: document.getElementById('calMoTa').value.trim()
-    };
+    const body = { TenLich: document.getElementById('calTen').value.trim(), MauSac: document.getElementById('calColor').value, MoTa: document.getElementById('calMoTa').value.trim() };
     if(!body.TenLich) return Swal.fire('Lỗi', 'Tên lịch không được để trống', 'warning');
     
     try {
         const res = await fetch(id ? `/quan-ly-lich/api/lich/${id}` : `/quan-ly-lich/api/lich`, {
-            method: id ? 'PUT' : 'POST',
-            headers: {'Content-Type':'application/json'},
-            body: JSON.stringify(body)
+            method: id ? 'PUT' : 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body)
         });
         const data = await res.json();
-        if(data.success) {
-            calModal.hide();
-            Swal.fire('Thành công', data.message, 'success');
-            loadCalendars();
-        } else Swal.fire('Lỗi', data.message, 'error');
-    } catch(e) { Swal.fire('Lỗi mạng', '', 'error'); }
+        if(data.success) { calModal.hide(); loadCalendars(); }
+    } catch(e) {}
 }
 
-// ĐÃ FIX PATH: /quan-ly-lich/api/lich
 function deleteCal(id) {
-    Swal.fire({ title: 'Xóa lịch?', text: 'Tất cả sự kiện trong lịch này sẽ biến mất vĩnh viễn!', icon: 'warning', showCancelButton: true, confirmButtonText: 'Xóa ngay', cancelButtonText: 'Hủy', confirmButtonColor: '#dc2626' })
+    Swal.fire({ title: 'Xóa lịch?', text: 'Toàn bộ sự kiện sẽ mất!', icon: 'warning', showCancelButton: true, confirmButtonText: 'Xóa', cancelButtonText: 'Hủy', confirmButtonColor: '#dc2626' })
     .then(async (r) => {
         if(r.isConfirmed) {
             const res = await fetch(`/quan-ly-lich/api/lich/${id}`, {method:'DELETE'});
             const data = await res.json();
-            if(data.success) { Swal.fire('Đã xóa!', '', 'success'); loadCalendars(); }
+            if(data.success) { loadCalendars(); }
         }
     });
 }
 
 function showAddEventModal() {
-    if(!calendars.length) return Swal.fire('Lưu ý', 'Bạn cần tạo một Lịch trước khi thêm sự kiện', 'info');
+    if(!calendars.length) return Swal.fire('Lưu ý', 'Hãy tạo Lịch trước', 'info');
     document.getElementById('evtModalTitle').textContent = 'Thêm sự kiện mới';
     document.getElementById('evtId').value = '';
     document.getElementById('evtTen').value = '';
-    document.getElementById('evtMoTa').value = '';
     document.getElementById('evtDiaDiem').value = '';
+    document.getElementById('evtMoTa').value = '';
     
-    const now = new Date();
-    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-    const iso = now.toISOString().slice(0, 16);
-    document.getElementById('evtStart').value = iso;
-    
+    const now = new Date(); now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+    document.getElementById('evtStart').value = now.toISOString().slice(0, 16);
     now.setHours(now.getHours() + 1);
-    const isoEnd = now.toISOString().slice(0, 16);
-    document.getElementById('evtEnd').value = isoEnd;
-    
+    document.getElementById('evtEnd').value = now.toISOString().slice(0, 16);
     evtModal.show();
 }
 
 function openEditEvt(id) {
-    const e = events.find(x => x.MaSuKien === id);
+    const e = events.find(x => x.originalId === id && x.type === 'personal');
     if(!e) return;
     document.getElementById('evtModalTitle').textContent = 'Cập nhật sự kiện';
-    document.getElementById('evtId').value = e.MaSuKien;
-    document.getElementById('evtLich').value = e.MaLich;
-    document.getElementById('evtTen').value = e.TieuDe;
-    document.getElementById('evtDiaDiem').value = e.DiaDiem || '';
-    document.getElementById('evtMoTa').value = e.MoTa || '';
+    document.getElementById('evtId').value = e.originalId;
+    document.getElementById('evtLich').value = e.maLich;
+    document.getElementById('evtTen').value = e.title;
+    document.getElementById('evtDiaDiem').value = e.location;
+    document.getElementById('evtMoTa').value = e.description;
     
-    const pad = n => String(n).padStart(2,'0');
     const fmt = dStr => {
-        const d = new Date(dStr);
+        const d = new Date(dStr); const pad = n => String(n).padStart(2,'0');
         return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
     };
-    document.getElementById('evtStart').value = fmt(e.ThoiGianBatDau);
-    document.getElementById('evtEnd').value = fmt(e.ThoiGIanKetThuc);
-    
+    document.getElementById('evtStart').value = fmt(e.start);
+    document.getElementById('evtEnd').value = fmt(e.end);
     evtModal.show();
 }
 
-// ĐÃ FIX PATH: /quan-ly-lich/api/su-kien
 async function saveEvent() {
     const id = document.getElementById('evtId').value;
     const body = {
-        MaLich: document.getElementById('evtLich').value,
-        TieuDe: document.getElementById('evtTen').value.trim(),
-        ThoiGianBatDau: document.getElementById('evtStart').value,
-        ThoiGIanKetThuc: document.getElementById('evtEnd').value,
-        DiaDiem: document.getElementById('evtDiaDiem').value.trim(),
-        MoTa: document.getElementById('evtMoTa').value.trim()
+        MaLich: document.getElementById('evtLich').value, TieuDe: document.getElementById('evtTen').value.trim(),
+        ThoiGianBatDau: document.getElementById('evtStart').value, ThoiGIanKetThuc: document.getElementById('evtEnd').value,
+        DiaDiem: document.getElementById('evtDiaDiem').value.trim(), MoTa: document.getElementById('evtMoTa').value.trim()
     };
     
-    if(!body.MaLich || !body.TieuDe || !body.ThoiGianBatDau || !body.ThoiGIanKetThuc) {
-        return Swal.fire('Thiếu thông tin', 'Vui lòng điền các trường bắt buộc', 'warning');
-    }
-    if(new Date(body.ThoiGianBatDau) > new Date(body.ThoiGIanKetThuc)) return Swal.fire('Lỗi thời gian', 'Ngày kết thúc phải lớn hơn ngày bắt đầu!', 'warning');
+    if(!body.MaLich || !body.TieuDe || !body.ThoiGianBatDau || !body.ThoiGIanKetThuc) return Swal.fire('Lỗi', 'Thiếu thông tin bắt buộc', 'warning');
+    if(new Date(body.ThoiGianBatDau) > new Date(body.ThoiGIanKetThuc)) return Swal.fire('Lỗi', 'Giờ kết thúc phải sau giờ bắt đầu', 'warning');
 
     try {
         const res = await fetch(id ? `/quan-ly-lich/api/su-kien/${id}` : `/quan-ly-lich/api/su-kien`, {
-            method: id ? 'PUT' : 'POST',
-            headers: {'Content-Type':'application/json'},
-            body: JSON.stringify(body)
+            method: id ? 'PUT' : 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body)
         });
         const data = await res.json();
-        if(data.success) {
-            evtModal.hide();
-            document.getElementById('dayEventsPanel').classList.add('d-none');
-            Swal.fire({title:'Thành công', text: data.message, icon:'success', timer: 1500, showConfirmButton: false});
-            loadEvents();
-        } else Swal.fire('Lỗi', data.message, 'error');
-    } catch(e) { Swal.fire('Lỗi mạng', '', 'error'); }
+        if(data.success) { evtModal.hide(); document.getElementById('dayEventsPanel').classList.add('d-none'); loadEvents(); }
+    } catch(e) {}
 }
 
-// ĐÃ FIX PATH: /quan-ly-lich/api/su-kien
 function deleteEvt(id) {
-    Swal.fire({ title: 'Xóa sự kiện này?', text: 'Bạn không thể khôi phục lại!', icon: 'warning', showCancelButton: true, confirmButtonText: 'Xóa', cancelButtonText: 'Hủy', confirmButtonColor: '#dc2626' })
+    Swal.fire({ title: 'Xóa sự kiện?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Xóa', cancelButtonText: 'Hủy', confirmButtonColor: '#dc2626' })
     .then(async (r) => {
         if(r.isConfirmed) {
             const res = await fetch(`/quan-ly-lich/api/su-kien/${id}`, {method:'DELETE'});
             const data = await res.json();
-            if(data.success) { 
-                Swal.fire({title:'Đã xóa!', icon:'success', timer: 1500, showConfirmButton: false}); 
-                document.getElementById('dayEventsPanel').classList.add('d-none');
-                loadEvents(); 
-            }
+            if(data.success) { document.getElementById('dayEventsPanel').classList.add('d-none'); loadEvents(); }
         }
     });
 }
