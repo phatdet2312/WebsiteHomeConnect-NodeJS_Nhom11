@@ -1,0 +1,92 @@
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<div class="admin-page-header">
+  <div><h4>Bản in Hợp đồng <span class="text-primary">#<%= id %></span></h4></div>
+  <div style="display:flex;gap:8px;">
+    <a href="/admin/hop-dong/update/<%= id %>" class="btn-hc-primary"><i class="fas fa-edit me-2"></i>Sửa</a>
+    <a href="/admin/hop-dong" class="btn-ghost"><i class="fas fa-arrow-left me-2"></i>Quay lại</a>
+  </div>
+</div>
+
+<div id="loader" style="padding:50px;text-align:center;"><i class="fas fa-circle-notch fa-spin fa-2x text-primary"></i></div>
+
+<div id="displayArea" style="display:none; flex-direction:column; gap:20px; max-width:900px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; background:#fff; padding:15px 24px; border-radius:12px; box-shadow:0 2px 10px rgba(0,0,0,0.02); border:1px solid #e2e8f0;">
+        <div style="font-size:1.1rem; font-weight:800;">Trạng thái hiện tại:</div>
+        <div id="statusBadgeDisplay" style="font-size:1rem;"></div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-6">
+            <div style="background:#fff; padding:20px; border-radius:12px; border:1px solid #e2e8f0; height:100%;">
+                <h6 style="color:var(--primary); font-weight:800; margin-bottom:15px;"><i class="fas fa-file-contract me-2"></i>Thông tin hợp đồng</h6>
+                <table style="width:100%; font-size:.9rem;">
+                    <tbody id="tblContractInfo"></tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div style="background:#fff; padding:20px; border-radius:12px; border:1px solid #e2e8f0; margin-bottom:20px;">
+                <h6 style="color:var(--success); font-weight:800; margin-bottom:15px;"><i class="fas fa-user me-2"></i>Bên khách hàng</h6>
+                <div id="khInfo" style="font-size:.9rem;"></div>
+            </div>
+            <div style="background:#fff; padding:20px; border-radius:12px; border:1px solid #e2e8f0;">
+                <h6 style="color:#0ea5e9; font-weight:800; margin-bottom:15px;"><i class="fas fa-building me-2"></i>Thông tin căn hộ</h6>
+                <div id="chInfo" style="font-size:.9rem;"></div>
+            </div>
+        </div>
+    </div>
+
+    <div style="background:#fff; padding:20px; border-radius:12px; border:1px solid #e2e8f0;" id="imgArea">
+        <h6 style="color:#8b5cf6; font-weight:800; margin-bottom:15px;"><i class="fas fa-images me-2"></i>Tài liệu scan đính kèm</h6>
+        <div id="imgGrid" style="display:flex; gap:10px; flex-wrap:wrap;"></div>
+    </div>
+</div>
+
+<script>
+const hdId = parseInt("<%= id %>");
+document.addEventListener('DOMContentLoaded', async () => {
+    const res = await fetch('/admin/hop-dong/api/detail/' + hdId);
+    const json = await res.json();
+    if(json.success) {
+        const d = json.data;
+        
+        let badge = '<span class="badge bg-warning text-dark px-3 py-2"><i class="fas fa-clock me-1"></i>Chờ duyệt</span>';
+        if(d.TrangThaiHD === true) badge = '<span class="badge bg-success px-3 py-2"><i class="fas fa-check me-1"></i>Đã ký</span>';
+        else if(d.TrangThaiHD === false) badge = '<span class="badge bg-danger px-3 py-2"><i class="fas fa-times me-1"></i>Đã hủy</span>';
+        document.getElementById('statusBadgeDisplay').innerHTML = badge;
+
+        document.getElementById('tblContractInfo').innerHTML = `
+            <tr><td style="padding:8px 0; color:#64748b; width:40%;">Loại HĐ</td><td style="font-weight:700;">${d.LoaiHopDong?.TenLoai || '—'}</td></tr>
+            <tr><td style="padding:8px 0; color:#64748b;">Vai trò KH</td><td style="font-weight:700;">${d.VaiTroHD?.TenVaiTro || '—'}</td></tr>
+            <tr><td style="padding:8px 0; color:#64748b;">Giá trị gốc</td><td style="color:#aaa; text-decoration:line-through;">${d.GiaTriCanHo ? Number(d.GiaTriCanHo).toLocaleString()+'đ' : '—'}</td></tr>
+            <tr><td style="padding:8px 0; color:#64748b;">Giá chốt</td><td style="font-weight:800; color:var(--danger); font-size:1.1rem;">${d.GiaThoaThuan ? Number(d.GiaThoaThuan).toLocaleString()+'đ' : '—'}</td></tr>
+            <tr><td style="padding:8px 0; color:#64748b;">Nhân viên</td><td style="font-weight:600;">${d.NhanVien?.TenNV || '—'}</td></tr>
+            <tr><td style="padding:8px 0; color:#64748b;">Ngày lập</td><td>${d.NgayLap ? new Date(d.NgayLap).toLocaleDateString('vi-VN') : '—'}</td></tr>
+            <tr><td style="padding:8px 0; color:#64748b;">Ngày hiệu lực</td><td>${d.NgayHieuLuc ? new Date(d.NgayHieuLuc).toLocaleDateString('vi-VN') : '—'}</td></tr>
+            <tr><td style="padding:8px 0; color:#64748b;">Hết hạn</td><td>${d.NgayHetHan ? new Date(d.NgayHetHan).toLocaleDateString('vi-VN') : '—'}</td></tr>
+            <tr><td style="padding:8px 0; color:#64748b;">Nơi ký</td><td>${d.DiaChiKyHopDong || '—'}</td></tr>
+        `;
+
+        document.getElementById('khInfo').innerHTML = `
+            <div style="font-weight:800; font-size:1.1rem; margin-bottom:5px;">${d.KhachHang?.TenKH || 'Chưa xác định'}</div>
+            <div style="color:#64748b; margin-bottom:5px;"><i class="fas fa-phone me-2"></i>${d.SDTNhanLienLac || d.KhachHang?.DTKH || '—'}</div>
+            <div style="color:#64748b;"><i class="fas fa-envelope me-2"></i>${d.KhachHang?.EmailKH || '—'}</div>
+        `;
+
+        document.getElementById('chInfo').innerHTML = `
+            <div style="font-weight:800; font-size:1.1rem; margin-bottom:5px;">${d.CanHo?.TenCanHo || 'Chưa xác định'}</div>
+            <div style="color:#64748b;"><i class="fas fa-building me-2"></i>Tầng ${d.CanHo?.Tang?.TenTang || '?'} - ${d.CanHo?.Tang?.ToaNha?.TenToaNha || '?'}</div>
+        `;
+
+        let imgs = '';
+        if(d.UrlAnhHD) imgs += `<a href="${d.UrlAnhHD}" target="_blank"><img src="${d.UrlAnhHD}" style="height:120px; border-radius:8px; border:2px solid var(--primary);"></a>`;
+        if(d.DSA_HopDongS) d.DSA_HopDongS.forEach(a => imgs += `<a href="${a.UrlAnh}" target="_blank"><img src="${a.UrlAnh}" style="height:120px; border-radius:8px; border:1px solid #ddd;"></a>`);
+        
+        if(imgs) document.getElementById('imgGrid').innerHTML = imgs;
+        else document.getElementById('imgArea').style.display = 'none';
+
+        document.getElementById('loader').style.display = 'none';
+        document.getElementById('displayArea').style.display = 'flex';
+    }
+});
+</script>

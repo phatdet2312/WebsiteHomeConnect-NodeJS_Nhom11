@@ -1,0 +1,66 @@
+<!-- views/admin/loaiTTHD/update.ejs -->
+<div class="admin-page-header">
+  <div><h4>Cập nhật Loại Tiến trình <span style="color:var(--primary);">#<%= item.MaLoaiTT %></span></h4><p><%= item.TenLoaiTT %></p></div>
+  <div style="display:flex;gap:8px;">
+    <a href="/admin/loai-tt-hd/display/<%= item.MaLoaiTT %>" class="btn-ghost"><i class="fas fa-eye me-2"></i>Xem</a>
+    <a href="/admin/loai-tt-hd" class="btn-ghost"><i class="fas fa-arrow-left me-2"></i>Quay lại</a>
+  </div>
+</div>
+<% if (errors && errors.length > 0) { %>
+<div class="hc-toast hc-toast-danger" style="position:static;margin-bottom:16px;">
+  <i class="fas fa-exclamation-circle"></i>
+  <div><% errors.forEach(e => { %><div><%= e %></div><% }) %></div>
+</div>
+<% } %>
+<div style="max-width:560px;">
+  <div class="table-card">
+    <div class="table-card-header">
+      <div class="table-card-title"><i class="fas fa-list-alt me-2" style="color:#0061ff;"></i>Thông tin</div>
+    </div>
+    <div style="padding:24px;">
+      <form method="POST" action="/admin/loai-tt-hd/update/<%= item.MaLoaiTT %>" enctype="multipart/form-data">
+        <div style="margin-bottom:16px;">
+          <label class="filter-label">Mã Loại</label>
+          <input type="text" class="hc-input" value="<%= item.MaLoaiTT %>" disabled style="opacity:.6;cursor:not-allowed;">
+        </div>
+        <div style="margin-bottom:16px;">
+          <label class="filter-label">Tên Loại <span style="color:var(--danger);">*</span></label>
+          <input type="text" name="TenLoaiTT" class="hc-input" value="<%= item.TenLoaiTT %>" required>
+        </div>
+        <div style="margin-bottom:16px;">
+          <label class="filter-label">Icon</label>
+          <% if (item.UrlIcon) { %>
+            <div style="margin-bottom:8px;">
+              <img src="<%= item.UrlIcon %>" alt="" style="width:64px;height:64px;object-fit:cover;border-radius:10px;border:1.5px solid var(--border-light);">
+            </div>
+          <% } %>
+          <input type="file" name="UrlIcon" class="hc-input" accept="image/*" onchange="previewIcon(this)" style="padding:7px 12px;">
+          <div style="font-size:.72rem;color:var(--text-muted);margin-top:4px;">Để trống nếu không muốn thay đổi.</div>
+          <div id="iconPreviewBox" style="margin-top:10px;display:none;">
+            <img id="iconPreview" src="" alt="Preview" style="width:64px;height:64px;object-fit:cover;border-radius:10px;border:1.5px solid var(--border-light);">
+          </div>
+        </div>
+        <div style="margin-bottom:24px;">
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:.875rem;font-weight:600;color:var(--text);">
+            <input type="checkbox" name="TTHienThi" <%= item.TTHienThi ? 'checked' : '' %> style="accent-color:var(--primary);width:17px;height:17px;">Hiển thị
+          </label>
+        </div>
+        <div style="display:flex;gap:10px;">
+          <button type="submit" class="btn-hc-primary"><i class="fas fa-save me-2"></i>Cập nhật</button>
+          <a href="/admin/loai-tt-hd" class="btn-ghost"><i class="fas fa-times me-2"></i>Hủy</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<script>
+function previewIcon(input) {
+  const preview = document.getElementById('iconPreview');
+  const box = document.getElementById('iconPreviewBox');
+  if (input.files && input.files[0]) {
+    const reader = new FileReader();
+    reader.onload = e => { preview.src = e.target.result; box.style.display = 'block'; };
+    reader.readAsDataURL(input.files[0]);
+  } else { box.style.display = 'none'; }
+}
+</script>

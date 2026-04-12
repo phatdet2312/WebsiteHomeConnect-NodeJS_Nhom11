@@ -1,0 +1,36 @@
+<!-- views/admin/pttt/add.ejs -->
+<div class="admin-page-header">
+  <div><h4>Thêm Phương thức Thanh toán</h4><p>Tạo phương thức thanh toán mới</p></div>
+  <a href="/admin/pttt" class="btn-ghost"><i class="fas fa-arrow-left me-2"></i>Quay lại</a>
+</div>
+<% if (errors && errors.length > 0) { %>
+<div class="hc-toast hc-toast-danger" style="position:static;margin-bottom:16px;">
+  <i class="fas fa-exclamation-circle"></i>
+  <div><% errors.forEach(e => { %><div><%= e %></div><% }) %></div>
+</div>
+<% } %>
+<div style="max-width:560px;">
+  <div class="table-card">
+    <div class="table-card-header">
+      <div class="table-card-title"><i class="fas fa-credit-card me-2" style="color:#0061ff;"></i>Thông tin</div>
+    </div>
+    <div style="padding:24px;">
+      <form method="POST" action="/admin/pttt/add">
+        <div style="margin-bottom:16px;">
+          <label class="filter-label">Tên Phương thức <span style="color:var(--danger);">*</span></label>
+          <input type="text" name="TenPT" class="hc-input" placeholder="Ví dụ: Tiền mặt, Chuyển khoản, Ví điện tử..."
+            value="<%= item ? item.TenPT : '' %>" required>
+        </div>
+        <div style="margin-bottom:24px;">
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:.875rem;font-weight:600;color:var(--text);">
+            <input type="checkbox" name="TTHienThi" <%= !item || item.TTHienThi !== false ? 'checked' : '' %> style="accent-color:var(--primary);width:17px;height:17px;">Hiển thị
+          </label>
+        </div>
+        <div style="display:flex;gap:10px;">
+          <button type="submit" class="btn-hc-primary"><i class="fas fa-save me-2"></i>Lưu</button>
+          <a href="/admin/pttt" class="btn-ghost"><i class="fas fa-times me-2"></i>Hủy</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
