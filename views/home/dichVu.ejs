@@ -1,0 +1,66 @@
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<div style="background:linear-gradient(135deg,var(--primary-dark),var(--primary));padding:50px 0 40px;">
+  <div class="container text-center">
+    <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:6px 16px;color:rgba(255,255,255,.9);font-size:.8rem;font-weight:700;margin-bottom:16px;letter-spacing:.04em;">
+      <i class="fas fa-concierge-bell"></i> TIỆN ÍCH CƯ DÂN
+    </div>
+    <h1 style="font-size:2.4rem;font-weight:800;color:white;margin:0 0 16px;">Dịch Vụ HomeConnect</h1>
+    
+    <div style="margin-top: 24px; display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
+        <a href="/hoa-don-dich-vu" style="background: white; color: var(--primary); padding: 12px 24px; border-radius: 12px; font-weight: 800; font-size: 1rem; text-decoration: none; box-shadow: 0 4px 15px rgba(0,0,0,0.15); display: inline-flex; align-items: center; transition: transform 0.2s;">
+            <i class="fas fa-history me-2"></i> Lịch sử & Hóa đơn dịch vụ
+        </a>
+    </div>
+  </div>
+</div>
+
+<div class="container py-5">
+  <div id="loadingState" class="text-center py-5">
+    <div class="hc-loading"><div class="hc-spinner"></div><p>Đang tải dữ liệu dịch vụ...</p></div>
+  </div>
+  <div id="serviceList" class="row g-4 d-none"></div>
+</div>
+
+<style>
+.svc-card { background:var(--bg-white); border-radius:var(--radius-lg); border:1px solid var(--border-light); box-shadow:var(--shadow-sm); padding:28px 24px; transition:all .3s ease; height:100%; display:flex; flex-direction:column; position:relative; cursor:pointer; text-decoration:none; color:inherit; }
+.svc-card:hover { transform:translateY(-5px); box-shadow:var(--shadow-lg); border-color:var(--primary); }
+.svc-icon { width:64px; height:64px; border-radius:16px; display:flex; align-items:center; justify-content:center; font-size:1.8rem; margin-bottom:18px; flex-shrink:0; background:var(--primary-light); color:var(--primary); }
+.svc-icon img { width:100%; height:100%; object-fit:cover; border-radius:16px; }
+.svc-name { font-size:1.1rem; font-weight:800; color:var(--text); margin-bottom:8px; }
+.svc-action { display:inline-flex; align-items:center; gap:6px; color:var(--primary); font-size:.85rem; font-weight:700; margin-top:auto; padding-top:16px; }
+.badge-pulse { position:absolute; top:20px; right:20px; background:#ef4444; color:white; font-size:.75rem; font-weight:800; padding:4px 12px; border-radius:20px; animation: pulse 2s infinite; box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+@keyframes pulse { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
+</style>
+
+<script>
+fetch('/hoa-don-dich-vu/api/danh-sach')
+  .then(r => { if(r.status===401 || r.status===403) window.location.href='/auth/login'; return r.json(); })
+  .then(res => {
+    document.getElementById('loadingState').classList.add('d-none');
+    const el = document.getElementById('serviceList');
+    el.classList.remove('d-none');
+    
+    if(!res.data || !res.data.length){
+      el.innerHTML = `<div class="col-12"><div class="hc-empty"><div class="empty-icon"><i class="fas fa-concierge-bell"></i></div><div class="empty-title">Chưa có dịch vụ nào được kích hoạt.</div></div></div>`;
+      return;
+    }
+
+    el.innerHTML = res.data.map(dv => `
+      <div class="col-sm-6 col-lg-4">
+        <a href="/hoa-don-dich-vu/thanh-toan?maDV=${dv.maDV}" class="svc-card">
+          ${dv.soKyNo > 0 ? `<div class="badge-pulse">${dv.soKyNo} kỳ chưa thanh toán</div>` : ''}
+          <div class="svc-icon">
+            ${dv.urlIcon ? `<img src="${dv.urlIcon}" alt="icon">` : `<i class="fas fa-concierge-bell"></i>`}
+          </div>
+          <div class="svc-name">${dv.tenDV}</div>
+          <div class="svc-action">
+             ${dv.soKyNo > 0 ? '<span style="color:#ef4444;"><i class="fas fa-exclamation-circle me-1"></i>Thanh toán ngay</span>' : '<i class="fas fa-arrow-right me-1"></i>Xem chi tiết'}
+          </div>
+        </a>
+      </div>
+    `).join('');
+  })
+  .catch(() => {
+    document.getElementById('loadingState').innerHTML = `<div class="hc-empty"><div class="empty-icon"><i class="fas fa-exclamation-triangle text-danger"></i></div><div class="empty-title">Lỗi kết nối máy chủ</div></div>`;
+  });
+</script>
