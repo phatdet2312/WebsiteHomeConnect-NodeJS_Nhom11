@@ -1,0 +1,733 @@
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+
+<style>
+/* CSS Tái cấu trúc chuẩn C# Layout */
+.content-wrapper { padding: 20px 0; width: 100%; overflow-x: hidden; }
+
+/* FIX LỖI CSS GRID BLOWOUT TẠI ĐÂY */
+.service-detail-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 24px; margin-bottom: 24px; width: 100%; }
+.card-block { background: #fff; border-radius: 16px; padding: 24px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid var(--border-light); min-width: 0; }
+.info-service { background: linear-gradient(135deg, #ffffff, #f8fafc); min-width: 0; }
+.ky-circle-container { height: 100%; min-width: 0; /* Ép không cho phình to ra ngoài */ }
+.ky-circle-card { background: #fff; border-radius: 16px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid var(--border-light); height: 100%; display: flex; flex-direction: column; min-width: 0; overflow: hidden; /* Cắt phần tràn */ }
+.ky-circle-scroll { display: flex; gap: 15px; overflow-x: auto; padding: 10px 5px 20px 5px; flex: 1; align-items: center; width: 100%; scrollbar-width: thin; }
+
+.card-title { font-size: 1.1rem; font-weight: 800; color: var(--text); margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+.info-pair { display: flex; justify-content: space-between; margin-bottom: 12px; border-bottom: 1px dashed #eee; padding-bottom: 8px; }
+.info-label { font-weight: 600; color: var(--text-muted); font-size: .9rem; }
+.info-value { font-weight: 800; color: var(--primary); font-size: .95rem; }
+
+/* Vòng tròn danh sách Kỳ */
+.ky-circle-scroll::-webkit-scrollbar { height: 8px; }
+.ky-circle-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+.ky-circle-scroll::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
+.ky-circle-item { min-width: 100px; height: 100px; border-radius: 50%; background: #f1f5f9; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; border: 2px solid transparent; transition: 0.3s; flex-shrink: 0; /* Giữ vòng tròn không bị móp */ }
+.ky-circle-item:hover { border-color: var(--primary); background: #e0e7ff; box-shadow: 0 5px 15px rgba(67, 56, 202, 0.2); }
+.ky-circle-item strong { font-size: 1.2rem; color: var(--primary); }
+.ky-circle-item .ten-ky { font-size: .75rem; font-weight: 700; color: var(--text-muted); text-align: center; padding: 0 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 90px; }
+.ky-actions { position: absolute; top: -5px; right: -5px; display: none; gap: 5px; }
+.ky-circle-item:hover .ky-actions { display: flex; }
+.btn-circle-action { width: 24px; height: 24px; border-radius: 50%; border: none; color: #fff; display: flex; align-items: center; justify-content: center; font-size: .7rem; cursor: pointer; }
+.bg-edit { background: #f59e0b; } .bg-del { background: #dc2626; }
+
+/* Accordion Table */
+.parent-row { cursor: pointer; transition: background 0.2s; }
+.parent-row:hover { background: #f8fafc; }
+.child-row { display: none; background: #f8fafc; }
+.child-content { padding: 15px 40px 20px 55px; border-bottom: 2px solid var(--border-light); }
+.child-table { width: 100%; background: #fff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); overflow: hidden; border: 1px solid #e2e8f0; }
+.child-table th, .child-table td { padding: 12px; font-size: .85rem; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+
+/* Trạng thái Badge */
+.st-chua { background: #f1f5f9; color: #64748b; }
+.st-dang { background: #fef3c7; color: #b45309; }
+.st-da { background: #dcfce7; color: #15803d; }
+.st-huy { background: #fee2e2; color: #b91c1c; }
+.status-badge { padding: 4px 10px; border-radius: 20px; font-size: .75rem; font-weight: 700; display: inline-block; }
+
+/* Tổng phí Footer */
+.tong-phi-row-new td { background: #f8fafc; padding: 15px 20px; border-top: 2px solid var(--primary); }
+.tong-phi-container-new { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
+.filter-group-compact { display: flex; gap: 15px; flex-wrap: wrap; }
+.filter-item label { font-size: .75rem; font-weight: 700; color: var(--text-muted); margin-right: 5px; }
+.filter-select-compact { border: 1px solid #cbd5e1; border-radius: 6px; padding: 4px 8px; font-size: .8rem; outline: none; }
+.tong-phi-final { font-size: 1.2rem; font-weight: 800; color: var(--danger); display: flex; align-items: center; gap: 10px; }
+
+/* Modals */
+.custom-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1050; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+.custom-modal-content { background: #fff; width: 90%; max-width: 900px; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.2); animation: slideDown 0.3s ease; display: flex; flex-direction: column; max-height: 90vh; }
+.c-modal-header { padding: 15px 24px; background: var(--bg-soft); border-bottom: 1px solid var(--border-light); display: flex; justify-content: space-between; align-items: center; }
+.c-modal-body { padding: 24px; overflow-y: auto; flex: 1; }
+.c-modal-footer { padding: 15px 24px; background: var(--bg-soft); border-top: 1px solid var(--border-light); display: flex; justify-content: flex-end; gap: 10px; }
+@keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+</style>
+
+<div class="content-wrapper">
+    <div class="admin-page-header" style="margin-bottom:20px;">
+        <div style="display:flex; align-items:center; gap:16px;">
+            <% if(dichVu.UrlIcon) { %>
+                <img src="<%= dichVu.UrlIcon %>" style="width:48px;height:48px;border-radius:10px;object-fit:cover;box-shadow:0 2px 10px rgba(0,0,0,0.1);">
+            <% } else { %>
+                <div style="width:48px;height:48px;border-radius:10px;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.5rem;"><i class="fas fa-concierge-bell"></i></div>
+            <% } %>
+            <div>
+                <h4 style="margin:0;"><%= dichVu.TenDV %></h4>
+                <p style="margin:0;font-size:.8rem;color:var(--text-muted);">Không gian quản lý phân bổ dịch vụ</p>
+            </div>
+        </div>
+        <div style="display:flex;gap:10px;">
+            <button onclick="openKyModal()" class="btn-hc-primary" style="background:#f59e0b; border-color:#f59e0b;"><i class="fas fa-calendar-alt me-2"></i>Quản lý Kỳ</button>
+            <button onclick="openAssignModal()" class="btn-hc-primary"><i class="fas fa-link me-2"></i>Gán Căn Hộ Mới</button>
+            <a href="/admin/ct-dich-vu" class="btn-ghost"><i class="fas fa-times"></i> Đóng</a>
+        </div>
+    </div>
+
+    <div id="loader" style="padding:50px;text-align:center;">
+        <i class="fas fa-circle-notch fa-spin fa-2x text-primary"></i><br><b class="mt-2 d-block text-muted">Đang phân tích dữ liệu...</b>
+    </div>
+
+    <div id="mainData" style="display:none;">
+        <div class="service-detail-grid">
+            <div class="card-block info-service">
+                <h3 class="card-title">Thông tin tổng quan</h3>
+                <div class="info-pair"><span class="info-label">Mã dịch vụ</span><span class="info-value">#<%= dichVu.MaDV %></span></div>
+                <div class="info-pair"><span class="info-label">Tên dịch vụ</span><span class="info-value"><%= dichVu.TenDV %></span></div>
+                <div class="info-pair" style="border:none;"><span class="info-label">Trạng thái</span><span class="info-value"><%= dichVu.TTHienThi ? 'Hiển thị công khai' : 'Đang ẩn' %></span></div>
+            </div>
+
+            <div class="ky-circle-container">
+                <div class="ky-circle-card">
+                    <div class="card-title" style="margin-bottom:0;">
+                        Danh sách các Kỳ
+                        <button class="btn-hc-primary" style="padding:4px 10px; font-size:.75rem;" onclick="addKyPrompt()"><i class="fas fa-plus"></i> Thêm kỳ</button>
+                    </div>
+                    <div class="ky-circle-scroll" id="circleKyContainer"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-card">
+            <div class="table-card-header">
+                <div class="table-card-title">Danh sách Căn hộ sử dụng (<span id="countCanHo">0</span>)</div>
+            </div>
+            
+            <div style="overflow-x:auto;">
+                <table style="width:100%; border-collapse:collapse; min-width:800px;">
+                    <thead>
+                        <tr style="background:#f8fafc; border-bottom:1px solid #e2e8f0; text-align:left;">
+                            <th style="padding:15px; width:40px;"></th>
+                            <th style="padding:15px; font-size:.8rem; color:#64748b; text-transform:uppercase;">Căn hộ</th>
+                            <th style="padding:15px; font-size:.8rem; color:#64748b; text-transform:uppercase;">Tổng Kỳ</th>
+                            <th style="padding:15px; font-size:.8rem; color:#64748b; text-transform:uppercase;">Kỳ Mới Nhất</th>
+                            <th style="padding:15px; font-size:.8rem; color:#64748b; text-transform:uppercase;">Trạng Thái KMN</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody"></tbody>
+                    <tfoot>
+                        <tr class="tong-phi-row-new">
+                            <td colspan="5">
+                                <div class="tong-phi-container-new">
+                                    <div class="filter-group-compact">
+                                        <div class="filter-item">
+                                            <label>Kỳ:</label>
+                                            <select id="filterKy" class="filter-select-compact" onchange="calcTotal()"><option value="0">Kỳ mới nhất</option></select>
+                                        </div>
+                                        <div class="filter-item">
+                                            <label>Tòa:</label>
+                                            <select id="filterToa" class="filter-select-compact" onchange="calcTotal()"><option value="">Tất cả</option></select>
+                                        </div>
+                                        <div class="filter-item">
+                                            <label>Tầng:</label>
+                                            <select id="filterTang" class="filter-select-compact" onchange="calcTotal()"><option value="">Tất cả</option></select>
+                                        </div>
+                                    </div>
+                                    <div class="tong-phi-final">
+                                        <span style="font-size:.85rem; color:var(--text-muted);">TỔNG PHÍ:</span>
+                                        <span id="totalFeeDisplay">0đ</span>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="custom-modal" id="assignModal">
+    <div class="custom-modal-content">
+        <div class="c-modal-header">
+            <h5 style="margin:0; font-weight:800;"><i class="fas fa-tasks text-primary me-2"></i>Gán kỳ thanh toán</h5>
+            <button class="modal-close" onclick="closeModal('assignModal')" style="border:none;background:none;font-size:1.5rem;">&times;</button>
+        </div>
+        <div class="c-modal-body">
+            <div style="background:#f8fafc; padding:16px; border-radius:12px; border:1px solid #e2e8f0; margin-bottom:20px;">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label class="filter-label">Chọn Kỳ *</label>
+                        <select id="modalKySelect" class="hc-select" required></select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="filter-label">Phí chung (VNĐ)</label>
+                        <input type="number" id="modalGiaChung" class="hc-input" placeholder="VD: 2500000">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="filter-label">Hạn chung</label>
+                        <input type="date" id="modalHanChung" class="hc-input">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="filter-label">Ghi chú chung</label>
+                        <input type="text" id="modalNoteChung" class="hc-input" placeholder="Note...">
+                    </div>
+                </div>
+            </div>
+
+            <div style="display:flex; gap:10px; margin-bottom:12px;">
+                <select id="modalFilterToa" class="hc-select" style="flex:1;"><option value="">-- Lọc Tòa --</option></select>
+                <select id="modalFilterTang" class="hc-select" style="flex:1;"><option value="">-- Lọc Tầng --</option></select>
+            </div>
+
+            <div style="border:1px solid #e2e8f0; border-radius:12px; overflow:hidden;">
+                <table style="width:100%; font-size:.85rem; text-align:left;">
+                    <thead style="background:#f1f5f9; border-bottom:1px solid #e2e8f0;">
+                        <tr>
+                            <th style="padding:10px 15px;"><input type="checkbox" id="checkAllApp" onclick="toggleAllApp(this)"></th>
+                            <th style="padding:10px 15px;">Căn Hộ</th>
+                            <th style="padding:10px 15px;">Giá riêng (Tùy chọn)</th>
+                            <th style="padding:10px 15px;">Hạn riêng (Tùy chọn)</th>
+                            <th style="padding:10px 15px; text-align:center;">Ảnh MC</th>
+                        </tr>
+                    </thead>
+                </table>
+                <div style="max-height:300px; overflow-y:auto;">
+                    <table style="width:100%; font-size:.85rem; text-align:left;">
+                        <tbody id="appTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="c-modal-footer">
+            <button class="btn-ghost" onclick="closeModal('assignModal')">Hủy</button>
+            <button class="btn-hc-primary" id="btnThucThiGan" onclick="submitBatchAssign()"><i class="fas fa-check me-2"></i>Thực thi gán</button>
+        </div>
+    </div>
+</div>
+
+<div class="custom-modal" id="kyModal">
+    <div class="custom-modal-content" style="max-width:500px;">
+        <div class="c-modal-header">
+            <h5 style="margin:0; font-weight:800;"><i class="fas fa-calendar text-warning me-2"></i>Quản lý Danh sách Kỳ</h5>
+            <button class="modal-close" onclick="closeModal('kyModal')" style="border:none;background:none;font-size:1.5rem;">&times;</button>
+        </div>
+        <div class="c-modal-body" style="padding:0;">
+            <div style="padding:15px; border-bottom:1px solid #eee; display:flex; gap:10px;">
+                <input type="text" id="newKyName" class="hc-input" placeholder="Nhập tên kỳ mới...">
+                <button class="btn-hc-primary" onclick="addKy()">Thêm</button>
+            </div>
+            <ul id="kyListUl" style="list-style:none; padding:0; margin:0; max-height:300px; overflow-y:auto;"></ul>
+        </div>
+    </div>
+</div>
+
+<div class="custom-modal" id="invoiceModal">
+    <div class="custom-modal-content" style="max-width:700px;">
+        <div class="c-modal-header" style="background:linear-gradient(135deg, var(--primary), #8b5cf6); color:#fff;">
+            <h5 style="margin:0; font-weight:800;"><i class="bi bi-receipt me-2"></i>Chi tiết & Trạng thái thanh toán</h5>
+            <button class="modal-close" onclick="closeModal('invoiceModal')" style="border:none;background:none;font-size:1.5rem;color:#fff;">&times;</button>
+        </div>
+        <div class="c-modal-body" id="invoiceContent" style="background:#f8fafc;">
+            <div style="text-align:center; padding:40px;"><i class="fas fa-circle-notch fa-spin fa-2x text-primary"></i></div>
+        </div>
+    </div>
+</div>
+
+<script>
+const maDV = parseInt("<%= dichVu.MaDV %>");
+let masterData = [];
+let metadata = { toaNhas: [], tangs: [], kys: [], trangThais: [] };
+let tempImages = {}; 
+let openAccordions = [];
+
+document.addEventListener('DOMContentLoaded', async () => {
+    await fetchMetadata();
+    await fetchWorkspaceData();
+    setupAssignFilters();
+});
+
+function getStatusBadge(status) {
+    if (!status) return 'st-chua';
+    const s = status.toLowerCase();
+    if(s.includes('đã thanh toán') || s.includes('hoàn thành')) return 'st-da';
+    if(s.includes('đang') || s.includes('chờ')) return 'st-dang';
+    if(s.includes('hủy') || s.includes('lỗi') || s.includes('thất bại')) return 'st-huy';
+    return 'st-chua';
+}
+
+async function fetchMetadata() {
+    const res = await fetch('/admin/ct-dich-vu/api/metadata');
+    const json = await res.json();
+    if(json.success) {
+        metadata = json;
+        renderCircleKy();
+        fillFilters();
+    }
+}
+
+async function fetchWorkspaceData(isSilent = false) {
+    if (!isSilent) {
+        document.getElementById('loader').style.display = 'block';
+        document.getElementById('mainData').style.display = 'none';
+    } else {
+        openAccordions = Array.from(document.querySelectorAll('.child-row'))
+                              .filter(row => row.style.display === 'table-row')
+                              .map(row => parseInt(row.id.split('_')[1]));
+    }
+    
+    const res = await fetch('/admin/ct-dich-vu/api/workspace-data/' + maDV);
+    const json = await res.json();
+    
+    if(json.success) {
+        masterData = json.data;
+        renderMainTable();
+        calcTotal();
+        document.getElementById('countCanHo').textContent = masterData.length;
+        
+        if (!isSilent) {
+            document.getElementById('loader').style.display = 'none';
+            document.getElementById('mainData').style.display = 'block';
+        } else {
+            openAccordions.forEach(id => toggleAccordion(id, true));
+        }
+    }
+}
+
+function renderCircleKy() {
+    const cont = document.getElementById('circleKyContainer');
+    if(!metadata.kys.length) { cont.innerHTML = '<span class="text-muted">Chưa có kỳ.</span>'; return; }
+    cont.innerHTML = metadata.kys.map(k => `
+        <div class="ky-circle-item">
+            <strong>#${k.maKy}</strong>
+            <div class="ten-ky" title="${k.tenKy}">${k.tenKy}</div>
+            <div class="ky-actions">
+                <button class="btn-circle-action bg-edit" onclick="editKy(${k.maKy}, '${k.tenKy}')"><i class="fas fa-pen"></i></button>
+                <button class="btn-circle-action bg-del" onclick="deleteKy(${k.maKy})"><i class="fas fa-times"></i></button>
+            </div>
+        </div>
+    `).join('');
+}
+
+async function addKyPrompt() {
+    const { value: tenKy } = await Swal.fire({ title: 'Tên kỳ mới', input: 'text', showCancelButton: true });
+    if(tenKy) {
+        const res = await fetch('/admin/ct-dich-vu/api/ky/thao-tac', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({action:'add', tenKy}) });
+        const data = await res.json();
+        if(data.success) { 
+            await fetchMetadata(); 
+            Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'Đã thêm', showConfirmButton: false, timer: 1500 }); 
+        } else Swal.fire('Lỗi', data.message, 'error');
+    }
+}
+
+async function editKy(id, oldName) {
+    const { value: tenKy } = await Swal.fire({ title: 'Sửa Tên Kỳ', input: 'text', inputValue: oldName, showCancelButton: true });
+    if(tenKy && tenKy !== oldName) {
+        const res = await fetch('/admin/ct-dich-vu/api/ky/thao-tac', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({action:'edit', maKy:id, tenKy}) });
+        if((await res.json()).success) { 
+            await fetchMetadata(); 
+            fetchWorkspaceData(true);
+        }
+    }
+}
+
+function deleteKy(id) {
+    Swal.fire({
+        title: 'Xóa kỳ thanh toán?',
+        text: 'Kỳ này sẽ bị xóa hoàn toàn khỏi hệ thống nếu chưa có căn hộ nào sử dụng.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc2626',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Có, Xóa!',
+        cancelButtonText: 'Hủy'
+    }).then(async (result) => {
+        if(result.isConfirmed) {
+            const res = await fetch('/admin/ct-dich-vu/api/ky/thao-tac', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({action:'delete', maKy:id}) });
+            const data = await res.json();
+            if(data.success) { 
+                Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'Đã xóa kỳ', showConfirmButton: false, timer: 1500 });
+                await fetchMetadata(); 
+                fetchWorkspaceData(true); 
+            }
+            else Swal.fire('Cảnh báo', data.message, 'warning');
+        }
+    });
+}
+
+function renderMainTable() {
+    const tbody = document.getElementById('tableBody');
+    if(!masterData.length) {
+        tbody.innerHTML = `<tr><td colspan="5" style="padding:40px;text-align:center;color:#888;"><i class="fas fa-box-open fa-2x mb-2 opacity-50"></i><br>Chưa có căn hộ nào được gán dịch vụ này.</td></tr>`;
+        return;
+    }
+
+    let html = '';
+    masterData.forEach(row => {
+        const ttMoiNhat = row.tenTrangThai || 'Chưa thanh toán';
+        html += `
+            <tr class="parent-row" data-ma="${row.maCanHo}" data-toa="${row.tenToaNha}" data-tang="${row.tenTang}" onclick="toggleAccordion(${row.maCanHo})">
+                <td style="padding:15px; color:var(--primary);"><i id="icon_${row.maCanHo}" class="fas fa-chevron-right"></i></td>
+                <td style="padding:15px;">
+                    <div style="font-weight:800;font-size:1rem;color:var(--text);">${row.tenCanHo}</div>
+                    <div style="font-size:.8rem;color:var(--text-muted);"><i class="fas fa-map-marker-alt me-1"></i>${row.tenTang && row.tenToaNha ? `Tầng ${row.tenTang} - ${row.tenToaNha}` : 'Chưa xác định'}</div>
+                </td>
+                <td style="padding:15px; font-weight:700; color:var(--text);"><span style="background:#e0e7ff; color:#4338ca; padding:2px 8px; border-radius:5px;">${row.danhSachKy ? row.danhSachKy.length : 0} kỳ</span></td>
+                <td style="padding:15px;">
+                    <div style="font-weight:700;">${row.kyMoiNhat ? row.kyMoiNhat.tenKy : '?'}</div>
+                    <div style="color:var(--danger); font-size:.8rem; font-weight:600;">${row.kyMoiNhat ? Number(row.kyMoiNhat.gia).toLocaleString() : 0}đ</div>
+                </td>
+                <td style="padding:15px;">
+                    <span class="status-badge ${getStatusBadge(ttMoiNhat)}">${ttMoiNhat}</span>
+                    <div style="font-size:.7rem; color:var(--text-muted); margin-top:4px;">${row.tenKHThanhToan || '?'} (${row.tenPhuongThuc || '—'})</div>
+                </td>
+            </tr>
+            <tr class="child-row" id="child_${row.maCanHo}">
+                <td colspan="5" class="child-content">
+                    <table class="child-table">
+                        <thead style="background:#f8fafc;">
+                            <tr>
+                                <th>Ảnh MC</th><th>Kỳ</th><th>Giá Tiền</th><th>Hạn Chót</th><th>Ghi chú</th><th>Trạng thái</th><th>Thao Tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${row.danhSachKy ? row.danhSachKy.map(ky => `
+                                <tr>
+                                    <td style="text-align:center;">
+                                        ${ky.urlAnh ? `<img src="${ky.urlAnh}" style="width:40px;height:40px;object-fit:cover;border-radius:6px;border:1px solid #ddd;">` : `<i class="fas fa-image text-muted" style="opacity:.4;"></i>`}
+                                    </td>
+                                    <td><b>${ky.tenKy}</b></td>
+                                    <td><input type="number" id="gia_${row.maCanHo}_${ky.maKy}" value="${ky.gia}" class="hc-input" style="padding:4px; height:30px; width:110px;"></td>
+                                    <td><input type="date" id="han_${row.maCanHo}_${ky.maKy}" value="${ky.ngayDenHan || ''}" class="hc-input" style="padding:4px; height:30px; width:130px;"></td>
+                                    <td><input type="text" id="note_${row.maCanHo}_${ky.maKy}" value="${ky.ghiChu || ''}" class="hc-input" style="padding:4px; height:30px;"></td>
+                                    <td>
+                                        <div style="font-size:.75rem; font-weight:700;" class="${getStatusBadge(ky.trangThaiKy).replace('st-','text-')}">${ky.trangThaiHienThi || '—'}</div>
+                                    </td>
+                                    <td>
+                                        <div style="display:flex;gap:5px;">
+                                            <button onclick="confirmSaveInline(${row.maCanHo}, ${ky.maKy})" class="btn-tbl btn-tbl-edit" title="Lưu thông tin"><i class="fas fa-save"></i></button>
+                                            <button onclick="confirmDeleteCT(${row.maCanHo}, ${ky.maKy})" class="btn-tbl btn-tbl-delete" title="Xóa dòng này"><i class="fas fa-trash"></i></button>
+                                            <button onclick="openInvoice(${row.maCanHo}, ${ky.maKy}, '${ky.tenKy}')" class="btn-tbl btn-tbl-view" title="Cập nhật trạng thái / Hóa đơn"><i class="fas fa-file-invoice-dollar"></i></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            `).join('') : ''}
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+        `;
+    });
+    tbody.innerHTML = html;
+}
+
+function toggleAccordion(id, forceOpen = false) {
+    const tr = document.getElementById('child_' + id);
+    const icon = document.getElementById('icon_' + id);
+    if (!tr || !icon) return;
+
+    if(tr.style.display === 'table-row' && !forceOpen) {
+        tr.style.display = 'none'; 
+        icon.className = 'fas fa-chevron-right';
+    } else {
+        tr.style.display = 'table-row'; 
+        icon.className = 'fas fa-chevron-down';
+    }
+}
+
+function fillFilters() {
+    document.getElementById('filterKy').innerHTML = `<option value="0">Kỳ mới nhất</option>` + metadata.kys.map(k => `<option value="${k.maKy}">${k.tenKy}</option>`).join('');
+    document.getElementById('filterToa').innerHTML = `<option value="">Tất cả Tòa</option>` + metadata.toaNhas.map(t => `<option value="${t.maToaNha}">${t.tenToaNha}</option>`).join('');
+    document.getElementById('filterTang').innerHTML = `<option value="">Tất cả Tầng</option>` + metadata.tangs.map(t => `<option value="${t.maTang}">${t.tenTang}</option>`).join('');
+}
+
+function calcTotal() {
+    let total = 0;
+    const fKy = parseInt(document.getElementById('filterKy').value);
+    const fToa = document.getElementById('filterToa').value;
+    const fTang = document.getElementById('filterTang').value;
+
+    document.querySelectorAll('.parent-row').forEach(row => {
+        const ma = parseInt(row.getAttribute('data-ma'));
+        const toa = row.getAttribute('data-toa');
+        const tang = row.getAttribute('data-tang');
+        
+        let match = true;
+        if(fToa && toa !== fToa) match = false;
+        if(fTang && tang !== fTang) match = false;
+
+        const dataRow = masterData.find(d => d.maCanHo === ma);
+        if(match && dataRow) {
+            let kyHopLe = fKy === 0 ? dataRow.kyMoiNhat : dataRow.danhSachKy.find(k => k.maKy === fKy);
+            if(kyHopLe) total += parseInt(kyHopLe.gia) || 0;
+            else match = false;
+        }
+
+        row.style.display = match ? 'table-row' : 'none';
+        const child = document.getElementById('child_' + ma);
+        if(!match && child.style.display === 'table-row') toggleAccordion(ma);
+    });
+
+    document.getElementById('totalFeeDisplay').textContent = total.toLocaleString() + 'đ';
+}
+
+function confirmSaveInline(maCanHo, maKy) {
+    Swal.fire({
+        title: 'Lưu thay đổi?',
+        text: 'Cập nhật Giá, Hạn chót và Ghi chú cho kỳ này?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#0061ff',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Đồng ý lưu',
+        cancelButtonText: 'Hủy'
+    }).then(async (result) => {
+        if(result.isConfirmed) {
+            const gia = document.getElementById(`gia_${maCanHo}_${maKy}`).value;
+            const han = document.getElementById(`han_${maCanHo}_${maKy}`).value;
+            const note = document.getElementById(`note_${maCanHo}_${maKy}`).value;
+
+            const res = await fetch('/admin/ct-dich-vu/api/cap-nhat-inline', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ maDV, maCanHo, maKy, gia, ngayDenHan: han, ghiChu: note })
+            });
+            const json = await res.json();
+            if(json.success) {
+                Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'Đã lưu thành công', showConfirmButton: false, timer: 1500 });
+                fetchWorkspaceData(true); 
+            } else Swal.fire('Lỗi', json.message, 'error');
+        }
+    });
+}
+
+function confirmDeleteCT(maCanHo, maKy) {
+    Swal.fire({
+        title: 'Xóa gán kỳ?',
+        text: 'Thao tác này sẽ gỡ dịch vụ kỳ này khỏi căn hộ!',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc2626',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Xóa ngay',
+        cancelButtonText: 'Hủy'
+    }).then(async (result) => {
+        if(result.isConfirmed) {
+            const res = await fetch('/admin/ct-dich-vu/api/xoa-ct', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ maDV, maCanHo, maKy })
+            });
+            const json = await res.json();
+            if(json.success) {
+                Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'Đã xóa', showConfirmButton: false, timer: 1500 });
+                fetchWorkspaceData(true);
+            }
+            else Swal.fire('Cảnh báo', json.message, 'warning');
+        }
+    });
+}
+
+async function openInvoice(maCanHo, maKy, tenKy) {
+    document.getElementById('invoiceModal').style.display = 'flex';
+    const content = document.getElementById('invoiceContent');
+    content.innerHTML = `<div style="text-align:center; padding:40px;"><i class="fas fa-circle-notch fa-spin fa-2x text-primary"></i><br>Đang tải hóa đơn...</div>`;
+    
+    const res = await fetch(`/admin/ct-dich-vu/api/chi-tiet-thanh-toan?maDV=${maDV}&maCanHo=${maCanHo}&maKy=${maKy}`);
+    const json = await res.json();
+    
+    if(!json.success || !json.daThanhToan) {
+        content.innerHTML = `<div style="text-align:center; padding:40px; color:#888;"><i class="bi bi-info-circle-fill fa-3x text-warning mb-3"></i><br>Căn hộ chưa có dữ liệu hóa đơn thanh toán cho kỳ này.</div>`;
+        return;
+    }
+
+    let html = `<h4 style="text-align:center; color:var(--primary); font-weight:800; margin-bottom:20px;">Hóa đơn ${tenKy}</h4>`;
+    json.hoaDons.forEach(hd => {
+        html += `
+        <div style="background:#fff; border-radius:12px; border:1px solid #e2e8f0; padding:20px; margin-bottom:15px; box-shadow:0 4px 6px rgba(0,0,0,0.02);">
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px dashed #e2e8f0; padding-bottom:10px; margin-bottom:15px;">
+                <b style="font-size:1.1rem; color:var(--text);">Hóa đơn #${hd.maHDDV}</b>
+                <span class="badge-status ${hd.trangThaiMau === 'success' ? 'st-da' : 'st-dang'}">${hd.trangThai}</span>
+            </div>
+            
+            <div class="row mb-3">
+                <div class="col-6"><span style="color:#64748b; font-size:.9rem;"><i class="fas fa-clock me-1"></i>Ngày TT:</span> <b>${hd.ngayThanhToan}</b></div>
+                <div class="col-6 text-end"><span style="color:#64748b; font-size:.9rem;"><i class="fas fa-money-bill-wave me-1"></i>Tổng:</span> <b style="color:var(--danger); font-size:1.1rem;">${Number(hd.tongTien).toLocaleString()}đ</b></div>
+            </div>
+
+            <div style="background:#f1f5f9; padding:15px; border-radius:8px; margin-bottom:15px; border:1px solid #e2e8f0;">
+                <b style="font-size:.85rem; color:var(--primary); margin-bottom:10px; display:block;"><i class="fas fa-bolt me-1"></i>Cập nhật trạng thái nhanh</b>
+                <div style="display:flex; gap:10px;">
+                    <select id="statusSelect_${hd.maHDDV}" class="hc-select" style="flex:1;">
+                        ${metadata.trangThais ? metadata.trangThais.map(tt => `<option value="${tt.maTT}">${tt.tenTT}</option>`).join('') : ''}
+                    </select>
+                    <input type="text" id="statusNote_${hd.maHDDV}" class="hc-input" placeholder="Ghi chú..." style="flex:2;">
+                    <button onclick="confirmUpdateInvoiceStatus(${hd.maHDDV})" class="btn-hc-primary" style="padding:0 15px;"><i class="fas fa-check"></i> Lưu</button>
+                </div>
+            </div>
+
+            <div style="font-size:.85rem;">
+                <b style="display:block; margin-bottom:8px; color:var(--text-muted);">Lịch sử giao dịch:</b>
+                ${hd.lichSu.map(ls => `
+                    <div style="display:flex; justify-content:space-between; border-left:2px solid var(--border-light); padding-left:10px; margin-bottom:5px;">
+                        <span><b style="color:#475569;">${ls.trangThai}</b> <br><small style="color:#94a3b8;">${ls.ghiChu}</small></span>
+                        <span style="color:#64748b; font-size:.75rem;">${ls.thoiGian}</span>
+                    </div>
+                `).join('')}
+            </div>
+        </div>`;
+    });
+    content.innerHTML = html;
+}
+
+function confirmUpdateInvoiceStatus(maHDDV) {
+    const maTT = document.getElementById('statusSelect_' + maHDDV).value;
+    const ghiChu = document.getElementById('statusNote_' + maHDDV).value;
+    if(!maTT) return;
+
+    Swal.fire({
+        title: 'Cập nhật trạng thái hóa đơn?',
+        text: 'Trạng thái hóa đơn sẽ được thay đổi và lưu vào lịch sử.',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#0061ff',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Đồng ý',
+        cancelButtonText: 'Hủy'
+    }).then(async (result) => {
+        if(result.isConfirmed) {
+            const res = await fetch('/admin/ct-dich-vu/api/cap-nhat-trang-thai-hoa-don', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ maHDDV, maTT, ghiChu })
+            });
+            const json = await res.json();
+            if(json.success) {
+                Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'Đã cập nhật trạng thái', showConfirmButton: false, timer: 1500 });
+                document.getElementById('invoiceModal').style.display = 'none';
+                fetchWorkspaceData(true); 
+            } else Swal.fire('Lỗi', json.message, 'error');
+        }
+    });
+}
+
+function openAssignModal() {
+    document.getElementById('modalKySelect').innerHTML = metadata.kys.map(k => `<option value="${k.maKy}">${k.tenKy}</option>`).join('');
+    document.getElementById('modalFilterToa').innerHTML = `<option value="">-- Lọc Tòa --</option>` + metadata.toaNhas.map(t => `<option value="${t.maToaNha}">${t.tenToaNha}</option>`).join('');
+    loadAssignApps();
+    document.getElementById('assignModal').style.display = 'flex';
+}
+
+function setupAssignFilters() {
+    document.getElementById('modalFilterToa').addEventListener('change', async (e) => {
+        const maToa = e.target.value;
+        const res = await fetch('/admin/ct-dich-vu/api/lay-tang?maToaNha=' + maToa);
+        const json = await res.json();
+        document.getElementById('modalFilterTang').innerHTML = `<option value="">-- Lọc Tầng --</option>` + json.data.map(t => `<option value="${t.maTang}">${t.tenTang}</option>`).join('');
+        loadAssignApps();
+    });
+    document.getElementById('modalFilterTang').addEventListener('change', loadAssignApps);
+}
+
+async function loadAssignApps() {
+    const maToa = document.getElementById('modalFilterToa').value;
+    const maTang = document.getElementById('modalFilterTang').value;
+    const res = await fetch(`/admin/ct-dich-vu/api/lay-can-ho?maToaNha=${maToa}&maTang=${maTang}`);
+    const json = await res.json();
+    
+    document.getElementById('appTableBody').innerHTML = json.data.map(ch => `
+        <tr style="border-bottom:1px solid #f1f5f9;">
+            <td style="padding:10px 15px;"><input type="checkbox" class="app-chk" value="${ch.maCanHo}" style="accent-color:var(--primary);width:16px;height:16px;"></td>
+            <td style="padding:10px 15px;"><b>${ch.tenCanHo}</b> <div style="font-size:.7rem;color:#888;">${ch.tenToaNha} - Tầng ${ch.tenTang}</div></td>
+            <td style="padding:10px 15px;"><input type="number" id="oGia_${ch.maCanHo}" class="hc-input" style="height:30px;padding:4px;width:120px;" placeholder="Theo giá chung"></td>
+            <td style="padding:10px 15px;"><input type="date" id="oHan_${ch.maCanHo}" class="hc-input" style="height:30px;padding:4px;"></td>
+            <td style="padding:10px 15px; text-align:center;">
+                <label style="cursor:pointer;color:var(--primary);font-size:1.2rem;" title="Tải ảnh minh chứng">
+                    <i class="fas fa-camera" id="iconCam_${ch.maCanHo}"></i>
+                    <input type="file" onchange="cacheImage(this, ${ch.maCanHo})" style="display:none;" accept="image/*">
+                </label>
+            </td>
+        </tr>
+    `).join('');
+}
+
+function toggleAllApp(source) {
+    document.querySelectorAll('.app-chk').forEach(c => c.checked = source.checked);
+}
+
+function cacheImage(input, maCanHo) {
+    if(input.files && input.files[0]) {
+        tempImages[maCanHo] = input.files[0];
+        document.getElementById('iconCam_' + maCanHo).style.color = '#10b981';
+    }
+}
+
+function confirmBatchAssign() {
+    const checked = Array.from(document.querySelectorAll('.app-chk:checked')).map(c => c.value);
+    if(checked.length === 0) return Swal.fire('Lỗi', 'Chưa chọn căn hộ nào', 'error');
+
+    Swal.fire({
+        title: 'Xác nhận gán?',
+        text: `Bạn đang chuẩn bị phân bổ kỳ dịch vụ cho ${checked.length} căn hộ.`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#0061ff',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Đồng ý gán',
+        cancelButtonText: 'Hủy'
+    }).then((result) => {
+        if(result.isConfirmed) submitBatchAssign(checked);
+    });
+}
+
+async function submitBatchAssign(checked) {
+    const btn = document.getElementById('btnThucThiGan');
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Đang gán...';
+    btn.disabled = true;
+
+    const fd = new FormData();
+    fd.append('maDV', maDV);
+    fd.append('maKy', document.getElementById('modalKySelect').value);
+    
+    const mGia = document.getElementById('modalGiaChung').value;
+    const mHan = document.getElementById('modalHanChung').value;
+    const mNote = document.getElementById('modalNoteChung').value;
+
+    checked.forEach(id => {
+        fd.append('danhSachCanHo', id);
+        fd.append('giaList', document.getElementById(`oGia_${id}`).value || mGia || 0);
+        fd.append('ngayDenHanList', document.getElementById(`oHan_${id}`).value || mHan || '');
+        fd.append('ghiChuList', mNote || '');
+        if(tempImages[id]) {
+            fd.append('maCanHoAnh', id);
+            fd.append('anhMinhChung', tempImages[id]);
+        }
+    });
+
+    const res = await fetch('/admin/ct-dich-vu/api/gan-ky-hang-loat', { method: 'POST', body: fd });
+    const json = await res.json();
+    
+    if(json.success) {
+        Swal.fire('Thành công', json.message, 'success');
+        closeModal('assignModal');
+        tempImages = {};
+        fetchWorkspaceData(true); 
+    } else Swal.fire('Lỗi', json.message, 'error');
+    
+    btn.innerHTML = '<i class="fas fa-check me-2"></i>Thực thi gán';
+    btn.disabled = false;
+}
+
+function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+document.addEventListener('keydown', (e) => {
+    if(e.key === "Escape") document.querySelectorAll('.custom-modal').forEach(m => m.style.display = 'none');
+});
+</script>
