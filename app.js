@@ -62,12 +62,13 @@ app.use(activityMiddleware);
 const homeRoutes = require('./apps/routes/home');
 const authRoutes = require('./apps/routes/auth');
 const adminRoutes = require('./apps/routes/admin/index');
-
+const hoaDonDichVuRoutes = require('./apps/routes/hoaDonDichVu');
 
 
 app.use('/', homeRoutes);
 app.use('/auth', authRoutes);
 app.use('/admin', adminRoutes);
+app.use('/hoa-don-dich-vu', hoaDonDichVuRoutes);
 
 app.use((req, res) => {
   res.status(404).render('errors/404', { title: 'Không tìm thấy trang', layout: 'layouts/main' });

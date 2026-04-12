@@ -1,0 +1,235 @@
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<div style="background:linear-gradient(135deg,var(--primary-dark),var(--primary));padding:36px 0 28px;">
+  <div class="container" style="max-width:1100px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+      <div>
+        <h1 style="font-size:1.5rem;font-weight:800;color:white;margin:0 0 4px;"><i class="fas fa-shopping-cart me-3" style="opacity:.8;"></i>Thanh toán dịch vụ</h1>
+        <p style="color:rgba(255,255,255,.7);margin:0;font-size:.875rem;">Chọn kỳ nợ và phương thức thanh toán</p>
+      </div>
+      <a href="/dich-vu" class="btn-ghost" style="color:white;border-color:rgba(255,255,255,.4);font-size:.82rem;">
+        <i class="fas fa-arrow-left me-2"></i>Quay lại
+      </a>
+    </div>
+  </div>
+</div>
+
+<div class="container py-4" style="max-width:1100px;">
+  <div id="loadingState" class="text-center py-5">
+    <div class="hc-loading"><div class="hc-spinner"></div><p>Đang tổng hợp dữ liệu thanh toán...</p></div>
+  </div>
+  
+  <div id="emptyState" class="d-none">
+    <div class="hc-empty">
+      <div class="empty-icon"><i class="fas fa-check-circle text-success"></i></div>
+      <div class="empty-title">Tuyệt vời! Bạn không nợ kỳ nào.</div>
+      <a href="/hoa-don-dich-vu" class="btn-hc-primary mt-3" style="margin:12px auto 0;">Xem lịch sử hóa đơn</a>
+    </div>
+  </div>
+
+  <div id="mainContent" class="row g-4 d-none">
+    <div class="col-lg-8">
+      <div class="table-card">
+        <div class="table-card-header">
+          <div class="table-card-title" id="dichVuTitle"><i class="fas fa-list me-2" style="color:var(--primary);"></i>Danh sách kỳ chưa thanh toán</div>
+          <button class="btn btn-outline-secondary btn-sm" onclick="selectAll(true)">Chọn tất cả</button>
+        </div>
+        <div style="padding:0 20px 20px;" id="dvList"></div>
+      </div>
+    </div>
+
+    <div class="col-lg-4">
+      <div style="background:var(--bg-white);border-radius:var(--radius-lg);border:1px solid var(--border-light);box-shadow:var(--shadow-md);padding:24px;position:sticky;top:80px;">
+        <div style="font-size:1rem;font-weight:800;color:var(--text);margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border-light);">
+          <i class="fas fa-receipt me-2" style="color:var(--primary);"></i>Chi tiết thanh toán
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:10px;">
+          <span style="font-size:.875rem;color:var(--text-muted);">Đã chọn:</span>
+          <span style="font-weight:700;font-size:.875rem;" id="selectedCount">0 kỳ</span>
+        </div>
+        <hr style="margin:12px 0;border-color:var(--border-light);">
+        <div style="display:flex;justify-content:space-between;margin-bottom:20px;align-items:center;">
+          <span style="font-weight:700;">Tổng tiền:</span>
+          <span style="font-size:1.4rem;font-weight:800;color:#ef4444;" id="totalAmount">0 ₫</span>
+        </div>
+
+        <div style="font-size:.8rem;font-weight:700;color:var(--text-secondary);margin-bottom:10px;text-transform:uppercase;">Phương thức thanh toán</div>
+        <div id="ptttList" style="display:flex;flex-direction:column;gap:10px;margin-bottom:24px;"></div>
+        
+        <button id="btnThanhToan" class="btn-hc-primary w-100" style="justify-content:center;padding:14px;font-size:.95rem;" onclick="processCheckout()">
+          <i class="fas fa-shield-alt me-2"></i>Thanh toán an toàn
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="lightbox" style="display:none;position:fixed;z-index:9999;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.85);align-items:center;justify-content:center;">
+    <span style="position:absolute;top:20px;right:30px;color:white;font-size:40px;cursor:pointer;font-weight:bold;" onclick="document.getElementById('lightbox').style.display='none'">&times;</span>
+    <img id="lightbox-img" style="max-width:90%;max-height:90%;border-radius:8px;box-shadow:0 10px 30px rgba(0,0,0,0.5);">
+</div>
+
+<style>
+.table-card { background:var(--bg-white); border-radius:var(--radius-lg); border:1px solid var(--border-light); box-shadow:var(--shadow-sm); overflow:hidden; }
+.table-card-header { padding:16px 20px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--border-light); background:var(--bg-soft); }
+.table-card-title { font-size:.95rem; font-weight:800; color:var(--text); }
+.dv-item { display:flex; align-items:flex-start; gap:16px; padding:20px 0; border-bottom:1px dashed var(--border-light); transition:background .2s; }
+.dv-item:last-child { border-bottom:none; }
+.dv-item:hover { background:var(--bg-soft); }
+.pt-option { display:flex; align-items:center; gap:12px; padding:12px 16px; border-radius:var(--radius-md); border:2px solid var(--border-light); cursor:pointer; transition:all .2s; background:var(--bg-white); }
+.pt-option:has(input:checked) { border-color:var(--primary); background:var(--primary-light); }
+.pt-option:hover { border-color:var(--primary); }
+</style>
+
+<script>
+function openLightbox(src) {
+    document.getElementById('lightbox-img').src = src;
+    document.getElementById('lightbox').style.display = 'flex';
+}
+
+const urlParams = new URLSearchParams(window.location.search);
+const maDV = urlParams.get('maDV');
+let heartbeatInterval = null;
+
+if (!maDV) {
+    Swal.fire('Lỗi', 'Không tìm thấy dịch vụ cần thanh toán', 'error').then(()=> window.location.href='/dich-vu');
+} else {
+    fetchData();
+}
+
+function fetchData() {
+  fetch(`/hoa-don-dich-vu/api/unpaid?maDV=${maDV}`)
+    .then(r => r.json())
+    .then(res => {
+      document.getElementById('loadingState').classList.add('d-none');
+      
+      if(!res.success) {
+          Swal.fire('Lỗi máy chủ', res.message, 'error');
+          return;
+      }
+
+      if(res.unpaidItems.length === 0){
+          document.getElementById('emptyState').classList.remove('d-none');
+          return;
+      }
+      
+      document.getElementById('dichVuTitle').innerHTML = `<i class="fas fa-list me-2" style="color:var(--primary);"></i>Kỳ chưa thanh toán: ${res.unpaidItems[0].tenDV}`;
+      
+      document.getElementById('dvList').innerHTML = res.unpaidItems.map((item, i) => {
+        // ĐÃ FIX: Có ảnh thì lấy ảnh thật, không có ảnh thì lấy chữ N/A giữ chỗ
+        const anhHienThi = item.urlAnh ? item.urlAnh : 'https://placehold.co/400x400/f8fafc/94a3b8?text=N/A';
+        return `
+        <div class="dv-item">
+          <input type="checkbox" class="dv-check" id="chk_${i}" data-madv="${item.maDV}" data-macanho="${item.maCanHo}" data-maky="${item.maKy}" data-tien="${item.conThieu}" onchange="calcTotal()" style="accent-color:var(--primary);width:20px;height:20px;margin-top:4px;">
+          
+          <img src="${anhHienThi}" onclick="openLightbox('${anhHienThi}')" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #ddd;cursor:zoom-in;flex-shrink:0;" title="Bấm để xem lớn">
+          
+          <label for="chk_${i}" style="flex:1;cursor:pointer;margin:0;">
+            <div style="font-weight:800;font-size:1.05rem;color:var(--text);margin-bottom:4px;">Kỳ: ${item.tenKy}</div>
+            <div style="font-size:.85rem;color:var(--text-muted);"><i class="fas fa-home me-2"></i>${item.toaNhaTang} ➔ ${item.tenCanHo}</div>
+            ${item.ngayDenHan !== 'Không có hạn' ? `<div style="font-size:.8rem;color:#ef4444;margin-top:4px;"><i class="fas fa-clock me-2"></i>Hạn: ${item.ngayDenHan}</div>` : ''}
+          </label>
+          <div style="font-weight:800;font-size:1.15rem;color:var(--primary);">${item.conThieu.toLocaleString('vi-VN')} ₫</div>
+        </div>
+      `}).join('');
+
+      document.getElementById('ptttList').innerHTML = res.pttts.map(pt => {
+        const icon = pt.TenPT.toLowerCase().includes('vnpay') ? 'fa-qrcode' : 'fa-money-bill-wave';
+        return `
+          <label class="pt-option">
+            <input type="radio" name="payMethod" value="${pt.MaPT}" style="accent-color:var(--primary);width:16px;height:16px;">
+            <i class="fas ${icon} fa-lg" style="color:var(--primary);"></i>
+            <span style="font-weight:700;font-size:.9rem;">${pt.TenPT}</span>
+          </label>
+        `;
+      }).join('');
+      
+      document.getElementById('mainContent').classList.remove('d-none');
+      selectAll(true); 
+    }).catch(() => Swal.fire('Lỗi', 'Không thể kết nối đến máy chủ', 'error'));
+}
+
+function selectAll(state) {
+    document.querySelectorAll('.dv-check').forEach(cb => cb.checked = state);
+    calcTotal();
+}
+
+function calcTotal() {
+    const checks = document.querySelectorAll('.dv-check:checked');
+    let total = 0;
+    checks.forEach(c => total += parseInt(c.dataset.tien));
+    document.getElementById('totalAmount').textContent = total.toLocaleString('vi-VN') + ' ₫';
+    document.getElementById('selectedCount').textContent = checks.length + ' kỳ';
+}
+
+async function processCheckout() {
+    const checks = document.querySelectorAll('.dv-check:checked');
+    if(checks.length === 0) return Swal.fire('Oops...', 'Bạn chưa chọn kỳ nào để thanh toán!', 'warning');
+    
+    const ptInput = document.querySelector('input[name="payMethod"]:checked');
+    if(!ptInput) return Swal.fire('Oops...', 'Vui lòng chọn phương thức thanh toán!', 'warning');
+
+    const items = Array.from(checks).map(c => ({
+        maDV: c.dataset.madv,
+        maCanHo: c.dataset.macanho,
+        maKy: c.dataset.maky
+    }));
+
+    const btn = document.getElementById('btnThanhToan');
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Đang xử lý...';
+    btn.disabled = true;
+
+    try {
+        const res = await fetch('/hoa-don-dich-vu/api/checkout', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ maPT: ptInput.value, items })
+        });
+        const data = await res.json();
+
+        if(!data.success) {
+            Swal.fire('Lỗi', data.message, 'error');
+            btn.innerHTML = '<i class="fas fa-shield-alt me-2"></i>Thanh toán an toàn';
+            btn.disabled = false;
+            return;
+        }
+
+        if(data.isVnPay) {
+            const w = 500, h = 700;
+            const left = (screen.width/2)-(w/2), top = (screen.height/2)-(h/2);
+            const popup = window.open(data.redirectUrl, 'ThanhToanVNPAY', `width=${w},height=${h},top=${top},left=${left}`);
+            
+            if(!popup) return Swal.fire('Lỗi trình duyệt', 'Vui lòng cho phép Pop-up để mở VNPay', 'error');
+            
+            Swal.fire({
+                title: 'Đang chờ thanh toán VNPay',
+                text: 'Vui lòng hoàn tất giao dịch trong cửa sổ mới.',
+                allowOutsideClick: false,
+                didOpen: () => Swal.showLoading()
+            });
+
+            heartbeatInterval = setInterval(() => {
+                if(popup.closed) {
+                    clearInterval(heartbeatInterval);
+                    Swal.fire('Đã đóng', 'Giao dịch VNPay đã bị đóng hoặc hủy', 'info').then(()=> window.location.reload());
+                } else {
+                    fetch('/hoa-don-dich-vu/api/heartbeat', {
+                        method: 'POST', headers:{'Content-Type':'application/json'},
+                        body: JSON.stringify({ maHoaDon: data.maHDDV })
+                    });
+                }
+            }, 30000);
+
+            window.vnpayCallback = function(success) {
+                clearInterval(heartbeatInterval);
+                if(success) window.location.href = '/hoa-don-dich-vu/vnpay-return?txnRef=' + data.maHDDV + '&vnp_ResponseCode=00&vnp_SecureHash=VALID'; 
+            };
+        } else {
+            Swal.fire('Thành công', data.message, 'success').then(() => window.location.href = '/hoa-don-dich-vu');
+        }
+    } catch(err) {
+        Swal.fire('Lỗi mạng', 'Không thể kết nối đến máy chủ', 'error');
+        btn.innerHTML = '<i class="fas fa-shield-alt me-2"></i>Thanh toán an toàn';
+        btn.disabled = false;
+    }
+}
+</script>
