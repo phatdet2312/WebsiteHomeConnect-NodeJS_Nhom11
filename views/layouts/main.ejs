@@ -26,9 +26,26 @@
         <a href="/" class="nav-link<%= currentPath==='/' ? ' active' : '' %>">
           <i class="fas fa-home me-1" style="font-size:.7rem;"></i>Trang chủ
         </a>
+        <a href="/kham-pha" class="nav-link<%= currentPath.startsWith('/kham-pha') ? ' active' : '' %>">
+          <i class="fas fa-search me-1" style="font-size:.7rem;"></i>Khám phá
+        </a>
+        <a href="/dich-vu" class="nav-link<%= currentPath.startsWith('/dich-vu') ? ' active' : '' %>">
+          <i class="fas fa-concierge-bell me-1" style="font-size:.7rem;"></i>Dịch vụ
+        </a>
+        <% if (isAuthenticated) { %>
+          <a href="/can-ho" class="nav-link<%= currentPath.startsWith('/can-ho') ? ' active' : '' %>">
+            <i class="fas fa-file-contract me-1" style="font-size:.7rem;"></i>Hợp đồng
+          </a>
+          <a href="/quan-ly-lich" class="nav-link<%= currentPath.startsWith('/quan-ly-lich') ? ' active' : '' %>">
+            <i class="fas fa-calendar-alt me-1" style="font-size:.7rem;"></i>Lịch
+          </a>
+        <% } %>
       </nav>
 
       <div class="nav-actions">
+        <a href="/gio-hang" class="cart-btn">
+          <i class="fas fa-shopping-bag"></i>
+        </a>
 
         <% if (isAuthenticated && user) { %>
           <% const roles = (user.dataValues && user.dataValues.roles) || []; %>
@@ -53,7 +70,6 @@
                   <div style="font-size:.78rem;color:var(--text-muted);"><%= user.Email || '' %></div>
                 </div>
               </li>
-              <li><hr class="dropdown-divider"></li>
               <li><a class="dropdown-item" href="/auth/change-password"><i class="fas fa-key me-2 text-muted"></i>Đổi mật khẩu</a></li>
               <li><a class="dropdown-item text-danger" href="/auth/logout"><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</a></li>
             </ul>
@@ -72,7 +88,6 @@
     <div id="mobileNav" style="display:none;border-top:1px solid var(--border-light);background:var(--bg-white);">
       <div style="padding:12px 20px;display:flex;flex-direction:column;gap:4px;">
         <a href="/" class="nav-link" style="padding:10px 12px;">🏠 Trang chủ</a>
-
       </div>
     </div>
   </header>
@@ -116,9 +131,6 @@
           <h6 class="footer-heading">Khám phá</h6>
           <ul class="footer-links">
             <li><a href="/">Trang chủ</a></li>
-            <li><a href="/kham-pha">Tìm căn hộ</a></li>
-            <li><a href="/dich-vu">Dịch vụ</a></li>
-            <li><a href="/lien-he">Liên hệ</a></li>
           </ul>
         </div>
         <div class="col-lg-2 col-md-6 col-6">
@@ -126,8 +138,6 @@
           <ul class="footer-links">
             <li><a href="/auth/login">Đăng nhập</a></li>
             <li><a href="/auth/register">Đăng ký</a></li>
-            <li><a href="/can-ho">Hợp đồng</a></li>
-            <li><a href="/gio-hang">Giỏ hàng</a></li>
           </ul>
         </div>
         <div class="col-lg-4 col-md-6">

@@ -1,0 +1,325 @@
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<style>
+/* CSS Nâng cấp dành riêng cho Quản lý Người dùng */
+.filter-label { display:block; font-size:.72rem; font-weight:700; color:var(--text-secondary); text-transform:uppercase; margin-bottom:5px; }
+.badge-status { padding:4px 10px; border-radius:20px; font-size:.72rem; font-weight:700; display:inline-flex; align-items:center; gap:4px; }
+.badge-on { background:#dcfce7; color:#15803d; }
+.badge-off { background:#fee2e2; color:#dc2626; }
+.badge-role { background:var(--bg-soft); border:1px solid var(--border-light); color:var(--text-muted); padding:2px 8px; border-radius:6px; font-size:.7rem; font-weight:700; margin-right:4px; display:inline-block; margin-bottom:4px;}
+.badge-role-admin { background:#e0e7ff; color:#4338ca; border-color:#c7d2fe; }
+
+/* Các thẻ thống kê (Stats Cards) */
+.stat-card { background:#fff; border-radius:12px; padding:20px; border:1px solid #e2e8f0; box-shadow:0 2px 10px rgba(0,0,0,0.02); display:flex; align-items:center; gap:15px; }
+.stat-icon { width:50px; height:50px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:1.5rem; }
+.stat-icon.total { background:#e0f2fe; color:#0284c7; }
+.stat-icon.active { background:#dcfce7; color:#16a34a; }
+.stat-icon.locked { background:#fee2e2; color:#dc2626; }
+.stat-icon.online { background:#fef3c7; color:#d97706; }
+.stat-value { font-size:1.5rem; font-weight:800; color:var(--text); line-height:1; margin-bottom:4px; }
+.stat-title { font-size:.75rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; }
+
+/* Avatar tự động */
+.avatar-circle { width:42px; height:42px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800; font-size:.9rem; text-transform:uppercase; flex-shrink:0; }
+
+/* Đèn LED báo Online (Pulse Animation) */
+.status-dot { width:10px; height:10px; border-radius:50%; display:inline-block; }
+.status-dot.online { background:#10b981; box-shadow:0 0 0 0 rgba(16,185,129,0.7); animation:pulse 1.5s infinite; }
+.status-dot.offline { background:#94a3b8; }
+@keyframes pulse { 0% { box-shadow:0 0 0 0 rgba(16,185,129,0.7); } 70% { box-shadow:0 0 0 6px rgba(16,185,129,0); } 100% { box-shadow:0 0 0 0 rgba(16,185,129,0); } }
+
+.suggestion-item { padding:10px; cursor:pointer; border-bottom:1px solid #eee; display:flex; gap:10px; align-items:center;}
+.suggestion-item:hover { background:#f8fafc; }
+.pg-btn { display:inline-flex; align-items:center; justify-content:center; min-width:32px; height:32px; border-radius:6px; border:1px solid var(--border); background:var(--bg-white); font-weight:600; cursor:pointer;}
+.pg-btn.active { background:var(--primary); color:white; border-color:var(--primary); }
+</style>
+
+<div class="admin-page-header" style="margin-bottom:20px;">
+  <div>
+    <h4>Trung tâm Quản trị Người dùng</h4>
+    <p>Quản lý tài khoản, phân quyền và theo dõi hoạt động</p>
+  </div>
+</div>
+
+<div class="row g-3 mb-4" id="statsRow" style="display:none;">
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-icon total"><i class="fas fa-users"></i></div>
+            <div><div class="stat-value" id="stTotal">0</div><div class="stat-title">Tổng Tài Khoản</div></div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-icon active"><i class="fas fa-user-check"></i></div>
+            <div><div class="stat-value" id="stActive">0</div><div class="stat-title">Đang Hoạt Động</div></div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-icon locked"><i class="fas fa-user-lock"></i></div>
+            <div><div class="stat-value" id="stLocked">0</div><div class="stat-title">Đang Bị Khóa</div></div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-icon online"><i class="fas fa-wifi"></i></div>
+            <div><div class="stat-value" id="stOnline">0</div><div class="stat-title">Đang Online</div></div>
+        </div>
+    </div>
+</div>
+
+<div class="table-card mb-3">
+  <div class="table-card-header"><div class="table-card-title"><i class="fas fa-filter me-2 text-primary"></i>Tra cứu tài khoản</div></div>
+  <div style="padding:16px 20px;">
+    <div class="row g-2 align-items-end position-relative">
+      <div class="col-md-4">
+        <label class="filter-label">Tìm kiếm (Email, Tên, ID)</label>
+        <input type="text" id="searchInput" class="hc-input" placeholder="Nhập thông tin người dùng..." autocomplete="off">
+        <div id="suggestionBox" style="display:none;position:absolute;top:100%;left:0;width:350px;background:#fff;z-index:100;box-shadow:0 5px 15px rgba(0,0,0,0.1);border-radius:8px;overflow:hidden;"></div>
+      </div>
+      <div class="col-md-3">
+        <label class="filter-label">Trạng thái Tài khoản</label>
+        <select id="statusFilter" class="hc-select">
+            <option value="all">Tất cả</option><option value="active" selected>Hoạt động</option><option value="locked">Bị khóa</option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <label class="filter-label">Trạng thái Online</label>
+        <select id="hoatDongFilter" class="hc-select">
+            <option value="tatCa">Tất cả</option><option value="online">Đang Online</option><option value="offline">Offline</option>
+        </select>
+      </div>
+      <div class="col-md-1">
+        <button onclick="loadData()" class="btn-hc-primary w-100" style="justify-content:center;padding:9px;"><i class="fas fa-search"></i></button>
+      </div>
+      <div class="col-md-1">
+          <button onclick="resetFilters()" class="btn-ghost w-100" style="justify-content:center;padding:9px;"><i class="fas fa-sync"></i></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="table-card">
+  <div class="table-card-header" style="flex-wrap:wrap; gap:10px;">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <input type="checkbox" id="selectAllChk" style="accent-color:var(--primary);width:16px;height:16px;">
+      <label for="selectAllChk" style="font-weight:600;cursor:pointer;">Chọn tất cả</label>
+    </div>
+    <div style="display:flex; gap:8px; flex-wrap:wrap;" id="bulkActions" style="display:none;">
+        <button class="btn-hc-primary" style="background:#f59e0b;border-color:#f59e0b;height:32px;font-size:.8rem;padding:0 12px;" onclick="executeBulkAction('lock')"><i class="fas fa-lock me-1"></i> Khóa tài khoản</button>
+        <button class="btn-hc-primary" style="background:#dc2626;border-color:#dc2626;height:32px;font-size:.8rem;padding:0 12px;" onclick="executeBulkAction('delete')"><i class="fas fa-trash me-1"></i> Xóa vĩnh viễn</button>
+    </div>
+  </div>
+
+  <div id="searchMessageArea" style="display:none; background:#fffbe8; border-bottom:1px solid #fde68a; padding:12px 20px; color:#92400e; font-weight:600; font-size:.85rem;"></div>
+
+  <div style="overflow-x:auto;">
+    <table style="width:100%; min-width:1000px; border-collapse:collapse;">
+      <thead style="background:var(--bg-soft);border-bottom:1px solid var(--border-light);">
+        <tr>
+          <th style="padding:12px;width:40px;"></th>
+          <th style="padding:12px;font-size:.75rem;color:var(--text-muted);">NGƯỜI DÙNG</th>
+          <th style="padding:12px;font-size:.75rem;color:var(--text-muted);">LIÊN HỆ</th>
+          <th style="padding:12px;font-size:.75rem;color:var(--text-muted);">PHÂN QUYỀN</th>
+          <th style="padding:12px;font-size:.75rem;color:var(--text-muted);text-align:center;">TRẠNG THÁI</th>
+          <th style="padding:12px;font-size:.75rem;color:var(--text-muted);text-align:right;">THAO TÁC</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"><tr><td colspan="6" style="padding:40px;text-align:center;"><i class="fas fa-circle-notch fa-spin fa-2x text-muted"></i></td></tr></tbody>
+    </table>
+  </div>
+</div>
+<div id="paginationArea" style="display:flex;justify-content:center;gap:6px;margin-top:16px;"></div>
+
+<div class="custom-modal" id="hoatDongModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:1050; align-items:center; justify-content:center;">
+    <div style="background:#fff; width:400px; padding:24px; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,0.2);">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:1px solid #eee; padding-bottom:10px;">
+            <h5 style="font-weight:800; margin:0;"><i class="fas fa-history text-primary me-2"></i>Lịch sử truy cập</h5>
+            <button onclick="document.getElementById('hoatDongModal').style.display='none'" style="border:none;background:none;font-size:1.2rem;cursor:pointer;">&times;</button>
+        </div>
+        <div style="background:#f8fafc; padding:15px; border-radius:8px; border:1px solid #e2e8f0; margin-bottom:20px;">
+            <p style="margin-bottom:8px; color:#64748b; font-size:.9rem;"><strong>Đăng nhập lúc:</strong> <span id="timeOnline" style="color:var(--text);"></span></p>
+            <p style="margin:0; color:#64748b; font-size:.9rem;"><strong>Hoạt động cuối:</strong> <span id="timeOffline" style="color:var(--text);"></span></p>
+        </div>
+        <div style="text-align:right;"><button onclick="document.getElementById('hoatDongModal').style.display='none'" class="btn-ghost">Đóng</button></div>
+    </div>
+</div>
+
+<script>
+let currentPage = 1;
+
+// Hàm tạo ký tự đại diện & màu cho Avatar
+function getInitials(name) {
+    if(!name) return 'U';
+    const parts = name.trim().split(' ');
+    if(parts.length === 1) return parts[0].charAt(0).toUpperCase();
+    return (parts[0].charAt(0) + parts[parts.length-1].charAt(0)).toUpperCase();
+}
+function getColor(name) {
+    const colors = ['#f59e0b', '#10b981', '#3b82f6', '#ef4444', '#0ea5e9', '#8b5cf6'];
+    let sum = 0; for(let i=0; i<(name||'').length; i++) sum += name.charCodeAt(i);
+    return colors[sum % colors.length];
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadData();
+    setupSearch();
+    setInterval(() => loadData(true), 30000); 
+    
+    document.getElementById('statusFilter').addEventListener('change', () => { currentPage=1; loadData(); });
+    document.getElementById('hoatDongFilter').addEventListener('change', () => { currentPage=1; loadData(); });
+    document.getElementById('selectAllChk').addEventListener('change', e => {
+        document.querySelectorAll('.row-check').forEach(c => c.checked = e.target.checked);
+        toggleBulk();
+    });
+});
+
+function setupSearch() {
+    const input = document.getElementById('searchInput');
+    const box = document.getElementById('suggestionBox');
+    input.addEventListener('input', async (e) => {
+        const val = e.target.value.trim();
+        if(!val) { box.style.display = 'none'; return; }
+        const res = await fetch(`/admin/quan-ly-nguoi-dung/api/suggestions?term=${encodeURIComponent(val)}`);
+        const json = await res.json();
+        if(json.success && json.data.length) {
+            box.innerHTML = json.data.map(d => `
+                <div class="suggestion-item" onclick="selectSuggestion('${d.Id}')">
+                    <div class="avatar-circle" style="width:32px;height:32px;font-size:.7rem;background:${getColor(d.HoTen || d.UserName)};">${getInitials(d.HoTen || d.UserName)}</div>
+                    <div>
+                        <div style="font-weight:700;font-size:.9rem;">${d.HoTen || d.UserName}</div>
+                        <div style="font-size:.75rem;color:#888;">${d.Email}</div>
+                    </div>
+                </div>
+            `).join('');
+            box.style.display = 'block';
+        } else box.style.display = 'none';
+    });
+    document.addEventListener('click', e => { if(!input.contains(e.target) && !box.contains(e.target)) box.style.display = 'none'; });
+}
+
+function selectSuggestion(txt) { document.getElementById('searchInput').value = txt; document.getElementById('suggestionBox').style.display='none'; loadData(); }
+function resetFilters() { document.getElementById('searchInput').value=''; document.getElementById('statusFilter').value='active'; document.getElementById('hoatDongFilter').value='tatCa'; currentPage=1; loadData(); }
+
+async function loadData(isSilent = false) {
+    const search = document.getElementById('searchInput').value;
+    const status = document.getElementById('statusFilter').value;
+    const hd = document.getElementById('hoatDongFilter').value;
+
+    if(!isSilent) document.getElementById('tableBody').innerHTML = `<tr><td colspan="6" style="padding:40px;text-align:center;"><i class="fas fa-circle-notch fa-spin fa-2x text-muted"></i></td></tr>`;
+
+    const res = await fetch(`/admin/quan-ly-nguoi-dung/api/list?page=${currentPage}&search=${encodeURIComponent(search)}&trangThai=${status}&hoatDong=${hd}`);
+    const json = await res.json();
+
+    if(json.success) {
+        // Cập nhật Thống Kê
+        document.getElementById('statsRow').style.display = 'flex';
+        document.getElementById('stTotal').innerText = json.stats.total;
+        document.getElementById('stActive').innerText = json.stats.active;
+        document.getElementById('stLocked').innerText = json.stats.locked;
+        document.getElementById('stOnline').innerText = json.stats.online;
+
+        const msg = document.getElementById('searchMessageArea');
+        if(json.message) { msg.style.display='block'; msg.innerHTML = `<i class="fas fa-info-circle me-2"></i>${json.message}`; if(json.suggestions) json.data = json.suggestions; }
+        else msg.style.display='none';
+
+        renderTable(json.data);
+        if(!isSilent) renderPagination(json.totalPages);
+        toggleBulk();
+    }
+}
+
+function renderTable(data) {
+    const tbody = document.getElementById('tableBody');
+    if(!data.length) return tbody.innerHTML = `<tr><td colspan="6" style="padding:50px;text-align:center;color:#888;"><i class="fas fa-users fa-3x mb-3 opacity-25"></i><br>Không tìm thấy người dùng</td></tr>`;
+
+    const now = new Date();
+    tbody.innerHTML = data.map(u => {
+        const isLocked = u.LockoutEnd && new Date(u.LockoutEnd) > now;
+        let rolesHtml = '';
+        if (u.IsSuperAdmin) rolesHtml += `<span class="badge-role badge-role-admin"><i class="fas fa-crown me-1"></i>Super Admin</span>`;
+        if (u.NhanVien?.VaiTroNhanViens?.length) u.NhanVien.VaiTroNhanViens.forEach(v => rolesHtml += `<span class="badge-role"><i class="fas fa-user-shield me-1"></i>${v.ChucVu}</span>`);
+        else if (u.KhachHang) rolesHtml += `<span class="badge-role" style="background:#dcfce7;color:#15803d;border-color:#bbf7d0;"><i class="fas fa-user me-1"></i>Khách hàng</span>`;
+        else rolesHtml += `<span style="color:#aaa;font-size:.75rem;">Chưa phân quyền</span>`;
+
+        const nameDisplay = u.HoTen || u.UserName || 'Vô Danh';
+        const color = getColor(nameDisplay);
+        const initials = getInitials(nameDisplay);
+
+        return `
+        <tr style="border-bottom:1px solid #f1f5f9; transition:background .2s;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background=''">
+            <td style="padding:12px;"><input type="checkbox" value="${u.Id}" class="row-check" onchange="toggleBulk()"></td>
+            <td style="padding:12px;">
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <div class="avatar-circle" style="background:${color};">${initials}</div>
+                    <div>
+                        <div style="font-weight:800;font-size:.95rem;color:var(--text);">${nameDisplay}</div>
+                        <div style="font-size:.7rem;color:#94a3b8;font-weight:600;margin-top:2px;">ID: ${u.Id.substring(0,8)}...</div>
+                    </div>
+                </div>
+            </td>
+            <td style="padding:12px;">
+                <div style="font-size:.8rem;color:#475569;font-weight:600;"><i class="fas fa-envelope me-1" style="color:#cbd5e1;"></i>${u.Email || '—'}</div>
+                <div style="font-size:.8rem;color:#475569;margin-top:4px;"><i class="fas fa-phone me-1" style="color:#cbd5e1;"></i>${u.SDT || u.PhoneNumber || '—'}</div>
+            </td>
+            <td style="padding:12px; max-width:200px; display:flex; flex-wrap:wrap;">${rolesHtml}</td>
+            <td style="padding:12px; text-align:center;">
+                <div style="display:flex; flex-direction:column; gap:6px; align-items:center;">
+                    <div style="font-size:.75rem; font-weight:700; color:${u.TrangThaiHoatDong ? '#10b981' : '#94a3b8'}; cursor:pointer; background:var(--bg-soft); padding:3px 10px; border-radius:20px; border:1px solid var(--border-light);" onclick="showActivity('${u.ThoiGianBatDauOnline}','${u.ThoiGianOffline}', ${u.TrangThaiHoatDong})">
+                        <div class="status-dot ${u.TrangThaiHoatDong ? 'online' : 'offline'} me-1"></div> ${u.TrangThaiHoatDong ? 'Đang Online' : 'Offline'}
+                    </div>
+                    <span class="badge-status ${isLocked ? 'badge-off' : 'badge-on'}" style="cursor:pointer;" onclick="toggleLock('${u.Id}', ${!isLocked}, ${u.IsSuperAdmin})">
+                        ${isLocked ? '<i class="fas fa-lock"></i> Đã khóa' : '<i class="fas fa-check"></i> Hoạt động'}
+                    </span>
+                </div>
+            </td>
+            <td style="padding:12px; text-align:right;">
+                <a href="/admin/quan-ly-nguoi-dung/phan-quyen/${u.Id}" class="btn-tbl btn-tbl-view" style="background:#e0f2fe; color:#0284c7; border-color:#0284c7;" title="Hồ sơ & Phân Quyền"><i class="fas fa-user-cog"></i> Phân quyền</a>
+            </td>
+        </tr>`;
+    }).join('');
+}
+
+function renderPagination(t) {
+    if(t <= 1) return document.getElementById('paginationArea').innerHTML = '';
+    let html = '';
+    for(let i=1; i<=t; i++) html += `<button onclick="currentPage=${i};loadData()" class="pg-btn ${currentPage===i?'active':''}">${i}</button>`;
+    document.getElementById('paginationArea').innerHTML = html;
+}
+
+function toggleBulk() {
+    const c = document.querySelectorAll('.row-check:checked').length > 0;
+    document.getElementById('bulkActions').style.display = c ? 'flex' : 'none';
+}
+
+function showActivity(onl, off, isOnline) {
+    document.getElementById('timeOnline').innerText = onl && onl !== 'null' ? new Date(onl).toLocaleString('vi-VN') : 'Chưa có dữ liệu';
+    document.getElementById('timeOffline').innerText = isOnline ? 'Tài khoản đang kết nối...' : (off && off !== 'null' ? new Date(off).toLocaleString('vi-VN') : 'Chưa có dữ liệu');
+    document.getElementById('hoatDongModal').style.display = 'flex';
+}
+
+function toggleLock(id, currentActive, isSuperAdmin) {
+    if(isSuperAdmin && currentActive) { Swal.fire('Cảnh báo', 'Không thể khóa tài khoản Super Admin của hệ thống!', 'warning'); return; }
+    const text = currentActive ? 'Người dùng này sẽ bị chặn đăng nhập và sử dụng hệ thống.' : 'Mở khóa để người dùng tiếp tục sử dụng dịch vụ?';
+    Swal.fire({
+        title: currentActive ? 'Khóa Tài Khoản?' : 'Mở Khóa Tài Khoản?', 
+        text, icon: 'warning', showCancelButton: true, confirmButtonColor: currentActive ? '#dc2626' : '#10b981', confirmButtonText: 'Đồng ý'
+    }).then(async r => {
+        if(r.isConfirmed) {
+            const res = await fetch(`/admin/quan-ly-nguoi-dung/api/change-status/${id}`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({status: !currentActive}) });
+            if((await res.json()).success) { Swal.fire({toast:true, position:'top-end', icon:'success', title:'Thành công', showConfirmButton:false, timer:1500}); loadData(true); }
+        }
+    });
+}
+
+function executeBulkAction(action) {
+    const ids = Array.from(document.querySelectorAll('.row-check:checked')).map(c => c.value);
+    if(!ids.length) return;
+    const text = action === 'delete' ? 'Dữ liệu tài khoản sẽ bị xóa vĩnh viễn khỏi hệ thống.' : 'Tài khoản sẽ bị chặn đăng nhập.';
+    Swal.fire({ title: 'Xác nhận thực thi', text, icon: 'warning', showCancelButton: true, confirmButtonColor: '#dc2626', confirmButtonText: 'Thực thi' }).then(async r => {
+        if(r.isConfirmed) {
+            const res = await fetch(`/admin/quan-ly-nguoi-dung/api/bulk-action`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ids, action}) });
+            if((await res.json()).success) { Swal.fire({toast:true, position:'top-end', icon:'success', title:'Thành công', showConfirmButton:false, timer:1500}); loadData(); }
+        }
+    });
+}
+</script>

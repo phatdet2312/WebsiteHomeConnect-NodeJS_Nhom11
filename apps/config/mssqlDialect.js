@@ -1,3 +1,5 @@
+
+//apps/config/mssqlDialect.js
 'use strict';
 /**
  * Patch sequelize-msnodesqlv8 để tương thích với Sequelize 6.
