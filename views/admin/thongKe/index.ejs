@@ -1,0 +1,136 @@
+<!-- views/admin/thongKe/index.ejs -->
+<div class="admin-page-header">
+  <div><h4>Thống kê tổng quan</h4><p>Dashboard phân tích kinh doanh</p></div>
+  <div style="display:flex;gap:8px;">
+    <a href="/admin/thong-ke/doanh-thu" class="btn-ghost"><i class="fas fa-file-invoice-dollar me-2"></i>Doanh thu</a>
+    <a href="/admin/thong-ke/hop-dong" class="btn-ghost"><i class="fas fa-file-contract me-2"></i>Hợp đồng</a>
+    <a href="/admin/thong-ke/can-ho" class="btn-ghost"><i class="fas fa-home me-2"></i>Căn hộ</a>
+  </div>
+</div>
+
+<!-- Summary stats -->
+<div style="display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:24px;">
+  <% const statItems = [
+    { icon:'fas fa-users', color:'#0061ff', bg:'#e8f0ff', val: stats.tongKH, label:'Khách hàng' },
+    { icon:'fas fa-home', color:'#16a34a', bg:'#dcfce7', val: stats.tongCanHo, label:'Căn hộ' },
+    { icon:'fas fa-clock', color:'#ca8a04', bg:'#fef9c3', val: stats.tongHDDangKy, label:'HĐ chờ duyệt' },
+    { icon:'fas fa-check-circle', color:'#16a34a', bg:'#dcfce7', val: stats.tongHDDaKy, label:'HĐ đã ký' },
+    { icon:'fas fa-times-circle', color:'#dc2626', bg:'#fee2e2', val: stats.tongHDHuy, label:'HĐ đã hủy' },
+    { icon:'fas fa-chart-pie', color:'#7c3aed', bg:'#ede9fe', val: tyLeCanHo.tong||0, label:'Tổng căn hộ' }
+  ]; %>
+  <% statItems.forEach(s => { %>
+  <div class="table-card" style="text-align:center;padding:16px 12px;">
+    <div style="width:44px;height:44px;background:<%= s.bg %>;border-radius:12px;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;">
+      <i class="<%= s.icon %>" style="font-size:1.2rem;color:<%= s.color %>;"></i>
+    </div>
+    <div style="font-size:1.5rem;font-weight:800;color:var(--text);line-height:1;"><%= s.val %></div>
+    <div style="font-size:.72rem;color:var(--text-muted);margin-top:4px;"><%= s.label %></div>
+  </div>
+  <% }) %>
+</div>
+
+<div style="display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:16px;">
+  <!-- Revenue chart -->
+  <div class="table-card">
+    <div class="table-card-header">
+      <div class="table-card-title"><i class="fas fa-chart-line me-2" style="color:#16a34a;"></i>Doanh thu theo tháng (12 tháng gần nhất)</div>
+    </div>
+    <div style="padding:16px 20px;">
+      <canvas id="revenueChart" height="240"></canvas>
+    </div>
+  </div>
+  <!-- Occupancy pie -->
+  <div class="table-card">
+    <div class="table-card-header">
+      <div class="table-card-title"><i class="fas fa-chart-pie me-2" style="color:#7c3aed;"></i>Tỷ lệ sử dụng căn hộ</div>
+    </div>
+    <div style="padding:16px 20px;text-align:center;">
+      <canvas id="occupancyChart" height="200"></canvas>
+      <div style="display:flex;justify-content:center;gap:10px;margin-top:12px;flex-wrap:wrap;">
+        <span style="background:#dcfce7;color:#15803d;padding:3px 10px;border-radius:20px;font-size:.75rem;font-weight:700;"><%= tyLeCanHo.daSuDung||0 %> Đã sử dụng</span>
+        <span style="background:var(--bg-soft);color:var(--text-muted);padding:3px 10px;border-radius:20px;font-size:.75rem;font-weight:700;"><%= tyLeCanHo.chuaSuDung||0 %> Chưa sử dụng</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+  <!-- Revenue by building -->
+  <div class="table-card">
+    <div class="table-card-header">
+      <div class="table-card-title"><i class="fas fa-building me-2" style="color:#0061ff;"></i>Doanh thu theo Tòa nhà</div>
+    </div>
+    <div style="overflow-x:auto;">
+      <table style="width:100%;border-collapse:collapse;">
+        <thead><tr style="background:var(--bg-soft);border-bottom:1px solid var(--border-light);">
+          <th style="padding:8px 14px;font-size:.72rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;">Tòa nhà</th>
+          <th style="padding:8px 14px;font-size:.72rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;text-align:right;">Số HĐ</th>
+          <th style="padding:8px 14px;font-size:.72rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;text-align:right;">Doanh thu</th>
+        </tr></thead>
+        <tbody>
+          <% if (doanhThuToaNha && doanhThuToaNha.length > 0) { doanhThuToaNha.forEach(r => { %>
+          <tr style="border-bottom:1px solid var(--border-light);">
+            <td style="padding:9px 14px;font-weight:600;font-size:.85rem;color:var(--text);"><%= r.TenToaNha %></td>
+            <td style="padding:9px 14px;text-align:right;font-size:.85rem;"><%= r.soHopDong %></td>
+            <td style="padding:9px 14px;text-align:right;font-weight:700;color:#16a34a;font-size:.82rem;"><%= r.tongDoanhThu ? Number(r.tongDoanhThu).toLocaleString('vi-VN') : '0' %>đ</td>
+          </tr>
+          <% }) } else { %>
+          <tr><td colspan="3" style="padding:24px;text-align:center;color:var(--text-muted);font-size:.85rem;">Chưa có dữ liệu</td></tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <!-- Top apartments -->
+  <div class="table-card">
+    <div class="table-card-header">
+      <div class="table-card-title"><i class="fas fa-trophy me-2" style="color:#ca8a04;"></i>Top Căn hộ theo HĐ</div>
+    </div>
+    <div style="overflow-x:auto;">
+      <table style="width:100%;border-collapse:collapse;">
+        <thead><tr style="background:var(--bg-soft);border-bottom:1px solid var(--border-light);">
+          <th style="padding:8px 14px;font-size:.72rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;">#</th>
+          <th style="padding:8px 14px;font-size:.72rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;">Căn hộ</th>
+          <th style="padding:8px 14px;font-size:.72rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;text-align:center;">Số HĐ</th>
+          <th style="padding:8px 14px;font-size:.72rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;text-align:right;">Tổng giá trị</th>
+        </tr></thead>
+        <tbody>
+          <% if (topCanHo && topCanHo.length > 0) { topCanHo.forEach((r, i) => { %>
+          <tr style="border-bottom:1px solid var(--border-light);">
+            <td style="padding:9px 14px;">
+              <span style="background:<%= i<3?'#fef9c3':'var(--bg-soft)' %>;color:<%= i<3?'#a16207':'var(--text-muted)' %>;padding:2px 7px;border-radius:6px;font-size:.75rem;font-weight:700;"><%= i+1 %></span>
+            </td>
+            <td style="padding:9px 14px;font-weight:600;font-size:.85rem;color:var(--text);"><%= r.TenCanHo %></td>
+            <td style="padding:9px 14px;text-align:center;font-size:.85rem;"><%= r.soHopDong %></td>
+            <td style="padding:9px 14px;text-align:right;font-weight:700;color:#16a34a;font-size:.82rem;"><%= r.tongGiaTri ? Number(r.tongGiaTri).toLocaleString('vi-VN') : '0' %>đ</td>
+          </tr>
+          <% }) } else { %>
+          <tr><td colspan="4" style="padding:24px;text-align:center;color:var(--text-muted);font-size:.85rem;">Chưa có dữ liệu</td></tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+const revenueData = <%- JSON.stringify(doanhThuTheoThang || []) %>;
+const occupancyData = <%= JSON.stringify(tyLeCanHo) %>;
+new Chart(document.getElementById('revenueChart'), {
+  type: 'bar',
+  data: {
+    labels: revenueData.map(r => r.period),
+    datasets: [{ label: 'Doanh thu (đ)', data: revenueData.map(r => r.tongDoanhThu || 0), backgroundColor: 'rgba(0,97,255,0.7)', borderColor: '#0061ff', borderWidth: 1, borderRadius: 4 }]
+  },
+  options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+});
+new Chart(document.getElementById('occupancyChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Đã sử dụng', 'Chưa sử dụng'],
+    datasets: [{ data: [occupancyData.daSuDung || 0, occupancyData.chuaSuDung || 0], backgroundColor: ['#16a34a','#e5e7eb'], borderWidth: 0 }]
+  },
+  options: { responsive: true, cutout: '65%' }
+});
+</script>
