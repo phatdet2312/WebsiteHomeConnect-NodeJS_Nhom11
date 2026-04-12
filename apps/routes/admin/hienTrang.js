@@ -16,7 +16,7 @@ router.get('/', async (req, res) => {
     const { count, rows } = await HienTrang.findAndCountAll({
       where,
       limit,
-      offset, 
+      offset,
       order: [['MaHienTrang', 'DESC']]
     });
     res.render('admin/hienTrang/index', {

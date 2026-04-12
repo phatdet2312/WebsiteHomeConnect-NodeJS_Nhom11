@@ -1,3 +1,4 @@
+// app.js
 require('dotenv').config();
 const express = require('express');
 const path = require('path');
@@ -70,9 +71,7 @@ const thanhToanMuaThueRoutes = require('./apps/routes/thanhToanMuaThue');
 const quanLyLichRoutes = require('./apps/routes/quanLyLich');
 const shoppingCartRoutes = require('./apps/routes/shoppingCart');
 const adminRoutes = require('./apps/routes/admin/index');
-const apiRoutes = require('./apps/routes/api');
 
-app.use('/api', apiRoutes);
 app.use('/', homeRoutes);
 app.use('/auth', authRoutes);
 app.use('/can-ho', canhoRoutes);

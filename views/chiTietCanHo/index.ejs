@@ -9,7 +9,7 @@
       <span id="breadcrumbName" style="color:var(--text);font-weight:600;">Đang tải...</span>
     </nav>
   </div>
-</div> 
+</div>
 
 <div class="container py-4">
   <div id="loadingState" class="text-center py-5">
@@ -212,7 +212,7 @@
 
   function esc(s) { return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
 
-  fetch('/api/can-ho/' + canHoId)
+  fetch('/chi-tiet-can-ho/api/data/' + canHoId)
     .then(r => r.json())
     .then(c => {
       if (c.error) { showError(c.error); return; }

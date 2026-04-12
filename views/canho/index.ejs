@@ -1,3 +1,4 @@
+
 <!-- views/canho/index.ejs -->
 <div style="background:linear-gradient(135deg,var(--primary-dark),var(--primary));padding:36px 0 28px;">
   <div class="container">
@@ -14,7 +15,7 @@
   <div id="contractList" class="row g-4 d-none"></div>
 </div>
 
-<style> 
+<style>
 .contract-card { background:var(--bg-white); border-radius:var(--radius-lg); border:1px solid var(--border-light);
   box-shadow:var(--shadow-sm); overflow:hidden; transition:transform .2s,box-shadow .2s; height:100%; display:flex; flex-direction:column; }
 .contract-card:hover { transform:translateY(-3px); box-shadow:var(--shadow-md); }
@@ -34,17 +35,19 @@
 <script>
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
-fetch('/api/my-contracts')
+fetch('/can-ho/api/my-contracts')
   .then(r=>{ if(r.status===401){window.location.href='/auth/login';return null;} return r.json(); })
   .then(data=>{
     if(!data) return;
     document.getElementById('loadingState').classList.add('d-none');
     const el = document.getElementById('contractList');
     el.classList.remove('d-none');
+    
     if(!data.length){
       el.innerHTML = `<div class="col-12"><div class="hc-empty"><div class="empty-icon"><i class="fas fa-home"></i></div><div class="empty-title">Bạn chưa có hợp đồng nào</div><div class="empty-desc">Khám phá và đặt căn hộ ngay hôm nay</div><a href="/kham-pha" class="btn-hc-primary mt-3" style="margin:12px auto 0;">Tìm căn hộ</a></div></div>`;
       return;
     }
+    
     el.innerHTML = data.map(hd=>{
       const canHo = hd.CanHo||{};
       const img = canHo.DSA_CanHos&&canHo.DSA_CanHos.length>0 ? canHo.DSA_CanHos[0].UrlAnh : '/images/no-image.jpg';
@@ -57,9 +60,11 @@ fetch('/api/my-contracts')
       const gia = hd.GiaThoaThuan ? Number(hd.GiaThoaThuan).toLocaleString('vi-VN')+'đ' : '';
       const ngay = hd.NgayHieuLuc ? new Date(hd.NgayHieuLuc).toLocaleDateString('vi-VN') : '';
       const ngayHet = hd.NgayHetHan ? new Date(hd.NgayHetHan).toLocaleDateString('vi-VN') : '';
+      
+      // ĐÃ FIX: Điều hướng onClick và href chính xác về /can-ho/chi-tiet/...
       return `<div class="col-md-6 col-lg-4">
         <div class="contract-card">
-          <div style="position:relative;overflow:hidden;height:180px;cursor:pointer;" onclick="location.href='/can-ho/${hd.MaHopDong}'">
+          <div style="position:relative;overflow:hidden;height:180px;cursor:pointer;" onclick="location.href='/can-ho/chi-tiet/${hd.MaHopDong}'">
             <img src="${img}" class="contract-img" alt="${esc(canHo.TenCanHo||'')}">
             <div style="position:absolute;top:12px;right:12px;"><span class="status-pill ${statusCls}">${statusTxt}</span></div>
           </div>
@@ -71,7 +76,7 @@ fetch('/api/my-contracts')
             ${ngay ? `<div class="contract-meta"><i class="fas fa-calendar me-1"></i>${ngay}${ngayHet?' → '+ngayHet:''}</div>` : ''}
           </div>
           <div class="contract-footer">
-            <a href="/can-ho/${hd.MaHopDong}" class="btn-ghost w-100" style="justify-content:center;font-size:.82rem;">
+            <a href="/can-ho/chi-tiet/${hd.MaHopDong}" class="btn-ghost w-100" style="justify-content:center;font-size:.82rem;">
               <i class="fas fa-eye me-2"></i>Xem chi tiết
             </a>
           </div>

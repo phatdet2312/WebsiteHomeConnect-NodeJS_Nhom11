@@ -13,7 +13,7 @@ function tinhSoTuKhop(user, tuKhoaArray) {
         else if (hoTen.includes(tu)) diem += 1;
     }
     return diem;
-} 
+}
 function tinhSoKyTuKhop(user, tuKhoa) {
     let diem = 0;
     const email = (user.Email || '').toLowerCase();

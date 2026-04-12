@@ -1,22 +1,332 @@
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-8 text-center">
-            <h1 class="display-4 fw-bold text-primary mb-4">Chào mừng đến với hệ thống</h1>
-            <p class="lead text-muted mb-5">
-                Bạn đã đăng nhập thành công bằng JWT Token!<br>
-                Đây là phiên bản Boilerplate tối giản, sẵn sàng để bạn phát triển tiếp các tính năng khác.
-            </p>
-            
-            <div class="card shadow-sm border-0" style="border-radius: 16px;">
-                <div class="card-body p-4">
-                    <h5 class="fw-bold mb-3">Thông tin tài khoản của bạn:</h5>
-                    <ul class="list-group list-group-flush text-start">
-                        <li class="list-group-item"><strong>Họ Tên:</strong> <%= user.HoTen || user.UserName %></li>
-                        <li class="list-group-item"><strong>Email:</strong> <%= user.Email %></li>
-                        <li class="list-group-item"><strong>Vai trò:</strong> <%= (user.dataValues.roles && user.dataValues.roles.length > 0) ? user.dataValues.roles.join(', ') : 'Chưa phân quyền' %></li>
-                    </ul>
-                </div>
-            </div>
+<!-- views/home/index.ejs -->
+<section class="hc-hero">
+  <div class="hero-overlay"></div>
+  <div class="hero-content container">
+    <div class="row align-items-center">
+      <div class="col-lg-7">
+        <div class="hero-badge"><i class="fas fa-award me-2"></i>Nền tảng BĐS #1 Việt Nam</div>
+        <h1 class="hero-title">Tìm căn hộ<br><span style="color:var(--accent);">mơ ước</span> của bạn</h1>
+        <p class="hero-sub">HomeConnect — Hệ thống mua bán &amp; quản lý căn hộ thông minh.<br>Hàng trăm căn hộ cao cấp, minh bạch, tin cậy.</p>
+
+        <!-- Search box -->
+        <div class="hc-search-form mt-4" style="position:relative;">
+          <form action="/kham-pha" method="GET" class="search-inner">
+            <div class="search-icon"><i class="fas fa-search"></i></div>
+            <input type="text" name="search" id="heroSearch" class="search-input"
+                   placeholder="Tìm tên căn hộ, tòa nhà..." autocomplete="off">
+            <button type="submit" class="search-btn">Tìm ngay</button>
+          </form>
+          <div id="searchSuggestions" class="search-dropdown"></div>
         </div>
+
+        <!-- Quick links -->
+        <div class="d-flex gap-3 flex-wrap mt-4">
+          <a href="/kham-pha?loai=mua" class="btn-hc-primary" style="padding:11px 24px;font-size:.875rem;">
+            <i class="fas fa-building me-2"></i>Mua căn hộ
+          </a>
+          <a href="/kham-pha?loai=thue" class="btn-ghost" style="padding:11px 24px;font-size:.875rem;color:white;border-color:rgba(255,255,255,.4);">
+            <i class="fas fa-key me-2"></i>Thuê căn hộ
+          </a>
+        </div>
+      </div>
+
+      <!-- Hero stats (right) -->
+      <div class="col-lg-5 d-none d-lg-flex flex-column gap-3 align-items-end">
+        <div class="hero-stat-card"><div class="hs-num">500+</div><div class="hs-label"><i class="fas fa-home me-1"></i>Căn hộ</div></div>
+        <div class="hero-stat-card"><div class="hs-num">50+</div><div class="hs-label"><i class="fas fa-building me-1"></i>Tòa nhà</div></div>
+        <div class="hero-stat-card"><div class="hs-num">1K+</div><div class="hs-label"><i class="fas fa-users me-1"></i>Khách hàng</div></div>
+        <div class="hero-stat-card"><div class="hs-num">24/7</div><div class="hs-label"><i class="fas fa-headset me-1"></i>Hỗ trợ</div></div>
+      </div>
     </div>
+  </div>
+</section>
+
+<!-- Stats bar -->
+<div class="hc-stats-bar">
+  <div class="container">
+    <div class="stats-inner">
+      <div class="stat-item"><span class="stat-n" id="statCanHo">—</span><span class="stat-l">Căn hộ</span></div>
+      <div class="stat-div"></div>
+      <div class="stat-item"><span class="stat-n" id="statNoiBat">—</span><span class="stat-l">Nổi bật</span></div>
+      <div class="stat-div"></div>
+      <div class="stat-item"><span class="stat-n" id="statDV">—</span><span class="stat-l">Dịch vụ</span></div>
+      <div class="stat-div"></div>
+      <div class="stat-item"><span class="stat-n">24/7</span><span class="stat-l">Hỗ trợ</span></div>
+    </div>
+  </div>
 </div>
+
+<!-- Banners -->
+<div id="bannerSection"></div>
+
+<!-- ── FEATURED APARTMENTS ── -->
+<section class="py-section">
+  <div class="container">
+    <div class="section-header">
+      <div>
+        <div class="section-eyebrow">Căn hộ nổi bật</div>
+        <h2 class="section-title">Lựa chọn hàng đầu</h2>
+        <p class="section-sub">Những căn hộ được yêu thích và tìm kiếm nhiều nhất</p>
+      </div>
+      <a href="/kham-pha" class="btn-ghost">Xem tất cả <i class="fas fa-arrow-right ms-1"></i></a>
+    </div>
+    <div class="row g-4" id="featuredGrid">
+      <div class="col-12 text-center py-5">
+        <div class="hc-loading"><div class="hc-spinner"></div><p>Đang tải...</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── SERVICES ── -->
+<section class="py-section" style="background:var(--bg);">
+  <div class="container">
+    <div class="section-header">
+      <div>
+        <div class="section-eyebrow">Tiện ích &amp; Dịch vụ</div>
+        <h2 class="section-title">Cuộc sống đẳng cấp</h2>
+        <p class="section-sub">Đầy đủ tiện nghi, phục vụ cư dân 24/7</p>
+      </div>
+      <a href="/home/dich-vu" class="btn-ghost">Xem tất cả <i class="fas fa-arrow-right ms-1"></i></a>
+    </div>
+    <div class="row g-4" id="servicesGrid">
+      <div class="col-12 text-center py-3"><div class="hc-spinner" style="margin:auto;"></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA (injected if not auth) -->
+<div id="ctaSection"></div>
+
+<style>
+.py-section { padding: 72px 0; }
+.section-header { display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:40px; flex-wrap:wrap; gap:16px; }
+.section-eyebrow { font-size:.78rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--primary); margin-bottom:6px; }
+.section-title { font-size:1.75rem; font-weight:800; color:var(--text); margin:0 0 6px; line-height:1.2; }
+.section-sub { color:var(--text-muted); font-size:.9rem; margin:0; }
+.search-dropdown { position:absolute; z-index:999; background:var(--bg-white); left:0; right:0; top:calc(100% + 8px);
+  display:none; box-shadow:var(--shadow-md); border-radius:var(--radius-md); border:1px solid var(--border-light); overflow:hidden; }
+.search-dropdown a { display:block; padding:10px 16px; font-size:.875rem; color:var(--text); transition:background .15s; text-decoration:none; }
+.search-dropdown a:hover { background:var(--bg); }
+
+/* Hero section */
+.hero-overlay { position:absolute; inset:0; z-index:0; }
+.hero-content { position:relative; z-index:2; padding:100px 0 80px; width:100%; }
+.hero-title { font-size:clamp(2rem,5vw,3.5rem); font-weight:800; color:white; line-height:1.15; margin-bottom:12px; }
+.hero-sub { font-size:1rem; color:rgba(255,255,255,.72); line-height:1.7; margin-bottom:0; }
+
+/* Search form */
+.search-inner { display:flex; align-items:center; width:100%; }
+.search-icon { padding:0 10px 0 16px; color:var(--text-muted); font-size:.9rem; flex-shrink:0; }
+.search-input { flex:1; border:none; outline:none; font-size:.9rem; font-family:inherit; color:var(--text); background:transparent; padding:14px 8px; min-width:0; }
+.search-input::placeholder { color:var(--text-muted); }
+.search-btn { background:linear-gradient(135deg,var(--primary) 0%,#4f46e5 100%); color:white; border:none;
+  border-radius:var(--radius-lg); padding:12px 24px; font-size:.9rem; font-weight:600; cursor:pointer;
+  transition:var(--transition); white-space:nowrap; margin:4px; flex-shrink:0; }
+.search-btn:hover { transform:scale(1.02); box-shadow:0 4px 15px rgba(0,97,255,.4); }
+
+/* Stat bar */
+.hc-stats-bar { background:var(--bg-white); border-bottom:1px solid var(--border-light); }
+.stats-inner { display:flex; align-items:center; justify-content:center; gap:0; padding:20px 0; flex-wrap:wrap; }
+.stat-item { padding:0 32px; text-align:center; }
+.stat-div { width:1px; height:40px; background:var(--border-light); }
+.stat-n { display:block; font-size:1.5rem; font-weight:800; color:var(--primary); line-height:1; }
+.stat-l { display:block; font-size:.78rem; color:var(--text-muted); margin-top:4px; font-weight:500; }
+
+/* Hero extras */
+.hero-badge { display:inline-flex; align-items:center; background:rgba(255,107,53,.15); color:var(--accent);
+  border:1px solid rgba(255,107,53,.3); border-radius:20px; padding:5px 14px; font-size:.78rem; font-weight:700;
+  letter-spacing:.04em; margin-bottom:20px; }
+.hero-stat-card { background:rgba(255,255,255,.1); backdrop-filter:blur(12px); border:1px solid rgba(255,255,255,.2);
+  border-radius:var(--radius-md); padding:16px 28px; text-align:center; min-width:120px; }
+.hs-num { font-size:1.6rem; font-weight:800; color:white; line-height:1; }
+.hs-label { font-size:.75rem; color:rgba(255,255,255,.75); margin-top:4px; }
+
+/* Property card */
+.prop-card { background:var(--bg-white); border-radius:var(--radius-lg); overflow:hidden;
+  box-shadow:var(--shadow-sm); border:1px solid var(--border-light);
+  transition:transform .2s, box-shadow .2s; cursor:pointer; height:100%; display:flex; flex-direction:column; }
+.prop-card:hover { transform:translateY(-4px); box-shadow:var(--shadow-md); }
+.prop-img-wrap { position:relative; height:210px; overflow:hidden; }
+.prop-img-wrap img { width:100%; height:100%; object-fit:cover; transition:transform .35s; }
+.prop-card:hover .prop-img-wrap img { transform:scale(1.04); }
+.prop-badges { position:absolute; top:12px; left:12px; display:flex; gap:6px; flex-wrap:wrap; }
+.prop-badge { padding:3px 10px; border-radius:20px; font-size:.72rem; font-weight:700; }
+.prop-badge-buy { background:var(--primary); color:white; }
+.prop-badge-rent { background:var(--success); color:white; }
+.prop-badge-feat { background:var(--accent); color:white; }
+.prop-body { padding:16px 18px; flex:1; display:flex; flex-direction:column; }
+.prop-name { font-size:.95rem; font-weight:700; color:var(--text); margin-bottom:4px; }
+.prop-loc { font-size:.8rem; color:var(--text-muted); margin-bottom:10px; }
+.prop-price { font-size:1rem; font-weight:700; color:var(--primary); }
+.prop-price-rent { font-size:.875rem; font-weight:600; color:var(--success); }
+.prop-meta { display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
+.prop-meta span { font-size:.75rem; color:var(--text-muted); background:var(--bg); border-radius:6px; padding:2px 8px; }
+.prop-footer { padding:12px 18px; border-top:1px solid var(--border-light); display:flex; gap:8px; }
+
+/* Service card */
+.svc-card { background:var(--bg-white); border-radius:var(--radius-lg); padding:28px 24px;
+  border:1px solid var(--border-light); box-shadow:var(--shadow-sm); transition:transform .2s,box-shadow .2s; height:100%; }
+.svc-card:hover { transform:translateY(-3px); box-shadow:var(--shadow-md); }
+.svc-icon { width:56px; height:56px; border-radius:16px; display:flex; align-items:center; justify-content:center;
+  font-size:1.25rem; margin-bottom:16px; }
+.svc-name { font-size:.95rem; font-weight:700; color:var(--text); margin-bottom:6px; }
+.svc-desc { font-size:.82rem; color:var(--text-muted); line-height:1.6; }
+</style>
+
+<script>
+const isAuth = document.querySelector('meta[name="is-auth"]')?.content === 'true';
+
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+const svcIcons = ['fa-shield-alt','fa-swimming-pool','fa-dumbbell','fa-car-side','fa-wifi','fa-concierge-bell'];
+const svcColors = ['#dbeafe','#d1fae5','#fce7f3','#dcfce7','#fef9c3','#ede9fe'];
+const svcIconColors = ['#2563eb','#059669','#db2777','#16a34a','#ca8a04','#7c3aed'];
+const defaultSvcs = [
+  {icon:'fa-shield-alt',name:'An ninh 24/7',desc:'Hệ thống camera và bảo vệ quanh ngày đêm',bg:'#dbeafe',ic:'#2563eb'},
+  {icon:'fa-swimming-pool',name:'Hồ bơi',desc:'Hồ bơi trong nhà và ngoài trời tiêu chuẩn',bg:'#d1fae5',ic:'#059669'},
+  {icon:'fa-dumbbell',name:'Gym & Fitness',desc:'Trang thiết bị hiện đại, HLV chuyên nghiệp',bg:'#fce7f3',ic:'#db2777'},
+  {icon:'fa-car-side',name:'Bãi đỗ xe',desc:'Bãi đỗ xe rộng rãi, an toàn, có mái che',bg:'#dcfce7',ic:'#16a34a'},
+  {icon:'fa-wifi',name:'Internet cao tốc',desc:'Wi-Fi miễn phí trong toàn bộ khu vực',bg:'#fef9c3',ic:'#ca8a04'},
+  {icon:'fa-concierge-bell',name:'Dịch vụ lễ tân',desc:'Phục vụ 24/7, hỗ trợ mọi yêu cầu',bg:'#ede9fe',ic:'#7c3aed'}
+];
+
+fetch('/api/home').then(r=>r.json()).then(data=>{
+  // Stats
+  if (data.featuredCanHo) {
+    document.getElementById('statNoiBat').textContent = data.featuredCanHo.length + '+';
+  }
+  if (data.dichVus) {
+    document.getElementById('statDV').textContent = data.dichVus.length + '+';
+  }
+  document.getElementById('statCanHo').textContent = '500+';
+
+  // Banners
+  if (data.banners && data.banners.length > 0) {
+    const items = data.banners.map((b,i)=>`
+      <div class="carousel-item ${i===0?'active':''}">
+        ${b.UrlAnh
+          ? `<img src="${b.UrlAnh}" class="d-block w-100" alt="${esc(b.TenAQC||'')}" style="height:300px;object-fit:cover;">`
+          : `<div style="height:300px;background:linear-gradient(135deg,var(--primary),var(--primary-dark));display:flex;align-items:center;justify-content:center;"><span style="color:white;font-size:1.4rem;font-weight:700;">${esc(b.TenAQC||'')}</span></div>`}
+      </div>`).join('');
+    const nav = data.banners.length>1 ? `
+      <button class="carousel-control-prev" type="button" data-bs-target="#bannerCarousel" data-bs-slide="prev"><span class="carousel-control-prev-icon"></span></button>
+      <button class="carousel-control-next" type="button" data-bs-target="#bannerCarousel" data-bs-slide="next"><span class="carousel-control-next-icon"></span></button>` : '';
+    document.getElementById('bannerSection').innerHTML = `
+      <section style="padding:32px 0;background:var(--bg);">
+        <div class="container">
+          <div id="bannerCarousel" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-inner" style="border-radius:var(--radius-lg);overflow:hidden;">${items}</div>${nav}
+          </div>
+        </div>
+      </section>`;
+  }
+
+  // Featured
+  if (data.featuredCanHo && data.featuredCanHo.length > 0) {
+    document.getElementById('featuredGrid').innerHTML = data.featuredCanHo.map(c=>{
+      const img = c.DSA_CanHos&&c.DSA_CanHos.length>0 ? c.DSA_CanHos[0].UrlAnh : '/images/no-image.jpg';
+      const tang = c.Tang ? c.Tang.TenTang : '';
+      const toa = c.Tang&&c.Tang.ToaNha ? c.Tang.ToaNha.TenToaNha : '';
+      const loc = [toa, tang?'Tầng '+tang:''].filter(Boolean).join(' · ');
+      const gia = c.Gia ? Number(c.Gia).toLocaleString('vi-VN')+'đ' : '';
+      const giaThue = c.GiaThue ? Number(c.GiaThue).toLocaleString('vi-VN')+'đ/tháng' : '';
+      const dim = c.Dai&&c.Rong ? `<span><i class="fas fa-expand-alt me-1"></i>${c.Dai}×${c.Rong}m</span>` : '';
+      const phong = c.Phongs ? `<span><i class="fas fa-door-open me-1"></i>${c.Phongs.length} phòng</span>` : '';
+      return `<div class="col-sm-6 col-lg-4">
+        <div class="prop-card" onclick="location.href='/chi-tiet-can-ho/${c.MaCanHo}'">
+          <div class="prop-img-wrap">
+            <img src="${img}" alt="${esc(c.TenCanHo)}" loading="lazy">
+            <div class="prop-badges">
+              ${c.Gia ? '<span class="prop-badge prop-badge-buy">Mua</span>' : ''}
+              ${c.GiaThue ? '<span class="prop-badge prop-badge-rent">Thuê</span>' : ''}
+              ${c.TTDeXuat ? '<span class="prop-badge prop-badge-feat"><i class="fas fa-star me-1"></i>Nổi bật</span>' : ''}
+            </div>
+          </div>
+          <div class="prop-body">
+            <div class="prop-name">${esc(c.TenCanHo)}</div>
+            ${loc ? `<div class="prop-loc"><i class="fas fa-building me-1"></i>${esc(loc)}</div>` : ''}
+            ${gia ? `<div class="prop-price">${gia}</div>` : ''}
+            ${giaThue ? `<div class="prop-price-rent"><i class="fas fa-key me-1"></i>${giaThue}</div>` : ''}
+            <div class="prop-meta">${dim}${phong}</div>
+          </div>
+          <div class="prop-footer">
+            <a href="/chi-tiet-can-ho/${c.MaCanHo}" class="btn-ghost flex-fill text-center" style="font-size:.8rem;padding:7px;" onclick="event.stopPropagation()">Chi tiết</a>
+            ${isAuth ? `<button class="btn-hc-primary" style="font-size:.8rem;padding:7px 14px;" onclick="event.stopPropagation();addToCart(${c.MaCanHo},'mua')" title="Thêm giỏ hàng"><i class="fas fa-shopping-cart"></i></button>` : ''}
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  } else {
+    document.getElementById('featuredGrid').innerHTML = `<div class="col-12"><div class="hc-empty"><div class="empty-icon"><i class="fas fa-building"></i></div><div class="empty-title">Chưa có căn hộ nổi bật</div><a href="/kham-pha" class="btn-ghost mt-3">Khám phá tất cả</a></div></div>`;
+  }
+
+  // Services
+  const svcs = data.dichVus&&data.dichVus.length>0
+    ? data.dichVus.map((d,i)=>({icon:svcIcons[i%6],name:d.TenDV||'',desc:d.MoTa||'',bg:svcColors[i%6],ic:svcIconColors[i%6]}))
+    : defaultSvcs;
+  document.getElementById('servicesGrid').innerHTML = svcs.map(s=>`
+    <div class="col-sm-6 col-lg-4">
+      <div class="svc-card">
+        <div class="svc-icon" style="background:${s.bg};color:${s.ic};"><i class="fas ${s.icon}"></i></div>
+        <div class="svc-name">${esc(s.name)}</div>
+        <div class="svc-desc">${esc(s.desc)}</div>
+      </div>
+    </div>`).join('');
+
+  // CTA
+  if (!isAuth) {
+    document.getElementById('ctaSection').innerHTML = `
+      <section style="background:linear-gradient(135deg,#0a1628 0%,#0f2d5e 50%,#1a1040 100%);padding:80px 0;">
+        <div class="container text-center">
+          <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,107,53,.15);border:1px solid rgba(255,107,53,.3);border-radius:20px;padding:5px 16px;color:var(--accent);font-size:.78rem;font-weight:700;margin-bottom:20px;letter-spacing:.04em;">
+            <i class="fas fa-rocket"></i> BẮT ĐẦU NGAY HÔM NAY
+          </div>
+          <h2 style="font-size:2rem;font-weight:800;color:white;margin-bottom:12px;">Tìm ngôi nhà lý tưởng<br>của bạn</h2>
+          <p style="color:rgba(255,255,255,.65);margin-bottom:32px;font-size:.95rem;">Đăng ký miễn phí để trải nghiệm đầy đủ tính năng của HomeConnect</p>
+          <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;">
+            <a href="/auth/register" class="btn-hc-primary" style="padding:13px 32px;font-size:.9rem;"><i class="fas fa-user-plus me-2"></i>Đăng ký miễn phí</a>
+            <a href="/kham-pha" class="btn-ghost" style="padding:13px 32px;font-size:.9rem;color:white;border-color:rgba(255,255,255,.3);"><i class="fas fa-search me-2"></i>Khám phá căn hộ</a>
+          </div>
+        </div>
+      </section>`;
+  }
+}).catch(e=>console.error(e));
+
+// Search suggestions
+const heroSearch = document.getElementById('heroSearch');
+const suggBox = document.getElementById('searchSuggestions');
+let dbt;
+if (heroSearch) {
+  heroSearch.addEventListener('input', function() {
+    clearTimeout(dbt);
+    const q = this.value.trim();
+    if (!q) { suggBox.style.display='none'; return; }
+    dbt = setTimeout(async()=>{
+      try {
+        const res = await fetch('/api/search-suggestions?q='+encodeURIComponent(q));
+        const data = await res.json();
+        if (!data.length) { suggBox.style.display='none'; return; }
+        suggBox.innerHTML = data.map(d=>`<a href="/chi-tiet-can-ho/${d.id}"><i class="fas fa-home me-2" style="color:var(--primary);"></i><strong>${esc(d.ten)}</strong><span style="color:var(--text-muted);font-size:.8rem;margin-left:8px;">${esc(d.tang||'')}${d.toaNha?' - '+esc(d.toaNha):''}</span></a>`).join('');
+        suggBox.style.display='block';
+      } catch(e) { suggBox.style.display='none'; }
+    },300);
+  });
+  document.addEventListener('click', e=>{ if(!heroSearch.contains(e.target)) suggBox.style.display='none'; });
+}
+
+async function addToCart(maCanHo, loai) {
+  try {
+    const res = await fetch('/gio-hang/add', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({maCanHo,loai})});
+    const data = await res.json();
+    if (data.success) {
+      const t = document.createElement('div');
+      t.className = 'hc-toast hc-toast-success';
+      t.style.cssText = 'position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;align-items:center;gap:10px;';
+      t.innerHTML = `<i class="fas fa-check-circle" style="color:var(--success);"></i><span>Đã thêm vào giỏ hàng!</span>`;
+      document.body.appendChild(t);
+      setTimeout(()=>t.remove(), 2500);
+    }
+  } catch(e){}
+}
+</script>

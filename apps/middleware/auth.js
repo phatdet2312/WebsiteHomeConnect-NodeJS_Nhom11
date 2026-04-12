@@ -1,3 +1,5 @@
+
+//app/middleware/auth.js
 const passport = require('passport');
 
 // Hàm Helper để xử lý JWT Auth chung

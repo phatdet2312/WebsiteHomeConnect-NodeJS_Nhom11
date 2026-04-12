@@ -67,7 +67,7 @@
           <i class="fas fa-sign-in-alt me-2"></i>Đăng nhập để thanh toán
         </a>
       </div>
-    </div> 
+    </div>
   </div>
 </div>
 
@@ -91,7 +91,7 @@ const isAuth = document.querySelector('meta[name="is-auth"]')?.content === 'true
 let cartData = [];
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
-fetch('/api/gio-hang')
+fetch('/gio-hang/api/list')
   .then(r=>{ if(r.status===401){ showGuest(); return null; } return r.json(); })
   .then(data=>{
     if(!data) return;

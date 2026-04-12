@@ -22,7 +22,7 @@ ${context ? 'Thông tin ngữ cảnh hiện tại: ' + context : ''}`;
       maxOutputTokens: 1024,
       topP: 0.8,
       topK: 40
-    }, 
+    },
     safetySettings: [
       { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
       { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_MEDIUM_AND_ABOVE' }
