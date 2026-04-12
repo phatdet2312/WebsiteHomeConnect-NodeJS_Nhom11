@@ -1,0 +1,62 @@
+<!-- views/admin/thongKe/hopDong.ejs -->
+<div class="admin-page-header">
+  <div><h4>Thống kê Hợp đồng</h4><p>Phân tích theo loại hợp đồng và trạng thái</p></div>
+  <div style="display:flex;gap:8px;">
+    <a href="/admin/thong-ke" class="btn-ghost"><i class="fas fa-arrow-left me-2"></i>Tổng quan</a>
+    <a href="/admin/hop-dong" class="btn-ghost"><i class="fas fa-list me-2"></i>Danh sách HĐ</a>
+  </div>
+</div>
+<div style="display:grid;grid-template-columns:3fr 2fr;gap:16px;">
+  <div class="table-card">
+    <div class="table-card-header">
+      <div class="table-card-title"><i class="fas fa-file-contract me-2" style="color:#0061ff;"></i>Theo loại Hợp đồng</div>
+    </div>
+    <div style="overflow-x:auto;">
+      <table style="width:100%;border-collapse:collapse;">
+        <thead><tr style="background:var(--bg-soft);border-bottom:1px solid var(--border-light);">
+          <th style="padding:10px 14px;font-size:.72rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;">Loại HĐ</th>
+          <th style="padding:10px 14px;font-size:.72rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;text-align:center;">Tổng</th>
+          <th style="padding:10px 14px;font-size:.72rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;text-align:center;">Đã ký</th>
+          <th style="padding:10px 14px;font-size:.72rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;text-align:center;">Đang xử lý</th>
+          <th style="padding:10px 14px;font-size:.72rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;text-align:center;">Đã hủy</th>
+        </tr></thead>
+        <tbody>
+          <% if (!thongKeHD || thongKeHD.length === 0) { %>
+            <tr><td colspan="5" style="padding:32px;text-align:center;color:var(--text-muted);">Chưa có dữ liệu</td></tr>
+          <% } %>
+          <% if (thongKeHD) { thongKeHD.forEach(r => { %>
+          <tr style="border-bottom:1px solid var(--border-light);" onmouseover="this.style.background='var(--bg-soft)'" onmouseout="this.style.background=''">
+            <td style="padding:11px 14px;font-weight:700;color:var(--text);"><%= r.TenLoaiHD || '—' %></td>
+            <td style="padding:11px 14px;text-align:center;"><span style="background:var(--bg-soft);color:var(--text-secondary);padding:2px 8px;border-radius:20px;font-size:.78rem;font-weight:700;"><%= r.tong %></span></td>
+            <td style="padding:11px 14px;text-align:center;"><span style="background:#dcfce7;color:#15803d;padding:2px 8px;border-radius:20px;font-size:.78rem;font-weight:700;"><%= r.daKy %></span></td>
+            <td style="padding:11px 14px;text-align:center;"><span style="background:#fef9c3;color:#a16207;padding:2px 8px;border-radius:20px;font-size:.78rem;font-weight:700;"><%= r.dangXuLy %></span></td>
+            <td style="padding:11px 14px;text-align:center;"><span style="background:#fee2e2;color:#dc2626;padding:2px 8px;border-radius:20px;font-size:.78rem;font-weight:700;"><%= r.daHuy %></span></td>
+          </tr>
+          <% }) } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="table-card">
+    <div class="table-card-header">
+      <div class="table-card-title"><i class="fas fa-chart-pie me-2" style="color:#7c3aed;"></i>Biểu đồ phân bổ</div>
+    </div>
+    <div style="padding:16px 20px;">
+      <canvas id="hdChart" height="280"></canvas>
+    </div>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+const hdData = <%- JSON.stringify(thongKeHD || []) %>;
+if (hdData.length > 0) {
+  new Chart(document.getElementById('hdChart'), {
+    type: 'pie',
+    data: {
+      labels: hdData.map(r => r.TenLoaiHD || '?'),
+      datasets: [{ data: hdData.map(r => r.tong || 0), backgroundColor: ['#0061ff','#16a34a','#ff6b35','#7c3aed','#0891b2','#dc2626'], borderWidth: 0 }]
+    },
+    options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+  });
+}
+</script>
