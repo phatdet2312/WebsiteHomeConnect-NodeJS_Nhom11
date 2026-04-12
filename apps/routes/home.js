@@ -1,7 +1,7 @@
-// apps/routes/home.js
 const express = require('express');
 const router = express.Router();
 const { Op } = require('sequelize');
+const { isCustomer } = require('../middleware/auth'); // Import middleware bảo vệ
 
 // GET / - Homepage
 router.get('/', (_req, res) => {
@@ -12,7 +12,7 @@ router.get('/', (_req, res) => {
 router.get('/lien-he', (req, res) => {
   res.render('home/lienHe', { title: 'Liên hệ - HomeConnect', layout: 'layouts/main', sent: false });
 });
- 
+
 // POST /lien-he
 router.post('/lien-he', async (req, res) => {
   try {
@@ -25,17 +25,17 @@ router.post('/lien-he', async (req, res) => {
   }
 });
 
-// GET /dich-vu
+// GET /dich-vu (Khám phá Dịch vụ - Ai cũng xem được)
 router.get('/dich-vu', (_req, res) => {
   res.render('home/dichVu', { title: 'Dịch vụ - HomeConnect', layout: 'layouts/main' });
 });
 
-// GET /hoa-don-dich-vu
-router.get('/hoa-don-dich-vu', (_req, res) => {
-  res.render('home/hoaDonDichVu', { title: 'Hóa đơn dịch vụ', layout: 'layouts/main' });
+// =========================================================================
+// ĐÃ FIX: TRẢ LẠI ROUTE THANH TOÁN HỢP ĐỒNG ĐỂ RENDER GIAO DIỆN KHÁM PHÁ HĐ
+// =========================================================================
+router.get('/thanh-toan-hop-dong', isCustomer, (_req, res) => {
+  res.render('home/thanhToanHopDong', { title: 'Hợp Đồng & Thanh Toán', layout: 'layouts/main' });
 });
-
-
 
 // JSON APIs for homepage
 router.get('/api/can-ho-noi-bat', async (req, res) => {
