@@ -1,0 +1,145 @@
+<div class="admin-page-header">
+  <div>
+    <h4>Cập nhật Dịch vụ <span style="color:var(--primary);">#<%= id %></span></h4>
+    <p>Chỉnh sửa thông tin qua luồng API</p>
+  </div>
+  <div style="display:flex;gap:8px;">
+    <a href="/admin/dich-vu/display/<%= id %>" class="btn-ghost"><i class="fas fa-eye me-2"></i>Xem</a>
+    <a href="/admin/dich-vu" class="btn-ghost"><i class="fas fa-arrow-left me-2"></i>Quay lại</a>
+  </div>
+</div>
+
+<div id="loadingArea" style="padding:40px; text-align:center;">
+    <i class="fas fa-circle-notch fa-spin fa-3x" style="color:var(--primary);"></i>
+    <p class="mt-3 text-muted fw-bold">Đang tải dữ liệu API...</p>
+</div>
+
+<div id="formArea" style="max-width:600px; display:none;">
+  <div class="table-card">
+    <div class="table-card-header">
+      <div class="table-card-title"><i class="fas fa-edit me-2" style="color:#f59e0b;"></i>Chỉnh sửa dịch vụ</div>
+    </div>
+    <div style="padding:24px;">
+      <form id="updateForm" onsubmit="submitUpdate(event)">
+        <div style="margin-bottom:16px;">
+          <label class="filter-label">Mã Dịch vụ</label>
+          <input type="text" class="hc-input" value="<%= id %>" disabled style="background:var(--bg-soft);color:var(--text-muted);font-weight:bold;">
+        </div>
+        <div style="margin-bottom:16px;">
+          <label class="filter-label">Tên Dịch vụ <span style="color:var(--danger);">*</span></label>
+          <input type="text" id="TenDV" name="TenDV" class="hc-input" required>
+        </div>
+        <div style="margin-bottom:16px;">
+          <label class="filter-label">Icon Dịch vụ</label>
+          <div id="currentIconBox" style="margin-bottom:12px; display:none;">
+            <img id="currentIcon" src="" style="width:64px;height:64px;object-fit:cover;border-radius:var(--radius-md);border:1px solid #ddd;box-shadow:0 2px 5px rgba(0,0,0,0.05);">
+            <div style="font-size:.7rem;color:var(--text-muted);margin-top:4px;font-weight:600;">Icon hiện tại</div>
+          </div>
+          <input type="file" id="UrlIcon" name="UrlIcon" class="hc-input" accept="image/*" onchange="previewIcon(this)" style="padding:8px 14px;">
+          <div style="font-size:.72rem;color:var(--text-muted);margin-top:4px;">Để trống nếu không đổi icon mới.</div>
+          <div id="iconPreviewBox" style="display:none;margin-top:12px;">
+            <img id="iconPreview" src="" alt="Preview mới" style="width:64px;height:64px;object-fit:cover;border-radius:var(--radius-md);border:2px dashed var(--primary);">
+            <div style="font-size:.7rem;color:var(--primary);margin-top:4px;font-weight:600;">Sẽ thay thế bằng icon này</div>
+          </div>
+        </div>
+        <div style="margin-bottom:24px;">
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:.875rem;font-weight:600;color:var(--text);">
+            <input type="checkbox" id="TTHienThi" name="TTHienThi" style="accent-color:var(--primary);width:18px;height:18px;">
+            Hiển thị công khai
+          </label>
+        </div>
+        <div style="display:flex;gap:10px;">
+          <button type="submit" id="submitBtn" class="btn-hc-primary"><i class="fas fa-save me-2"></i>Lưu Thay Đổi</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+const serviceId = "<%= id %>";
+
+document.addEventListener('DOMContentLoaded', loadServiceData);
+
+async function loadServiceData() {
+    try {
+        const res = await fetch('/admin/dich-vu/api/detail/' + serviceId);
+        const json = await res.json();
+        
+        if(!json.success) throw new Error(json.message);
+        
+        const data = json.data;
+        document.getElementById('TenDV').value = data.TenDV;
+        document.getElementById('TTHienThi').checked = data.TTHienThi;
+        
+        if(data.UrlIcon) {
+            document.getElementById('currentIcon').src = data.UrlIcon;
+            document.getElementById('currentIconBox').style.display = 'block';
+        }
+        
+        document.getElementById('loadingArea').style.display = 'none';
+        document.getElementById('formArea').style.display = 'block';
+    } catch(err) {
+        Swal.fire('Lỗi Hệ Thống', err.message, 'error').then(() => {
+            window.location.href = '/admin/dich-vu';
+        });
+    }
+}
+
+function previewIcon(input) {
+  const preview = document.getElementById('iconPreview');
+  const box = document.getElementById('iconPreviewBox');
+  if (input.files && input.files[0]) {
+    const reader = new FileReader();
+    reader.onload = e => { preview.src = e.target.result; box.style.display = 'block'; };
+    reader.readAsDataURL(input.files[0]);
+  } else { box.style.display = 'none'; }
+}
+
+async function submitUpdate(e) {
+    e.preventDefault();
+
+    const result = await Swal.fire({
+        title: 'Lưu thay đổi?',
+        text: "Bạn có chắc chắn muốn cập nhật thông tin dịch vụ này?",
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#f59e0b',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Đồng ý',
+        cancelButtonText: 'Hủy'
+    });
+
+    if (!result.isConfirmed) return;
+
+    const btn = document.getElementById('submitBtn');
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Đang lưu...';
+    btn.disabled = true;
+
+    const formData = new FormData();
+    formData.append('TenDV', document.getElementById('TenDV').value.trim());
+    formData.append('TTHienThi', document.getElementById('TTHienThi').checked);
+    
+    const fileInput = document.getElementById('UrlIcon');
+    if(fileInput.files.length > 0) formData.append('UrlIcon', fileInput.files[0]);
+
+    try {
+        const res = await fetch('/admin/dich-vu/api/update/' + serviceId, { method: 'POST', body: formData });
+        const data = await res.json();
+        
+        if (data.success) {
+            Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: data.message, showConfirmButton: false, timer: 1500 }).then(() => {
+                window.location.href = '/admin/dich-vu';
+            });
+        } else {
+            throw new Error(data.message);
+        }
+    } catch(err) {
+        Swal.fire('Lỗi!', err.message, 'error');
+        btn.innerHTML = '<i class="fas fa-save me-2"></i>Lưu Thay Đổi';
+        btn.disabled = false;
+    }
+}
+</script>
+<style>.filter-label { display:block; font-size:.72rem; font-weight:600; color:var(--text-secondary); text-transform:uppercase; letter-spacing:.04em; margin-bottom:5px; }</style>

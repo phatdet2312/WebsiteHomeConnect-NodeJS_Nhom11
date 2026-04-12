@@ -63,6 +63,7 @@ router.get('/dashboard', async (req, res) => {
 
 router.use('/banner', require('./banner'));
 router.use('/quan-ly-nguoi-dung', require('./quanLyNguoiDung'));
-
+router.use('/dich-vu', require('./dichVu'));
+router.use('/ct-dich-vu', require('./ctDichVu'));
 
 module.exports = router;
