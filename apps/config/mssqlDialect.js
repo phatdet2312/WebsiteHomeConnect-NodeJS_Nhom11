@@ -133,7 +133,7 @@ class Request extends EventEmitter {
     let sql = this.sql;
     for (const { name, value } of this._params) {
       const safe = value === null || value === undefined ? 'NULL'
-        : typeof value === 'string' ? `'${value.replace(/'/g, "''")}'`
+        : typeof value === 'string' ? `N'${value.replace(/'/g, "''")}'`
         : typeof value === 'boolean' ? (value ? '1' : '0')
         : value instanceof Date ? `'${value.toISOString()}'`
         : String(value);
