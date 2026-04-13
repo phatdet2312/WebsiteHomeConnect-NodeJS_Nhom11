@@ -1,7 +1,14 @@
+// services/hoaDonHopDongService.js
 const repo = require('../repositories/hoaDonRepository');
 const vnpayService = require('./vnpayService');
+const emailService = require('./emailService');
 const { Op } = require('sequelize');
-const { LoaiTTHD, CT_ThanhToan, HD_HopDong, CT_HDHD, LS_TTHDHD, TrangThai, PTTT, CanHo, Tang, ToaNha, KyTT, sequelize } = require('../models');
+
+const { 
+    HD_HopDong, HopDong, KhachHang, 
+    LoaiTTHD, CT_ThanhToan, CT_HDHD, LS_TTHDHD, 
+    TrangThai, PTTT, CanHo, Tang, ToaNha, KyTT, sequelize 
+} = require('../models');
 
 class HoaDonHopDongService {
     async getDanhSachHDNo(maKH) {
@@ -146,6 +153,23 @@ class HoaDonHopDongService {
             const url = vnpayService.createPaymentUrl(req, { amount: tongTien, orderInfo: `Thanh toan HD HomeConnect - HD#${hoaDon.MaHDHD}`, txnRef: String(hoaDon.MaHDHD), returnUrl: process.env.BASE_URL + '/hoa-don-hop-dong/vnpay-return' });
             return { isVnPay: true, redirectUrl: url, maHDHD: hoaDon.MaHDHD };
         }
+
+        try {
+            const kh = await KhachHang.findByPk(maKH);
+            if (kh && kh.EmailKH) {
+                // Đối với COD, trạng thái là "Chờ thanh toán"
+                emailService.sendPaymentReceipt(
+                    kh.EmailKH, 
+                    kh.TenKH, 
+                    hoaDon.MaHDHD, 
+                    'Chi phí Hợp đồng (Chờ Admin xác nhận)', 
+                    tongTien, 
+                    pttt.TenPT // Ví dụ: "Chuyển khoản ngân hàng"
+                );
+            }
+        } catch (e) {
+            console.error("Lỗi gửi mail COD/Chuyển khoản HĐ:", e);
+        }
         return { isVnPay: false, message: 'Đã gửi yêu cầu thanh toán. Vui lòng chờ Admin xác nhận!' };
     }
 
@@ -163,7 +187,47 @@ class HoaDonHopDongService {
             const maHoaDon = parseInt(result.txnRef);
             const maTT = await repo.layMaTrangThai('Đã thanh toán');
             if (maHoaDon && maTT) {
-                await LS_TTHDHD.create({ MaHDHD: maHoaDon, MaTT: maTT, ThoiGianThayDoi: new Date(), GhiChu: `Thanh toán thành công VNPay - Mã GD: ${result.transactionNo || ''}` });
+                // 1. Tạo Lịch sử trạng thái mới
+                await LS_TTHDHD.create({ 
+                    MaHDHD: maHoaDon, 
+                    MaTT: maTT, 
+                    ThoiGianThayDoi: new Date(), 
+                    GhiChu: `Thanh toán thành công VNPay - Mã GD: ${result.transactionNo || ''}` 
+                });
+
+                // ==============================================================
+                // BẮT ĐẦU CHÈN LỆNH GỬI EMAIL BIÊN LAI THANH TOÁN
+                // ==============================================================
+                try {
+                    // Lấy thông tin Hóa đơn kèm Hợp đồng và Khách hàng
+                    const hd = await HD_HopDong.findByPk(maHoaDon, {
+                        include: [{ 
+                            model: HopDong, 
+                            as: 'HopDong',
+                            include: [{ model: KhachHang, as: 'KhachHang' }]
+                        }]
+                    });
+
+                    if (hd && hd.HopDong && hd.HopDong.KhachHang) {
+                        const kh = hd.HopDong.KhachHang;
+                        if (kh.EmailKH) {
+                            // Gửi mail ngầm, không dùng await để tránh chậm trễ phản hồi VNPay
+                            emailService.sendPaymentReceipt(
+                                kh.EmailKH,          // Email gửi đến
+                                kh.TenKH,            // Tên khách hàng
+                                maHoaDon,            // Mã Hóa đơn
+                                'Chi phí Hợp đồng',  // Loại phí
+                                result.amount,       // Tổng tiền (Lấy từ kết quả VNPay)
+                                'VNPay'              // Phương thức
+                            );
+                        }
+                    }
+                } catch (e) {
+                    console.error("Lỗi gửi mail biên lai thanh toán HĐ:", e);
+                }
+                // ==============================================================
+                // KẾT THÚC CHÈN LỆNH GỬI EMAIL
+                // ==============================================================
             }
             return { success: true, result };
         }

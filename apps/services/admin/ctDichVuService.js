@@ -1,5 +1,7 @@
+// services/admin/ctDichVuService.js
 const repo = require('../../repositories/admin/ctDichVuRepository');
-
+const emailService = require('../emailService');
+const { KhachHang, HopDong, DichVu } = require('../../models');
 class CTDichVuService {
     async getAllServices() { return await repo.getAllDichVu(); }
 
@@ -18,10 +20,10 @@ class CTDichVuService {
         for (const [maCanHo, cts] of Object.entries(grouped)) {
             const first = cts[0];
             const kyMoiNhat = [...cts].sort((a, b) => b.MaKy - a.MaKy)[0];
-            
+
             let tenTrangThai = 'Chưa thanh toán', tenPhuongThuc = '—', maKHTT = 0, tenKHTT = '?';
             const lsMoiNhat = await repo.getLatestLS(maDV, parseInt(maCanHo), kyMoiNhat.MaKy);
-            
+
             if (lsMoiNhat) {
                 tenTrangThai = lsMoiNhat.TrangThai ? lsMoiNhat.TrangThai.TenTT : 'Không xác định';
                 const hd = await repo.getHDById(lsMoiNhat.MaHDDV);
@@ -101,6 +103,23 @@ class CTDichVuService {
             if (existing) await existing.update(payload);
             else await repo.createCT({ MaDV: dto.maDV, MaCanHo: maCH, MaKy: dto.maKy, ...payload });
         }
+
+        try {
+            const dv = await DichVu.findByPk(dto.maDV);
+            // Tìm tất cả khách hàng đang thuê/mua các căn hộ này để gửi mail
+            const hopDongs = await HopDong.findAll({
+                where: { MaCanHo: dto.dsCanHo, TrangThaiHD: true },
+                include: [{ model: KhachHang, as: 'KhachHang' }]
+            });
+            const sentEmails = new Set();
+            for (const hd of hopDongs) {
+                const kh = hd.KhachHang;
+                if (kh && kh.EmailKH && !sentEmails.has(kh.EmailKH)) {
+                    emailService.sendNewInvoiceAlert(kh.EmailKH, kh.TenKH, dv?.TenDV || 'Dịch vụ', dto.dsCanHo.length, 0, dto.dsHan[0]);
+                    sentEmails.add(kh.EmailKH); // Đảm bảo 1 khách chỉ nhận 1 mail dù gán nhiều căn hộ
+                }
+            }
+        } catch (e) { console.error("Lỗi gửi email gán phí DV:", e); }
         return dto.dsCanHo.length;
     }
 

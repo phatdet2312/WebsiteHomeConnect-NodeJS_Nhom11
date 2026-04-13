@@ -1,13 +1,16 @@
+// services/admin/hopDongService.js
+const emailService = require('../emailService');
 const repo = require('../../repositories/admin/hopDongRepository');
+const { KhachHang, CanHo } = require('../../models');
 const fs = require('fs');
 const path = require('path');
 
 class HopDongService {
-    _deleteFile(url) { 
-        if (url) { 
-            const p = path.join(__dirname, '../../../../public', url); 
-            if (fs.existsSync(p)) fs.unlinkSync(p); 
-        } 
+    _deleteFile(url) {
+        if (url) {
+            const p = path.join(__dirname, '../../../../public', url);
+            if (fs.existsSync(p)) fs.unlinkSync(p);
+        }
     }
 
     _tinhSoTuKhop(hd, tuKhoaArray) {
@@ -92,11 +95,11 @@ class HopDongService {
     async getDetail(id) { return await repo.getById(id); }
 
     async create(dto, files) {
-        const err = dto.validate(); 
+        const err = dto.validate();
         if (err) throw new Error(err);
 
         const UrlAnhHD = files && files['urlAnhHD'] ? '/images/anhhopdong/' + files['urlAnhHD'][0].filename : null;
-        
+
         // MAPPING: Đảm bảo key truyền vào repo là "MaVaiTroHD" (T hoa) để khớp Model HopDong.js
         const contractData = {
             MaKH: dto.MaKH,
@@ -123,6 +126,17 @@ class HopDongService {
                 await repo.createDSA({ MaHopDong: hd.MaHopDong, UrlAnh: '/images/dsanhhopdong/' + img.filename });
             }
         }
+
+        try {
+            const kh = await KhachHang.findByPk(dto.MaKH);
+            const ch = await CanHo.findByPk(dto.MaCanHo);
+            if (kh && kh.EmailKH) {
+                // Đẩy vào background không đợi (không dùng await) để tránh làm chậm response
+                emailService.sendContractCreatedEmail(kh.EmailKH, kh.TenKH, hd.MaHopDong, ch?.TenCanHo || 'Căn hộ', dto.GiaThoaThuan);
+            }
+        } catch (e) { console.error("Lỗi gửi email tạo HĐ:", e); }
+
+
         return hd.MaHopDong;
     }
 
@@ -203,7 +217,7 @@ class HopDongService {
         const status = statusVal === 'null' ? null : (statusVal === 'true');
         for (const id of ids) {
             const hd = await repo.getById(id);
-            if(hd) await hd.update({ TrangThaiHD: status });
+            if (hd) await hd.update({ TrangThaiHD: status });
         }
     }
 }

@@ -1,4 +1,7 @@
+// services/admin/ctThanhToanService.js
 const repo = require('../../repositories/admin/ctThanhToanRepository');
+const emailService = require('../emailService')
+const { KhachHang, HopDong, LoaiTTHD } = require('../../models');
 
 class CTThanhToanService {
     async getAllServices() { return await repo.getAllLoaiTT(); }
@@ -90,6 +93,30 @@ class CTThanhToanService {
             if (existing) await existing.update(payload);
             else await repo.createCT({ MaLoaiTT: dto.maLoaiTT, MaCanHo: maCH, MaKyTT: dto.maKyTT, ...payload });
         }
+
+        // ==============================================================
+        // BẮT ĐẦU CHÈN LỆNH GỬI EMAIL THÔNG BÁO PHÍ MỚI
+        // ==============================================================
+        try {
+            const loaiTT = await LoaiTTHD.findByPk(dto.maLoaiTT);
+            // Tìm tất cả khách hàng đang thuê/mua các căn hộ này để gửi mail
+            const hopDongs = await HopDong.findAll({
+                where: { MaCanHo: dto.dsCanHo, TrangThaiHD: true },
+                include: [{ model: KhachHang, as: 'KhachHang' }]
+            });
+            const sentEmails = new Set();
+            for (const hd of hopDongs) {
+                const kh = hd.KhachHang;
+                if (kh && kh.EmailKH && !sentEmails.has(kh.EmailKH)) {
+                    emailService.sendNewInvoiceAlert(kh.EmailKH, kh.TenKH, loaiTT?.TenLoaiTT || 'Phí Hợp đồng', dto.dsCanHo.length, 0, dto.dsHan[0]);
+                    sentEmails.add(kh.EmailKH); // Tránh gửi trùng lặp nếu 1 khách có nhiều căn hộ
+                }
+            }
+        } catch (e) { console.error("Lỗi gửi email gán phí TT HĐ:", e); }
+        // ==============================================================
+        // KẾT THÚC CHÈN LỆNH GỬI EMAIL
+        // ==============================================================
+
         return dto.dsCanHo.length;
     }
 

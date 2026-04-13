@@ -1,5 +1,8 @@
+// services/hoaDonDichVuService.js
 const repo = require('../repositories/hoaDonRepository');
 const vnpayService = require('./vnpayService');
+const emailService = require('./emailService'); // Import email
+const { KhachHang } = require('../models');
 const { Op } = require('sequelize');
 const { DichVu, CT_DichVu, HD_DichVu, CT_HDDV, LS_TTHDDV, TrangThai, PTTT, CanHo, Tang, ToaNha, Ky, sequelize } = require('../models');
 
@@ -140,7 +143,7 @@ class HoaDonDichVuService {
 
         const hoaDon = await HD_DichVu.create({ MaKH: maKH, MaPT: dto.maPT, NgayThanhToan: new Date() });
         await CT_HDDV.bulkCreate(validItems.map(vi => ({ MaDV: vi.mDV, MaCanHo: vi.mCH, MaKy: vi.mKy, MaHDDV: hoaDon.MaHDDV, SL: 1, DonGia: vi.conThieu })));
-        
+
         const maTTFinal = await repo.layMaTrangThai(targetStatus);
         await LS_TTHDDV.create({ MaHDDV: hoaDon.MaHDDV, MaTT: maTTFinal, ThoiGianThayDoi: new Date(), GhiChu: `Khởi tạo thanh toán qua ${pttt.TenPT}` });
 
@@ -148,6 +151,24 @@ class HoaDonDichVuService {
             const url = vnpayService.createPaymentUrl(req, { amount: tongTien, orderInfo: `Thanh toan dich vu HomeConnect - HD#${hoaDon.MaHDDV}`, txnRef: String(hoaDon.MaHDDV), returnUrl: process.env.BASE_URL + '/hoa-don-dich-vu/vnpay-return' });
             return { isVnPay: true, redirectUrl: url, maHDDV: hoaDon.MaHDDV };
         }
+
+        try {
+            const kh = await KhachHang.findByPk(maKH);
+            if (kh && kh.EmailKH) {
+                // Đối với COD, trạng thái là "Chờ thanh toán", ta có thể gửi email dạng "Biên nhận yêu cầu"
+                emailService.sendPaymentReceipt(
+                    kh.EmailKH, 
+                    kh.TenKH, 
+                    hoaDon.MaHDDV, 
+                    'Dịch vụ hệ thống (Chờ Admin xác nhận)', 
+                    tongTien, 
+                    pttt.TenPT // Sẽ hiển thị tên phương thức, ví dụ: "Tiền mặt (COD)"
+                );
+            }
+        } catch (e) {
+            console.error("Lỗi gửi mail COD/Chuyển khoản DV:", e);
+        }
+        
         return { isVnPay: false, message: 'Đã gửi yêu cầu thanh toán. Vui lòng chờ Admin xác nhận!' };
     }
 
@@ -166,6 +187,15 @@ class HoaDonDichVuService {
             const maTT = await repo.layMaTrangThai('Đã thanh toán');
             if (maHoaDon && maTT) {
                 await LS_TTHDDV.create({ MaHDDV: maHoaDon, MaTT: maTT, ThoiGianThayDoi: new Date(), GhiChu: `Thanh toán thành công VNPay - Mã GD: ${result.transactionNo || ''}` });
+                try {
+                    const hd = await HD_DichVu.findByPk(maHoaDon);
+                    if (hd) {
+                        const kh = await KhachHang.findByPk(hd.MaKH);
+                        if (kh && kh.EmailKH) {
+                            emailService.sendPaymentReceipt(kh.EmailKH, kh.TenKH, maHoaDon, 'Dịch vụ hệ thống', result.amount, 'VNPay');
+                        }
+                    }
+                } catch (e) { console.error("Lỗi gửi mail biên lai:", e); }
             }
             return { success: true, result };
         }

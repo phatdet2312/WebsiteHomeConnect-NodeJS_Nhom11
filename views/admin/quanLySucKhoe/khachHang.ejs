@@ -1,0 +1,37 @@
+<!-- views/admin/quanLySucKhoe/khachHang.ejs -->
+<div class="admin-page-header">
+  <div>
+    <h4>Sức khỏe: <%= khachHang.TenKH %></h4>
+    <p><%= khachHang.EmailKH || '' %><% if (khachHang.DTKH) { %> &bull; <%= khachHang.DTKH %><% } %></p>
+  </div>
+  <a href="/admin/quan-ly-suc-khoe" class="btn-ghost"><i class="fas fa-arrow-left me-2"></i>Quay lại</a>
+</div>
+<div class="table-card">
+  <div style="overflow-x:auto;">
+    <table style="width:100%;border-collapse:collapse;">
+      <thead><tr style="background:var(--bg-soft);border-bottom:1px solid var(--border-light);">
+        <th style="padding:10px 16px;font-size:.72rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;">Mã</th>
+        <th style="padding:10px 16px;font-size:.72rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;">Tên chỉ số</th>
+        <th style="padding:10px 16px;font-size:.72rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;">Giá trị</th>
+        <th style="padding:10px 16px;font-size:.72rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;">Ngày ghi</th>
+      </tr></thead>
+      <tbody>
+        <% if (!items || items.length === 0) { %>
+          <tr><td colspan="4" style="padding:48px;text-align:center;color:var(--text-muted);"><i class="fas fa-heartbeat fa-3x" style="opacity:.2;display:block;margin-bottom:12px;"></i>Chưa có chỉ số nào</td></tr>
+        <% } %>
+        <% if (items) { items.forEach(item => { %>
+        <tr style="border-bottom:1px solid var(--border-light);" onmouseover="this.style.background='var(--bg-soft)'" onmouseout="this.style.background=''">
+          <td style="padding:12px 16px;"><span style="background:var(--primary-light);color:var(--primary);padding:2px 8px;border-radius:6px;font-size:.72rem;font-weight:700;">#<%= item.MaChiSo %></span></td>
+          <td style="padding:12px 16px;font-weight:600;color:var(--text);font-size:.875rem;"><%= item.TenChiSo %></td>
+          <td style="padding:12px 16px;">
+            <span style="background:#e0f2fe;color:#0369a1;padding:3px 10px;border-radius:20px;font-size:.78rem;font-weight:700;"><%= item.GiaTri %> <%= item.DonVi || '' %></span>
+          </td>
+          <td style="padding:12px 16px;font-size:.8rem;color:var(--text-muted);">
+            <%= item.NgayRecord ? new Date(item.NgayRecord).toLocaleDateString('vi-VN') : '—' %>
+          </td>
+        </tr>
+        <% }) } %>
+      </tbody>
+    </table>
+  </div>
+</div>
