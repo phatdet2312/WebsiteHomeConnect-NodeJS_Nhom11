@@ -3,7 +3,12 @@ const fs = require('fs');
 const path = require('path');
 
 class HopDongService {
-    _deleteFile(url) { if (url) { const p = path.join(__dirname, '../../../../public', url); if (fs.existsSync(p)) fs.unlinkSync(p); } }
+    _deleteFile(url) { 
+        if (url) { 
+            const p = path.join(__dirname, '../../../../public', url); 
+            if (fs.existsSync(p)) fs.unlinkSync(p); 
+        } 
+    }
 
     _tinhSoTuKhop(hd, tuKhoaArray) {
         let diem = 0;
@@ -34,7 +39,8 @@ class HopDongService {
             khachHangs: khachHangs.map(k => ({ maKH: k.MaKH, tenKH: k.TenKH, sdt: k.DTKH })),
             canHos: canHos.map(c => ({ maCanHo: c.MaCanHo, tenCanHo: c.TenCanHo, tenTang: c.Tang?.TenTang, tenToaNha: c.Tang?.ToaNha?.TenToaNha })),
             loaiHDs: loaiHDs.map(l => ({ maLoaiHD: l.MaLoaiHD, tenLoai: l.TenLoai })),
-            vaiTroHDs: vaiTroHDs.map(v => ({ maVaiTroHD: v.MaVaiTroHD, tenVaiTro: v.TenVaiTro })),
+            // LƯU Ý: Lấy MaVaitroHD (t thường) từ model VaiTroHD để map sang MaVaiTroHD cho View
+            vaiTroHDs: vaiTroHDs.map(v => ({ maVaiTroHD: v.MaVaitroHD, tenVaiTro: v.TenVaiTro })),
             nhanViens: nhanViens.map(n => ({ maNV: n.MaNV, tenNV: n.TenNV }))
         };
     }
@@ -86,10 +92,31 @@ class HopDongService {
     async getDetail(id) { return await repo.getById(id); }
 
     async create(dto, files) {
-        const err = dto.validate(); if (err) throw new Error(err);
+        const err = dto.validate(); 
+        if (err) throw new Error(err);
+
         const UrlAnhHD = files && files['urlAnhHD'] ? '/images/anhhopdong/' + files['urlAnhHD'][0].filename : null;
         
-        const hd = await repo.create({ ...dto, UrlAnhHD });
+        // MAPPING: Đảm bảo key truyền vào repo là "MaVaiTroHD" (T hoa) để khớp Model HopDong.js
+        const contractData = {
+            MaKH: dto.MaKH,
+            MaCanHo: dto.MaCanHo,
+            MaLoaiHD: dto.MaLoaiHD,
+            MaVaiTroHD: dto.MaVaiTroHD, // Đã khớp T hoa
+            MaNV: dto.MaNV,
+            GiaTriCanHo: dto.GiaTriCanHo,
+            GiaThoaThuan: dto.GiaThoaThuan,
+            NgayLap: dto.NgayLap,
+            NgayXuLyDuKien: dto.NgayXuLyDuKien,
+            NgayHieuLuc: dto.NgayHieuLuc,
+            NgayHetHan: dto.NgayHetHan,
+            DiaChiKyHopDong: dto.DiaChiKyHopDong,
+            SDTNhanLienLac: dto.SDTNhanLienLac,
+            UrlAnhHD: UrlAnhHD,
+            TrangThaiHD: dto.TrangThaiHD
+        };
+
+        const hd = await repo.create(contractData);
 
         if (files && files['additionalImages']) {
             for (const img of files['additionalImages']) {
@@ -121,7 +148,26 @@ class HopDongService {
             for (const img of files['additionalImages']) await repo.createDSA({ MaHopDong: hd.MaHopDong, UrlAnh: '/images/dsanhhopdong/' + img.filename });
         }
 
-        await hd.update({ ...dto, UrlAnhHD });
+        // MAPPING cho Update
+        const updateData = {
+            MaKH: dto.MaKH,
+            MaCanHo: dto.MaCanHo,
+            MaLoaiHD: dto.MaLoaiHD,
+            MaVaiTroHD: dto.MaVaiTroHD, // Đã khớp T hoa
+            MaNV: dto.MaNV,
+            GiaTriCanHo: dto.GiaTriCanHo,
+            GiaThoaThuan: dto.GiaThoaThuan,
+            NgayLap: dto.NgayLap,
+            NgayXuLyDuKien: dto.NgayXuLyDuKien,
+            NgayHieuLuc: dto.NgayHieuLuc,
+            NgayHetHan: dto.NgayHetHan,
+            DiaChiKyHopDong: dto.DiaChiKyHopDong,
+            SDTNhanLienLac: dto.SDTNhanLienLac,
+            UrlAnhHD: UrlAnhHD,
+            TrangThaiHD: dto.TrangThaiHD
+        };
+
+        await hd.update(updateData);
     }
 
     async deleteMultiple(ids) {
@@ -129,7 +175,8 @@ class HopDongService {
             const hd = await repo.getById(id);
             if (hd) {
                 this._deleteFile(hd.UrlAnhHD);
-                for (const dsa of hd.DSA_HopDongS || []) this._deleteFile(dsa.UrlAnh);
+                const dsanh = hd.DSA_HopDongS || [];
+                for (const dsa of dsanh) this._deleteFile(dsa.UrlAnh);
                 await hd.destroy();
             }
         }

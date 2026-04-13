@@ -4,7 +4,6 @@ const path = require('path');
 const { Tang, ToaNha } = require('../../models');
 
 class AdminCanHoService {
-    // Thuật toán C#
     _tinhSoTuKhop(ch, tuKhoaArray) {
         let diem = 0;
         const ten = ` ${(ch.TenCanHo || '').toLowerCase()} `.split(/\s+/).filter(Boolean);
@@ -52,7 +51,6 @@ class AdminCanHoService {
         let canHos = await repo.getCanHos(where, tangInclude);
         canHos = canHos.map(c => c.toJSON());
 
-        // Sort
         if (sortGia === 'thapDenCao') canHos.sort((a, b) => (a.Gia||0) - (b.Gia||0));
         else if (sortGia === 'caoDenThap') canHos.sort((a, b) => (b.Gia||0) - (a.Gia||0));
         if (sortViTri === 'tangDan') canHos.sort((a, b) => (a.ViTriDay||0) - (b.ViTriDay||0));
@@ -85,7 +83,6 @@ class AdminCanHoService {
 
     async getDetail(id) { return await repo.getById(id); }
 
-    // Xử lý tạo mới
     async create(dto, files) {
         const err = dto.validate();
         if (err) throw new Error(err);
@@ -95,11 +92,9 @@ class AdminCanHoService {
 
         const ch = await repo.createCanHo({ ...dto, UrlAnh });
 
-        // Ảnh phụ
         const galleryFiles = files.filter(f => f.fieldname === 'additionalImages');
         for (const file of galleryFiles) await repo.createDSACanHo({ MaCanHo: ch.MaCanHo, UrlAnh: '/images/dsanhcanho/' + file.filename });
 
-        // Phòng
         let dsTenPhong = dto.TenPhongList;
         if (dsTenPhong) {
             dsTenPhong = Array.isArray(dsTenPhong) ? dsTenPhong : [dsTenPhong];
@@ -114,7 +109,6 @@ class AdminCanHoService {
         return ch.MaCanHo;
     }
 
-    // Xử lý cập nhật phức tạp
     async update(id, dto, files) {
         const err = dto.validate();
         if (err) throw new Error(err);
@@ -131,7 +125,6 @@ class AdminCanHoService {
 
         await item.update({ ...dto, UrlAnh });
 
-        // Xóa ảnh phụ
         if (dto.DSA_CanHoToDelete) {
             const ids = Array.isArray(dto.DSA_CanHoToDelete) ? dto.DSA_CanHoToDelete : [dto.DSA_CanHoToDelete];
             for (const maAnh of ids) {
@@ -140,11 +133,9 @@ class AdminCanHoService {
             }
         }
 
-        // Thêm ảnh phụ
         const galleryFiles = files.filter(f => f.fieldname === 'additionalImages');
         for (const file of galleryFiles) await repo.createDSACanHo({ MaCanHo: item.MaCanHo, UrlAnh: '/images/dsanhcanho/' + file.filename });
 
-        // Xóa Phòng
         if (dto.PhongToDelete) {
             const pIds = Array.isArray(dto.PhongToDelete) ? dto.PhongToDelete : [dto.PhongToDelete];
             for (const pid of pIds) {
@@ -156,7 +147,6 @@ class AdminCanHoService {
             }
         }
 
-        // Xóa ảnh phòng cụ thể
         if (dto.DSA_PhongToDelete) {
             const aIds = Array.isArray(dto.DSA_PhongToDelete) ? dto.DSA_PhongToDelete : [dto.DSA_PhongToDelete];
             for (const aid of aIds) {
@@ -165,7 +155,6 @@ class AdminCanHoService {
             }
         }
 
-        // Cập nhật/Thêm phòng
         let dsTenPhong = dto.TenPhongList;
         let dsMaPhong = dto.MaPhongList; 
         if (dsTenPhong) {
@@ -189,15 +178,32 @@ class AdminCanHoService {
         }
     }
 
+    // ==========================================
+    // ĐÃ SỬA: HÀM XÓA CĂN HỘ ĐƯỢC BẢO VỆ CHẶT CHẼ
+    // ==========================================
     async deleteMultiple(ids) {
         for (const id of ids) {
             const ch = await repo.getById(id);
-            if (ch) {
-                this._deleteFile(ch.UrlAnh);
-                for (const dsa of ch.DSA_CanHos) this._deleteFile(dsa.UrlAnh);
-                for (const p of ch.Phongs) { for (const pa of p.DSA_Phongs) this._deleteFile(pa.UrlAnh); }
-                await ch.destroy();
-            }
+            if (!ch) continue; // Bỏ qua nếu không tồn tại
+
+            // 1. Kiểm tra Hợp Đồng
+            const checkHD = await repo.countHopDongByCanHo(id);
+            if (checkHD > 0) throw new Error(`Không thể xóa căn hộ #${id} vì đã tồn tại Hợp Đồng liên kết.`);
+
+            // 2. Kiểm tra Hóa Đơn Dịch Vụ
+            const checkDV = await repo.countHoaDonDichVuByCanHo(id);
+            if (checkDV > 0) throw new Error(`Không thể xóa căn hộ #${id} vì đã phát sinh Hóa đơn Dịch vụ.`);
+
+            // 3. Kiểm tra Hóa Đơn Hợp Đồng
+            const checkHDHD = await repo.countHoaDonHopDongByCanHo(id);
+            if (checkHDHD > 0) throw new Error(`Không thể xóa căn hộ #${id} vì đã phát sinh Hóa đơn Hợp đồng.`);
+
+            // Nếu an toàn, tiến hành xóa ảnh và xóa bảng
+            this._deleteFile(ch.UrlAnh);
+            for (const dsa of ch.DSA_CanHos) this._deleteFile(dsa.UrlAnh);
+            for (const p of ch.Phongs) { for (const pa of p.DSA_Phongs) this._deleteFile(pa.UrlAnh); }
+            
+            await ch.destroy();
         }
     }
 

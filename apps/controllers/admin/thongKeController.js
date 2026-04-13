@@ -2,63 +2,48 @@ const service = require('../../services/admin/thongKeService');
 const { ThongKeFilterDTO } = require('../../dtos/admin/statistic.dto');
 
 class ThongKeController {
-    async renderDashboard(req, res) {
+    // --- 1. RENDER VIEWS (Chỉ trả về khung HTML rỗng) ---
+    renderDashboard(req, res) { res.render('admin/thongKe/index', { title: 'Thống kê tổng quan', layout: 'layouts/admin' }); }
+    renderDoanhThu(req, res) { res.render('admin/thongKe/doanhThu', { title: 'Báo cáo Doanh thu', layout: 'layouts/admin' }); }
+    renderHopDong(req, res) { res.render('admin/thongKe/hopDong', { title: 'Thống kê Hợp đồng', layout: 'layouts/admin' }); }
+    renderCanHo(req, res) { res.render('admin/thongKe/canHo', { title: 'Thống kê Căn hộ', layout: 'layouts/admin' }); }
+
+    // --- 2. APIs (Chỉ trả về JSON) ---
+    async apiGetDashboard(req, res) {
         try {
             const data = await service.getTongQuanDashboard();
-            res.render('admin/thongKe/index', {
-                title: 'Thống kê', layout: 'layouts/admin',
-                stats: data.stats,
-                doanhThuTheoThang: data.doanhThuTheoThang,
-                topCanHo: data.topCanHo,
-                doanhThuToaNha: data.doanhThuToaNha,
-                tyLeCanHo: data.tyLeCanHo,
-                khachHangMoi: data.khachHangMoi,
-                thuNhapDichVu: data.thuNhapDichVu,
-                tuNgay: req.query.tuNgay || '', denNgay: req.query.denNgay || '', loai: req.query.loai || 'thang'
-            });
+            res.json({ success: true, data });
         } catch (err) {
             console.error(err);
-            req.flash('error_msg', err.message);
-            res.redirect('/admin/dashboard');
+            res.status(500).json({ success: false, message: err.message });
         }
     }
 
-    async renderDoanhThu(req, res) {
+    async apiGetDoanhThu(req, res) {
         try {
             const dto = new ThongKeFilterDTO(req.query);
             const data = await service.getBaoCaoDoanhThu(dto);
-            
-            res.render('admin/thongKe/doanhThu', {
-                title: 'Báo cáo Doanh thu', layout: 'layouts/admin',
-                items: data.items,
-                total: data.total,
-                tongTien: data.tongTien,
-                tuNgay: dto.tuNgay, denNgay: dto.denNgay,
-                currentPage: dto.page, totalPages: data.totalPages
-            });
+            res.json({ success: true, data });
         } catch (err) {
-            req.flash('error_msg', err.message);
-            res.redirect('/admin/thong-ke');
+            res.status(500).json({ success: false, message: err.message });
         }
     }
 
-    async renderHopDong(req, res) {
+    async apiGetHopDong(req, res) {
         try {
             const thongKeHD = await service.getThongKeHopDong();
-            res.render('admin/thongKe/hopDong', { title: 'Thống kê Hợp đồng', layout: 'layouts/admin', thongKeHD });
+            res.json({ success: true, data: thongKeHD });
         } catch (err) {
-            req.flash('error_msg', err.message);
-            res.redirect('/admin/thong-ke');
+            res.status(500).json({ success: false, message: err.message });
         }
     }
 
-    async renderCanHo(req, res) {
+    async apiGetCanHo(req, res) {
         try {
             const thongKeCanHo = await service.getThongKeCanHo();
-            res.render('admin/thongKe/canHo', { title: 'Thống kê Căn hộ', layout: 'layouts/admin', thongKeCanHo });
+            res.json({ success: true, data: thongKeCanHo });
         } catch (err) {
-            req.flash('error_msg', err.message);
-            res.redirect('/admin/thong-ke');
+            res.status(500).json({ success: false, message: err.message });
         }
     }
 }

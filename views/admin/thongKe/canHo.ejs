@@ -6,40 +6,49 @@
     <a href="/admin/can-ho" class="btn-ghost"><i class="fas fa-list me-2"></i>Danh sách CH</a>
   </div>
 </div>
+
 <div class="table-card">
   <div style="overflow-x:auto;">
     <table style="width:100%;border-collapse:collapse;">
       <thead><tr style="background:var(--bg-soft);border-bottom:1px solid var(--border-light);">
-        <th style="padding:10px 16px;font-size:.72rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;">Tòa nhà</th>
-        <th style="padding:10px 16px;font-size:.72rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;">Tầng</th>
-        <th style="padding:10px 16px;font-size:.72rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;text-align:center;">Tổng CH</th>
-        <th style="padding:10px 16px;font-size:.72rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;text-align:center;">Đang cho thuê</th>
-        <th style="padding:10px 16px;font-size:.72rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;text-align:right;">Giá mua TB</th>
-        <th style="padding:10px 16px;font-size:.72rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;text-align:right;">Giá thuê TB</th>
+        <th style="padding:10px 16px;font-size:.72rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;">Tòa nhà</th>
+        <th style="padding:10px 16px;font-size:.72rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;">Tầng</th>
+        <th style="padding:10px 16px;font-size:.72rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;text-align:center;">Tổng CH</th>
+        <th style="padding:10px 16px;font-size:.72rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;text-align:center;">Đang cho thuê</th>
+        <th style="padding:10px 16px;font-size:.72rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;text-align:right;">Giá mua TB</th>
+        <th style="padding:10px 16px;font-size:.72rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;text-align:right;">Giá thuê TB</th>
       </tr></thead>
-      <tbody>
-        <% if (!thongKeCanHo || thongKeCanHo.length === 0) { %>
-          <tr><td colspan="6" style="padding:48px;text-align:center;color:var(--text-muted);"><i class="fas fa-home fa-3x" style="opacity:.2;display:block;margin-bottom:12px;"></i>Chưa có dữ liệu</td></tr>
-        <% } %>
-        <% if (thongKeCanHo) { thongKeCanHo.forEach(r => { %>
-        <tr style="border-bottom:1px solid var(--border-light);" onmouseover="this.style.background='var(--bg-soft)'" onmouseout="this.style.background=''">
-          <td style="padding:12px 16px;font-weight:700;color:var(--text);"><i class="fas fa-building me-1" style="color:var(--primary);"></i><%= r.TenToaNha %></td>
-          <td style="padding:12px 16px;color:var(--text-muted);font-size:.85rem;">Tầng <%= r.TenTang %></td>
-          <td style="padding:12px 16px;text-align:center;">
-            <span style="background:var(--bg-soft);color:var(--text-secondary);padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:700;"><%= r.tongCanHo %></span>
-          </td>
-          <td style="padding:12px 16px;text-align:center;">
-            <span style="background:#e0f2fe;color:#0369a1;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:700;"><%= r.danhChoThue %></span>
-          </td>
-          <td style="padding:12px 16px;text-align:right;font-weight:600;color:#16a34a;font-size:.85rem;">
-            <%= r.giaTrungBinh ? Number(Math.round(r.giaTrungBinh)).toLocaleString('vi-VN') + ' đ' : '—' %>
-          </td>
-          <td style="padding:12px 16px;text-align:right;font-weight:600;color:#0369a1;font-size:.85rem;">
-            <%= r.giaThueGiaTrungBinh ? Number(Math.round(r.giaThueGiaTrungBinh)).toLocaleString('vi-VN') + ' đ/th' : '—' %>
-          </td>
-        </tr>
-        <% }) } %>
+      <tbody id="canHoBody">
+         <tr><td colspan="6" class="text-center p-4"><div class="hc-spinner"></div></td></tr>
       </tbody>
     </table>
   </div>
 </div>
+
+<script>
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+fetch('/admin/thong-ke/api/can-ho')
+    .then(r => r.json())
+    .then(res => {
+        if (!res.success) return;
+        const data = res.data;
+        const body = document.getElementById('canHoBody');
+
+        if (!data.length) {
+            body.innerHTML = '<tr><td colspan="6" style="padding:48px;text-align:center;color:var(--text-muted);"><i class="fas fa-home fa-3x" style="opacity:.2;display:block;margin-bottom:12px;"></i>Chưa có dữ liệu</td></tr>';
+            return;
+        }
+
+        body.innerHTML = data.map(r => `
+            <tr style="border-bottom:1px solid var(--border-light);">
+                <td style="padding:12px 16px;font-weight:700;color:var(--text);"><i class="fas fa-building me-1" style="color:var(--primary);"></i>${esc(r.TenToaNha)}</td>
+                <td style="padding:12px 16px;color:var(--text-muted);font-size:.85rem;">Tầng ${esc(r.TenTang)}</td>
+                <td style="padding:12px 16px;text-align:center;"><span style="background:var(--bg-soft);color:var(--text-secondary);padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:700;">${r.tongCanHo}</span></td>
+                <td style="padding:12px 16px;text-align:center;"><span style="background:#e0f2fe;color:#0369a1;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:700;">${r.danhChoThue}</span></td>
+                <td style="padding:12px 16px;text-align:right;font-weight:600;color:#16a34a;font-size:.85rem;">${r.giaTrungBinh ? Number(Math.round(r.giaTrungBinh)).toLocaleString('vi-VN') + ' đ' : '—'}</td>
+                <td style="padding:12px 16px;text-align:right;font-weight:600;color:#0369a1;font-size:.85rem;">${r.giaThueGiaTrungBinh ? Number(Math.round(r.giaThueGiaTrungBinh)).toLocaleString('vi-VN') + ' đ/th' : '—'}</td>
+            </tr>
+        `).join('');
+    });
+</script>
