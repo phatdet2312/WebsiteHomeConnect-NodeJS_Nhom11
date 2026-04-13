@@ -1,0 +1,65 @@
+<!-- views/admin/quanLySucKhoe/index.ejs -->
+<div class="admin-page-header">
+  <div><h4>Quản lý Sức khỏe</h4><p>Tổng: <%= totalItems || 0 %> chỉ số</p></div>
+</div>
+<div class="table-card mb-3">
+  <div class="table-card-header"><div class="table-card-title"><i class="fas fa-filter me-2" style="color:var(--primary);"></i>Bộ lọc</div></div>
+  <div style="padding:16px 20px;">
+    <form method="GET" class="row g-2 align-items-end">
+      <div class="col-md-4"><label class="filter-label">Khách hàng</label><input type="text" name="search" class="hc-input" placeholder="Tên khách hàng..." value="<%= search || '' %>"></div>
+      <div class="col-md-4"><label class="filter-label">Tên chỉ số</label><input type="text" name="tenChiSo" class="hc-input" placeholder="Huyết áp, nhịp tim..." value="<%= tenChiSo || '' %>"></div>
+      <div class="col-md-1"><button type="submit" class="btn-hc-primary w-100" style="justify-content:center;padding:9px;"><i class="fas fa-search"></i></button></div>
+      <div class="col-md-1"><a href="/admin/quan-ly-suc-khoe" class="btn-ghost w-100" style="justify-content:center;padding:9px;"><i class="fas fa-times"></i></a></div>
+    </form>
+  </div>
+</div>
+<div class="table-card">
+  <div style="overflow-x:auto;">
+    <table style="width:100%;border-collapse:collapse;">
+      <thead><tr style="background:var(--bg-soft);border-bottom:1px solid var(--border-light);">
+        <th style="padding:10px 16px;font-size:.72rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;">Mã</th>
+        <th style="padding:10px 16px;font-size:.72rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;">Khách hàng</th>
+        <th style="padding:10px 16px;font-size:.72rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;">Chỉ số</th>
+        <th style="padding:10px 16px;font-size:.72rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;">Giá trị</th>
+        <th style="padding:10px 16px;font-size:.72rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;">Ngày ghi</th>
+        <th style="padding:10px 16px;font-size:.72rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;text-align:center;">Thao tác</th>
+      </tr></thead>
+      <tbody>
+        <% if (!items || items.length === 0) { %>
+          <tr><td colspan="6" style="padding:48px;text-align:center;color:var(--text-muted);"><i class="fas fa-heartbeat fa-3x" style="opacity:.2;display:block;margin-bottom:12px;"></i>Không tìm thấy dữ liệu</td></tr>
+        <% } %>
+        <% if (items) { items.forEach(item => { %>
+        <tr style="border-bottom:1px solid var(--border-light);" onmouseover="this.style.background='var(--bg-soft)'" onmouseout="this.style.background=''">
+          <td style="padding:12px 16px;"><span style="background:var(--primary-light);color:var(--primary);padding:2px 8px;border-radius:6px;font-size:.72rem;font-weight:700;">#<%= item.MaChiSo %></span></td>
+          <td style="padding:12px 16px;">
+            <% if (item.KhachHang) { %>
+              <a href="/admin/quan-ly-suc-khoe/khach-hang/<%= item.KhachHang.MaKH %>" style="font-weight:700;color:var(--primary);text-decoration:none;"><%= item.KhachHang.TenKH %></a>
+              <div style="font-size:.75rem;color:var(--text-muted);margin-top:1px;"><%= item.KhachHang.EmailKH || '' %></div>
+            <% } else { %>
+              <span style="color:var(--text-muted);">KH#<%= item.MaKH %></span>
+            <% } %>
+          </td>
+          <td style="padding:12px 16px;font-weight:600;color:var(--text);font-size:.85rem;"><%= item.TenChiSo %></td>
+          <td style="padding:12px 16px;">
+            <span style="background:#e0f2fe;color:#0369a1;padding:3px 10px;border-radius:20px;font-size:.78rem;font-weight:700;"><%= item.GiaTri %> <%= item.DonVi || '' %></span>
+          </td>
+          <td style="padding:12px 16px;font-size:.8rem;color:var(--text-muted);">
+            <%= item.NgayRecord ? new Date(item.NgayRecord).toLocaleDateString('vi-VN') : '—' %>
+          </td>
+          <td style="padding:12px 16px;">
+            <div class="hc-card-actions">
+              <a href="/admin/quan-ly-suc-khoe/display/<%= item.MaChiSo %>" class="btn-tbl btn-tbl-view"><i class="fas fa-eye"></i></a>
+            </div>
+          </td>
+        </tr>
+        <% }) } %>
+      </tbody>
+    </table>
+  </div>
+</div>
+<% if (totalPages > 1) { %><div style="display:flex;justify-content:center;gap:6px;flex-wrap:wrap;margin-top:16px;">
+  <a href="?page=<%= currentPage-1 %>&search=<%= search||'' %>&tenChiSo=<%= tenChiSo||'' %>" class="pg-btn" <%= currentPage===1?'style="pointer-events:none;opacity:.5;"':'' %>><i class="fas fa-chevron-left"></i></a>
+  <% for (let i=1;i<=totalPages;i++) { %><a href="?page=<%= i %>&search=<%= search||'' %>&tenChiSo=<%= tenChiSo||'' %>" class="pg-btn <%= currentPage===i?'active':'' %>"><%= i %></a><% } %>
+  <a href="?page=<%= currentPage+1 %>&search=<%= search||'' %>&tenChiSo=<%= tenChiSo||'' %>" class="pg-btn" <%= currentPage===totalPages?'style="pointer-events:none;opacity:.5;"':'' %>><i class="fas fa-chevron-right"></i></a>
+</div><% } %>
+<style>.filter-label{display:block;font-size:.72rem;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px;}.pg-btn{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:34px;padding:0 10px;border-radius:8px;border:1.5px solid var(--border);background:var(--bg-white);color:var(--text-secondary);font-size:.82rem;font-weight:600;text-decoration:none;}.pg-btn:hover{border-color:var(--primary);color:var(--primary);}.pg-btn.active{background:var(--primary);border-color:var(--primary);color:white;}</style>
