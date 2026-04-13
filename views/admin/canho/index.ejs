@@ -1,204 +1,304 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <style>
-.filter-label { display:block; font-size:.72rem; font-weight:700; color:var(--text-secondary); text-transform:uppercase; margin-bottom:5px; }
-.badge-status { padding:4px 10px; border-radius:20px; font-size:.72rem; font-weight:700; display:inline-flex; align-items:center; gap:4px; }
-.badge-on { background:#dcfce7; color:#15803d; }
-.badge-off { background:var(--bg-soft); color:var(--text-muted); }
-.badge-hot { background:#fef9c3; color:#a16207; }
-.contract-tag { background: linear-gradient(135deg, #10b981, #059669); color:white; padding:4px 10px; border-radius:6px; font-size:.75rem; font-weight:600; display:inline-flex; align-items:center; gap:5px; margin-top:5px;}
+    .filter-label {
+        display: block;
+        font-size: .72rem;
+        font-weight: 700;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        margin-bottom: 5px;
+    }
 
-/* CSS Cho Room Tag - Giữ nguyên kích thước và kiểu dáng cũ */
-.room-tag { background:var(--bg-soft); border:1px solid var(--border-light); padding:2px 8px; border-radius:6px; font-size:.7rem; font-weight:600; color:var(--text-muted); }
- 
-.suggestion-item { padding:10px; cursor:pointer; border-bottom:1px solid #eee; display:flex; gap:10px; align-items:center;}
-.suggestion-item:hover { background:#f8fafc; }
-.pg-btn { display:inline-flex; align-items:center; justify-content:center; min-width:32px; height:32px; border-radius:6px; border:1px solid var(--border); background:var(--bg-white); font-weight:600; cursor:pointer;}
-.pg-btn.active { background:var(--primary); color:white; border-color:var(--primary); }
+    .badge-status {
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: .72rem;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .badge-on {
+        background: #dcfce7;
+        color: #15803d;
+    }
+
+    .badge-off {
+        background: var(--bg-soft);
+        color: var(--text-muted);
+    }
+
+    .badge-hot {
+        background: #fef9c3;
+        color: #a16207;
+    }
+
+    .contract-tag {
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: white;
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: .75rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        margin-top: 5px;
+    }
+
+    /* CSS Cho Room Tag - Giữ nguyên kích thước và kiểu dáng cũ */
+    .room-tag {
+        background: var(--bg-soft);
+        border: 1px solid var(--border-light);
+        padding: 2px 8px;
+        border-radius: 6px;
+        font-size: .7rem;
+        font-weight: 600;
+        color: var(--text-muted);
+    }
+
+    .suggestion-item {
+        padding: 10px;
+        cursor: pointer;
+        border-bottom: 1px solid #eee;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .suggestion-item:hover {
+        background: #f8fafc;
+    }
+
+    .pg-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 32px;
+        height: 32px;
+        border-radius: 6px;
+        border: 1px solid var(--border);
+        background: var(--bg-white);
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    .pg-btn.active {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+    }
 </style>
 
 <div class="admin-page-header">
-  <div>
-    <h4>Quản lý Căn hộ</h4>
-    <p>Tổng: <span id="totalItemsDisplay">0</span> căn hộ</p>
-  </div>
-  <a href="/admin/can-ho/add" class="btn-hc-primary"><i class="fas fa-plus me-2"></i>Thêm Căn hộ Mới</a>
+    <div>
+        <h4>Quản lý Căn hộ</h4>
+        <p>Tổng: <span id="totalItemsDisplay">0</span> căn hộ</p>
+    </div>
+    <a href="/admin/can-ho/add" class="btn-hc-primary"><i class="fas fa-plus me-2"></i>Thêm Căn hộ Mới</a>
 </div>
 
 <div class="table-card mb-3">
-  <div class="table-card-header"><div class="table-card-title"><i class="fas fa-filter me-2 text-primary"></i>Bộ lọc tìm kiếm</div></div>
-  <div style="padding:16px 20px;">
-    <div class="row g-2 align-items-end position-relative">
-      <div class="col-md-3">
-        <label class="filter-label">Tìm kiếm</label>
-        <input type="text" id="searchInput" class="hc-input" placeholder="Tên hoặc mã (VD: 1,2,3)..." autocomplete="off">
-        <div id="suggestionBox" style="display:none;position:absolute;top:100%;left:0;width:300px;background:#fff;z-index:100;box-shadow:0 5px 15px rgba(0,0,0,0.1);border-radius:8px;overflow:hidden;"></div>
-      </div>
-      <div class="col-md-2">
-        <label class="filter-label">Tòa nhà</label>
-        <select id="toaNhaFilter" class="hc-select"><option value="">Tất cả tòa</option></select>
-      </div>
-      <div class="col-md-2">
-        <label class="filter-label">Tầng</label>
-        <select id="tangFilter" class="hc-select"><option value="">Tất cả tầng</option></select>
-      </div>
-      <div class="col-md-2">
-        <label class="filter-label">Trạng thái</label>
-        <select id="statusFilter" class="hc-select">
-            <option value="tatCa">Tất cả</option><option value="batHienThi">Đang hiển thị</option><option value="tatHienThi">Đang ẩn</option>
-        </select>
-      </div>
-      <div class="col-md-1">
-        <button onclick="loadData()" class="btn-hc-primary w-100" style="justify-content:center;padding:9px;"><i class="fas fa-search"></i></button>
-      </div>
-      <div class="col-md-2 text-end">
-          <button onclick="resetFilters()" class="btn-ghost" style="font-size:.8rem;"><i class="fas fa-sync me-1"></i> Làm mới</button>
-      </div>
+    <div class="table-card-header">
+        <div class="table-card-title"><i class="fas fa-filter me-2 text-primary"></i>Bộ lọc tìm kiếm</div>
     </div>
-  </div>
+    <div style="padding:16px 20px;">
+        <div class="row g-2 align-items-end position-relative">
+            <div class="col-md-3">
+                <label class="filter-label">Tìm kiếm</label>
+                <input type="text" id="searchInput" class="hc-input" placeholder="Tên hoặc mã (VD: 1,2,3)..."
+                    autocomplete="off">
+                <div id="suggestionBox"
+                    style="display:none;position:absolute;top:100%;left:0;width:300px;background:#fff;z-index:100;box-shadow:0 5px 15px rgba(0,0,0,0.1);border-radius:8px;overflow:hidden;">
+                </div>
+            </div>
+            <div class="col-md-2">
+                <label class="filter-label">Tòa nhà</label>
+                <select id="toaNhaFilter" class="hc-select">
+                    <option value="">Tất cả tòa</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="filter-label">Tầng</label>
+                <select id="tangFilter" class="hc-select">
+                    <option value="">Tất cả tầng</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="filter-label">Trạng thái</label>
+                <select id="statusFilter" class="hc-select">
+                    <option value="tatCa">Tất cả</option>
+                    <option value="batHienThi">Đang hiển thị</option>
+                    <option value="tatHienThi">Đang ẩn</option>
+                </select>
+            </div>
+            <div class="col-md-1">
+                <button onclick="loadData()" class="btn-hc-primary w-100" style="justify-content:center;padding:9px;"><i
+                        class="fas fa-search"></i></button>
+            </div>
+            <div class="col-md-2 text-end">
+                <button onclick="resetFilters()" class="btn-ghost" style="font-size:.8rem;"><i
+                        class="fas fa-sync me-1"></i> Làm mới</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <div class="table-card">
-  <div class="table-card-header" style="flex-wrap:wrap; gap:10px;">
-    <div style="display:flex;align-items:center;gap:10px;">
-      <input type="checkbox" id="selectAllChk" style="accent-color:var(--primary);width:16px;height:16px;">
-      <label for="selectAllChk" style="font-weight:600;cursor:pointer;">Chọn tất cả</label>
+    <div class="table-card-header" style="flex-wrap:wrap; gap:10px;">
+        <div style="display:flex;align-items:center;gap:10px;">
+            <input type="checkbox" id="selectAllChk" style="accent-color:var(--primary);width:16px;height:16px;">
+            <label for="selectAllChk" style="font-weight:600;cursor:pointer;">Chọn tất cả</label>
+        </div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;" id="bulkActions" style="display:none;">
+            <select id="bulkActionSelect" class="hc-select"
+                style="width:auto; padding:4px 10px; height:32px; font-size:.8rem;">
+                <option value="">-- Hành động --</option>
+                <option value="tang">Đổi Tầng</option>
+                <option value="hientrang">Đổi Hiện Trạng</option>
+                <option value="muctt">Đổi Mức TT</option>
+                <option value="hienthi_true">Bật Hiển thị</option>
+                <option value="hienthi_false">Tắt Hiển thị</option>
+                <option value="dexuat_true">Bật Đề xuất</option>
+                <option value="dexuat_false">Tắt Đề xuất</option>
+                <option value="delete">Xóa Căn hộ</option>
+            </select>
+            <button class="btn-hc-primary" style="height:32px; padding:0 12px; font-size:.8rem;"
+                onclick="executeBulkAction()">Thực thi</button>
+        </div>
     </div>
-    <div style="display:flex; gap:8px; flex-wrap:wrap;" id="bulkActions" style="display:none;">
-        <select id="bulkActionSelect" class="hc-select" style="width:auto; padding:4px 10px; height:32px; font-size:.8rem;">
-            <option value="">-- Hành động --</option>
-            <option value="tang">Đổi Tầng</option>
-            <option value="hientrang">Đổi Hiện Trạng</option>
-            <option value="muctt">Đổi Mức TT</option>
-            <option value="hienthi_true">Bật Hiển thị</option>
-            <option value="hienthi_false">Tắt Hiển thị</option>
-            <option value="dexuat_true">Bật Đề xuất</option>
-            <option value="dexuat_false">Tắt Đề xuất</option>
-            <option value="delete">Xóa Căn hộ</option>
-        </select>
-        <button class="btn-hc-primary" style="height:32px; padding:0 12px; font-size:.8rem;" onclick="executeBulkAction()">Thực thi</button>
+
+    <div id="searchMessageArea"
+        style="display:none; background:#fffbe8; border-bottom:1px solid #fde68a; padding:12px 20px; color:#92400e; font-weight:600; font-size:.85rem;">
     </div>
-  </div>
 
-  <div id="searchMessageArea" style="display:none; background:#fffbe8; border-bottom:1px solid #fde68a; padding:12px 20px; color:#92400e; font-weight:600; font-size:.85rem;"></div>
-
-  <div style="overflow-x:auto;">
-    <table style="width:100%; min-width:1100px; border-collapse:collapse;">
-      <thead style="background:var(--bg-soft);border-bottom:1px solid var(--border-light);">
-        <tr>
-          <th style="padding:12px;width:40px;"></th>
-          <th style="padding:12px;font-size:.75rem;color:var(--text-muted);">MÃ</th>
-          <th style="padding:12px;font-size:.75rem;color:var(--text-muted);">CĂN HỘ / VỊ TRÍ</th>
-          <th style="padding:12px;font-size:.75rem;color:var(--text-muted);">KHÁCH ĐANG Ở (HỢP ĐỒNG)</th>
-          <th style="padding:12px;font-size:.75rem;color:var(--text-muted);">MỨC GIÁ</th>
-          <th style="padding:12px;font-size:.75rem;color:var(--text-muted);">HIỆN TRẠNG / MỨC TT</th>
-          <th style="padding:12px;font-size:.75rem;color:var(--text-muted);text-align:center;">TRẠNG THÁI</th>
-          <th style="padding:12px;font-size:.75rem;color:var(--text-muted);text-align:right;">THAO TÁC</th>
-        </tr>
-      </thead>
-      <tbody id="tableBody"><tr><td colspan="8" style="padding:40px;text-align:center;"><i class="fas fa-circle-notch fa-spin fa-2x text-muted"></i></td></tr></tbody>
-    </table>
-  </div>
+    <div style="overflow-x:auto;">
+        <table style="width:100%; min-width:1100px; border-collapse:collapse;">
+            <thead style="background:var(--bg-soft);border-bottom:1px solid var(--border-light);">
+                <tr>
+                    <th style="padding:12px;width:40px;"></th>
+                    <th style="padding:12px;font-size:.75rem;color:var(--text-muted);">MÃ</th>
+                    <th style="padding:12px;font-size:.75rem;color:var(--text-muted);">CĂN HỘ / VỊ TRÍ</th>
+                    <th style="padding:12px;font-size:.75rem;color:var(--text-muted);">KHÁCH ĐANG Ở (HỢP ĐỒNG)</th>
+                    <th style="padding:12px;font-size:.75rem;color:var(--text-muted);">MỨC GIÁ</th>
+                    <th style="padding:12px;font-size:.75rem;color:var(--text-muted);">HIỆN TRẠNG / MỨC TT</th>
+                    <th style="padding:12px;font-size:.75rem;color:var(--text-muted);text-align:center;">TRẠNG THÁI</th>
+                    <th style="padding:12px;font-size:.75rem;color:var(--text-muted);text-align:right;">THAO TÁC</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                <tr>
+                    <td colspan="8" style="padding:40px;text-align:center;"><i
+                            class="fas fa-circle-notch fa-spin fa-2x text-muted"></i></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </div>
 <div id="paginationArea" style="display:flex;justify-content:center;gap:6px;margin-top:16px;"></div>
 
-<div id="dynamicModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:1050; align-items:center; justify-content:center;">
-    <div style="background:#fff; width:400px; padding:24px; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,0.2);">
+<div id="dynamicModal"
+    style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:1050; align-items:center; justify-content:center;">
+    <div
+        style="background:#fff; width:400px; padding:24px; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,0.2);">
         <h5 id="dynModalTitle" style="font-weight:800; margin-bottom:15px;">Cập nhật hàng loạt</h5>
         <div id="dynModalBody" style="margin-bottom:20px;"></div>
         <div style="display:flex; justify-content:flex-end; gap:10px;">
-            <button onclick="document.getElementById('dynamicModal').style.display='none'" class="btn-ghost">Hủy</button>
+            <button onclick="document.getElementById('dynamicModal').style.display='none'"
+                class="btn-ghost">Hủy</button>
             <button id="dynModalConfirm" class="btn-hc-primary">Lưu</button>
         </div>
     </div>
 </div>
 
 <script>
-let currentPage = 1, meta = {};
+    let currentPage = 1, meta = {};
 
-document.addEventListener('DOMContentLoaded', async () => {
-    const res = await fetch('/admin/can-ho/api/metadata');
-    meta = await res.json();
-    if(meta.success) {
-        document.getElementById('toaNhaFilter').innerHTML += meta.toaNhas.map(t => `<option value="${t.maToaNha}">${t.tenToaNha}</option>`).join('');
-    }
-    
-    document.getElementById('toaNhaFilter').addEventListener('change', e => {
-        const maToa = e.target.value;
-        document.getElementById('tangFilter').innerHTML = `<option value="">Tất cả tầng</option>` + meta.tangs.filter(t => !maToa || t.maToaNha == maToa).map(t => `<option value="${t.maTang}">${t.tenTang}</option>`).join('');
+    document.addEventListener('DOMContentLoaded', async () => {
+        const res = await fetch('/admin/can-ho/api/metadata');
+        meta = await res.json();
+        if (meta.success) {
+            document.getElementById('toaNhaFilter').innerHTML += meta.toaNhas.map(t => `<option value="${t.maToaNha}">${t.tenToaNha}</option>`).join('');
+        }
+
+        document.getElementById('toaNhaFilter').addEventListener('change', e => {
+            const maToa = e.target.value;
+            document.getElementById('tangFilter').innerHTML = `<option value="">Tất cả tầng</option>` + meta.tangs.filter(t => !maToa || t.maToaNha == maToa).map(t => `<option value="${t.maTang}">${t.tenTang}</option>`).join('');
+        });
+
+        loadData();
+        setupSearch();
+
+        document.getElementById('selectAllChk').addEventListener('change', e => {
+            document.querySelectorAll('.row-check').forEach(c => c.checked = e.target.checked);
+            toggleBulk();
+        });
     });
 
-    loadData();
-    setupSearch();
-    
-    document.getElementById('selectAllChk').addEventListener('change', e => {
-        document.querySelectorAll('.row-check').forEach(c => c.checked = e.target.checked);
-        toggleBulk();
-    });
-});
-
-function setupSearch() {
-    const input = document.getElementById('searchInput');
-    const box = document.getElementById('suggestionBox');
-    input.addEventListener('input', async (e) => {
-        const val = e.target.value.trim();
-        if(!val) { box.style.display = 'none'; return; }
-        const res = await fetch(`/admin/can-ho/api/suggestions?term=${encodeURIComponent(val)}`);
-        const json = await res.json();
-        if(json.success && json.data.length) {
-            box.innerHTML = json.data.map(d => `
+    function setupSearch() {
+        const input = document.getElementById('searchInput');
+        const box = document.getElementById('suggestionBox');
+        input.addEventListener('input', async (e) => {
+            const val = e.target.value.trim();
+            if (!val) { box.style.display = 'none'; return; }
+            const res = await fetch(`/admin/can-ho/api/suggestions?term=${encodeURIComponent(val)}`);
+            const json = await res.json();
+            if (json.success && json.data.length) {
+                box.innerHTML = json.data.map(d => `
                 <div class="suggestion-item" onclick="selectSuggestion('${d.TenCanHo}')">
                     <div style="font-weight:700;">${d.TenCanHo}</div>
                     <div style="font-size:.7rem;color:#888;margin-left:auto;">${d.Tang?.ToaNha?.TenToaNha || ''} / ${d.Tang?.TenTang || ''}</div>
                 </div>
             `).join('');
-            box.style.display = 'block';
-        } else box.style.display = 'none';
-    });
-    document.addEventListener('click', e => { if(!input.contains(e.target) && !box.contains(e.target)) box.style.display = 'none'; });
-}
-
-function selectSuggestion(txt) { document.getElementById('searchInput').value = txt; document.getElementById('suggestionBox').style.display='none'; loadData(); }
-function resetFilters() { document.getElementById('searchInput').value=''; document.getElementById('toaNhaFilter').value=''; document.getElementById('tangFilter').value=''; document.getElementById('statusFilter').value='tatCa'; currentPage=1; loadData(); }
-
-async function loadData() {
-    const search = document.getElementById('searchInput').value;
-    const toa = document.getElementById('toaNhaFilter').value;
-    const tang = document.getElementById('tangFilter').value;
-    const status = document.getElementById('statusFilter').value;
-
-    document.getElementById('tableBody').innerHTML = `<tr><td colspan="8" style="padding:40px;text-align:center;"><i class="fas fa-circle-notch fa-spin fa-2x text-muted"></i></td></tr>`;
-
-    const res = await fetch(`/admin/can-ho/api/list?page=${currentPage}&search=${encodeURIComponent(search)}&maToaNha=${toa}&maTang=${tang}&status=${status}`);
-    const json = await res.json();
-
-    if(json.success) {
-        document.getElementById('totalItemsDisplay').innerText = json.totalItems;
-        const msg = document.getElementById('searchMessageArea');
-        if(json.message) { msg.style.display='block'; msg.innerHTML = `<i class="fas fa-info-circle me-2"></i>${json.message}`; if(json.suggestions) json.data = json.suggestions; }
-        else msg.style.display='none';
-
-        renderTable(json.data);
-        renderPagination(json.totalPages);
-        document.getElementById('selectAllChk').checked = false;
-        toggleBulk();
+                box.style.display = 'block';
+            } else box.style.display = 'none';
+        });
+        document.addEventListener('click', e => { if (!input.contains(e.target) && !box.contains(e.target)) box.style.display = 'none'; });
     }
-}
 
-function renderTable(data) {
-    const tbody = document.getElementById('tableBody');
-    if(!data.length) return tbody.innerHTML = `<tr><td colspan="8" style="padding:50px;text-align:center;color:#888;"><i class="fas fa-home fa-3x mb-3 opacity-25"></i><br>Không có căn hộ nào</td></tr>`;
+    function selectSuggestion(txt) { document.getElementById('searchInput').value = txt; document.getElementById('suggestionBox').style.display = 'none'; loadData(); }
+    function resetFilters() { document.getElementById('searchInput').value = ''; document.getElementById('toaNhaFilter').value = ''; document.getElementById('tangFilter').value = ''; document.getElementById('statusFilter').value = 'tatCa'; currentPage = 1; loadData(); }
 
-    tbody.innerHTML = data.map(c => {
-        let khachInfo = `<span style="color:#aaa;font-size:.8rem;">Trống (Chưa có khách)</span>`;
-        if(c.HopDongs && c.HopDongs.length > 0) {
-            const hd = c.HopDongs[0]; // Hợp đồng active
-            khachInfo = `
+    async function loadData() {
+        const search = document.getElementById('searchInput').value;
+        const toa = document.getElementById('toaNhaFilter').value;
+        const tang = document.getElementById('tangFilter').value;
+        const status = document.getElementById('statusFilter').value;
+
+        document.getElementById('tableBody').innerHTML = `<tr><td colspan="8" style="padding:40px;text-align:center;"><i class="fas fa-circle-notch fa-spin fa-2x text-muted"></i></td></tr>`;
+
+        const res = await fetch(`/admin/can-ho/api/list?page=${currentPage}&search=${encodeURIComponent(search)}&maToaNha=${toa}&maTang=${tang}&status=${status}`);
+        const json = await res.json();
+
+        if (json.success) {
+            document.getElementById('totalItemsDisplay').innerText = json.totalItems;
+            const msg = document.getElementById('searchMessageArea');
+            if (json.message) { msg.style.display = 'block'; msg.innerHTML = `<i class="fas fa-info-circle me-2"></i>${json.message}`; if (json.suggestions) json.data = json.suggestions; }
+            else msg.style.display = 'none';
+
+            renderTable(json.data);
+            renderPagination(json.totalPages);
+            document.getElementById('selectAllChk').checked = false;
+            toggleBulk();
+        }
+    }
+
+    function renderTable(data) {
+        const tbody = document.getElementById('tableBody');
+        if (!data.length) return tbody.innerHTML = `<tr><td colspan="8" style="padding:50px;text-align:center;color:#888;"><i class="fas fa-home fa-3x mb-3 opacity-25"></i><br>Không có căn hộ nào</td></tr>`;
+
+        tbody.innerHTML = data.map(c => {
+            let khachInfo = `<span style="color:#aaa;font-size:.8rem;">Trống (Chưa có khách)</span>`;
+            if (c.HopDongs && c.HopDongs.length > 0) {
+                const hd = c.HopDongs[0]; // Hợp đồng active
+                khachInfo = `
                 <div class="contract-tag"><i class="fas fa-user-check"></i> ${hd.KhachHang?.TenKH || 'Khách'}</div>
                 <div style="font-size:.75rem; color:#64748b; margin-top:3px; font-weight:600;">Vai trò: ${hd.VaiTroHD?.TenVaiTro || '?'}</div>
             `;
-        }
+            }
 
-        return `
+            return `
         <tr style="border-bottom:1px solid #f1f5f9; transition:background .2s;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background=''">
             <td style="padding:12px;"><input type="checkbox" value="${c.MaCanHo}" class="row-check" onchange="toggleBulk()"></td>
             <td style="padding:12px;">
@@ -221,8 +321,8 @@ function renderTable(data) {
             </td>
             <td style="padding:12px;">${khachInfo}</td>
             <td style="padding:12px;">
-                <div style="font-weight:800; color:var(--success); font-size:.9rem;">Bán: ${c.Gia ? Number(c.Gia).toLocaleString()+'đ' : '—'}</div>
-                <div style="font-weight:700; color:var(--primary); font-size:.8rem; margin-top:2px;">Thuê: ${c.GiaThue ? Number(c.GiaThue).toLocaleString()+'đ/th' : '—'}</div>
+                <div style="font-weight:800; color:var(--success); font-size:.9rem;">Bán: ${c.Gia ? Number(c.Gia).toLocaleString() + 'đ' : '—'}</div>
+                <div style="font-weight:700; color:var(--primary); font-size:.8rem; margin-top:2px;">Thuê: ${c.GiaThue ? Number(c.GiaThue).toLocaleString() + 'đ/th' : '—'}</div>
             </td>
             <td style="padding:12px;">
                 <div style="font-size:.8rem; font-weight:600; color:#475569;"><i class="fas fa-clipboard-check me-1" style="color:#f59e0b;"></i>${c.HienTrang?.TenHienTrang || '—'}</div>
@@ -238,100 +338,138 @@ function renderTable(data) {
                 <button onclick="deleteSingle(${c.MaCanHo})" class="btn-tbl btn-tbl-delete"><i class="fas fa-trash"></i></button>
             </td>
         </tr>`;
-    }).join('');
-}
+        }).join('');
+    }
 
-function renderPagination(t) {
-    if(t <= 1) return document.getElementById('paginationArea').innerHTML = '';
-    let html = '';
-    for(let i=1; i<=t; i++) html += `<button onclick="currentPage=${i};loadData()" class="pg-btn ${currentPage===i?'active':''}">${i}</button>`;
-    document.getElementById('paginationArea').innerHTML = html;
-}
+    function renderPagination(t) {
+        if (t <= 1) return document.getElementById('paginationArea').innerHTML = '';
+        let html = '';
+        for (let i = 1; i <= t; i++) html += `<button onclick="currentPage=${i};loadData()" class="pg-btn ${currentPage === i ? 'active' : ''}">${i}</button>`;
+        document.getElementById('paginationArea').innerHTML = html;
+    }
 
-function toggleBulk() {
-    const c = document.querySelectorAll('.row-check:checked').length > 0;
-    document.getElementById('bulkActions').style.display = c ? 'flex' : 'none';
-}
+    function toggleBulk() {
+        const c = document.querySelectorAll('.row-check:checked').length > 0;
+        document.getElementById('bulkActions').style.display = c ? 'flex' : 'none';
+    }
 
-function toggleStatus(id, type, current) {
-    const text = type === 'hienthi' ? (current ? 'Ẩn căn hộ này?' : 'Hiển thị căn hộ này?') : (current ? 'Tắt đề xuất HOT?' : 'Bật đề xuất HOT?');
-    Swal.fire({
-        title: 'Thay đổi trạng thái',
-        text,
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonColor: '#0061ff',
-        cancelButtonText: 'Hủy',
-        confirmButtonText: 'Đồng ý'
-    }).then(async (result) => {
-        if (result.isConfirmed) {
-            const res = await fetch(`/admin/can-ho/api/change-status/${id}`, { method: 'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({type, status: !current}) });
-            if((await res.json()).success) {
-                Swal.fire({toast:true, position:'top-end', icon:'success', title:'Cập nhật thành công', showConfirmButton:false, timer:1500});
-                loadData();
-            }
-        }
-    });
-}
-
-function deleteSingle(id) {
-    Swal.fire({ title: 'Xóa Căn hộ?', text:'Dữ liệu liên quan sẽ bị xóa sạch!', icon: 'warning', showCancelButton: true, confirmButtonColor: '#dc2626', confirmButtonText: 'Xóa ngay' }).then(async r => {
-        if(r.isConfirmed) {
-            const res = await fetch(`/admin/can-ho/api/delete-multiple`, { method: 'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ids: [id]}) });
-            if((await res.json()).success) { Swal.fire({toast:true, position:'top-end', icon:'success', title:'Đã xóa', showConfirmButton:false, timer:1500}); loadData(); }
-        }
-    });
-}
-
-function executeBulkAction() {
-    const action = document.getElementById('bulkActionSelect').value;
-    const ids = Array.from(document.querySelectorAll('.row-check:checked')).map(c => c.value);
-    if(!action || !ids.length) return;
-
-    if(action === 'delete') {
-        Swal.fire({ title: `Xóa ${ids.length} căn hộ?`, icon: 'warning', showCancelButton: true, confirmButtonColor: '#dc2626', confirmButtonText: 'Xóa ngay' }).then(async r => {
-            if(r.isConfirmed) {
-                const res = await fetch(`/admin/can-ho/api/delete-multiple`, { method: 'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ids}) });
-                if((await res.json()).success) { Swal.fire({toast:true, position:'top-end', icon:'success', title:'Đã xóa', showConfirmButton:false, timer:1500}); loadData(); }
+    function toggleStatus(id, type, current) {
+        const text = type === 'hienthi' ? (current ? 'Ẩn căn hộ này?' : 'Hiển thị căn hộ này?') : (current ? 'Tắt đề xuất HOT?' : 'Bật đề xuất HOT?');
+        Swal.fire({
+            title: 'Thay đổi trạng thái',
+            text,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#0061ff',
+            cancelButtonText: 'Hủy',
+            confirmButtonText: 'Đồng ý'
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                const res = await fetch(`/admin/can-ho/api/change-status/${id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ type, status: !current }) });
+                if ((await res.json()).success) {
+                    Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'Cập nhật thành công', showConfirmButton: false, timer: 1500 });
+                    loadData();
+                }
             }
         });
-        return;
     }
 
-    if(action.startsWith('hienthi_') || action.startsWith('dexuat_')) {
-        const type = action.split('_')[0];
-        const val = action.split('_')[1];
-        Swal.fire({ title: 'Xác nhận thay đổi?', icon: 'question', showCancelButton: true, confirmButtonText: 'Đồng ý' }).then(async r => {
-            if(r.isConfirmed) {
-                await fetch(`/admin/can-ho/api/bulk-update`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ids, type, value: val}) });
-                loadData();
-                Swal.fire({toast:true, position:'top-end', icon:'success', title:'Cập nhật thành công', showConfirmButton:false, timer:1500});
+    function deleteSingle(id) {
+        Swal.fire({
+            title: 'Xóa Căn hộ?',
+            text: 'Dữ liệu liên quan sẽ bị xóa sạch!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc2626',
+            confirmButtonText: 'Xóa ngay'
+        }).then(async r => {
+            if (r.isConfirmed) {
+                const res = await fetch(`/admin/can-ho/api/delete-multiple`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ids: [id] })
+                });
+                const json = await res.json();
+
+                if (json.success) {
+                    Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'Đã xóa thành công', showConfirmButton: false, timer: 1500 });
+                    loadData();
+                } else {
+                    // HIỂN THỊ LỖI RÀNG BUỘC TỪ BACKEND
+                    Swal.fire('Không thể xóa', json.message, 'error');
+                }
             }
         });
-        return;
     }
 
-    const modal = document.getElementById('dynamicModal');
-    const title = document.getElementById('dynModalTitle');
-    const body = document.getElementById('dynModalBody');
-    const btn = document.getElementById('dynModalConfirm');
+    function executeBulkAction() {
+        const action = document.getElementById('bulkActionSelect').value;
+        const ids = Array.from(document.querySelectorAll('.row-check:checked')).map(c => c.value);
+        if (!action || !ids.length) return;
 
-    if(action === 'tang') {
-        title.innerText = 'Chuyển Tầng Hàng Loạt';
-        body.innerHTML = `<label class="filter-label">Chọn tầng mới</label><select id="bulkVal" class="hc-select">${meta.tangs.map(t=>`<option value="${t.maTang}">${t.tenTang} (${t.tenToaNha})</option>`).join('')}</select>`;
-    } else if(action === 'hientrang') {
-        title.innerText = 'Đổi Hiện Trạng Hàng Loạt';
-        body.innerHTML = `<label class="filter-label">Chọn hiện trạng</label><select id="bulkVal" class="hc-select"><option value="">-- Xóa trắng --</option>${meta.hienTrangs.map(h=>`<option value="${h.maHT}">${h.tenHT}</option>`).join('')}</select>`;
-    } else if(action === 'muctt') {
-        title.innerText = 'Đổi Mức TT Hàng Loạt';
-        body.innerHTML = `<label class="filter-label">Chọn mức thanh toán</label><select id="bulkVal" class="hc-select"><option value="">-- Xóa trắng --</option>${meta.mucTTs.map(m=>`<option value="${m.maMucTT}">${m.ten} (${m.mucDo}%)</option>`).join('')}</select>`;
+        if (action === 'delete') {
+            Swal.fire({
+                title: `Xóa ${ids.length} căn hộ đã chọn?`,
+                text: 'Lưu ý: Những căn hộ đã có hợp đồng hoặc hóa đơn sẽ không thể xóa.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc2626',
+                confirmButtonText: 'Xóa ngay'
+            }).then(async r => {
+                if (r.isConfirmed) {
+                    const res = await fetch(`/admin/can-ho/api/delete-multiple`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ ids })
+                    });
+                    const json = await res.json();
+
+                    if (json.success) {
+                        Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: json.message, showConfirmButton: false, timer: 1500 });
+                        loadData();
+                    } else {
+                        // HIỂN THỊ LỖI (Ví dụ: "Không thể xóa căn hộ #15 vì đã tồn tại Hợp đồng")
+                        Swal.fire('Lỗi thực thi', json.message, 'error');
+                    }
+                }
+            });
+            return;
+        }
+
+        if (action.startsWith('hienthi_') || action.startsWith('dexuat_')) {
+            const type = action.split('_')[0];
+            const val = action.split('_')[1];
+            Swal.fire({ title: 'Xác nhận thay đổi?', icon: 'question', showCancelButton: true, confirmButtonText: 'Đồng ý' }).then(async r => {
+                if (r.isConfirmed) {
+                    await fetch(`/admin/can-ho/api/bulk-update`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ids, type, value: val }) });
+                    loadData();
+                    Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'Cập nhật thành công', showConfirmButton: false, timer: 1500 });
+                }
+            });
+            return;
+        }
+
+        const modal = document.getElementById('dynamicModal');
+        const title = document.getElementById('dynModalTitle');
+        const body = document.getElementById('dynModalBody');
+        const btn = document.getElementById('dynModalConfirm');
+
+        if (action === 'tang') {
+            title.innerText = 'Chuyển Tầng Hàng Loạt';
+            body.innerHTML = `<label class="filter-label">Chọn tầng mới</label><select id="bulkVal" class="hc-select">${meta.tangs.map(t => `<option value="${t.maTang}">${t.tenTang} (${t.tenToaNha})</option>`).join('')}</select>`;
+        } else if (action === 'hientrang') {
+            title.innerText = 'Đổi Hiện Trạng Hàng Loạt';
+            body.innerHTML = `<label class="filter-label">Chọn hiện trạng</label><select id="bulkVal" class="hc-select"><option value="">-- Xóa trắng --</option>${meta.hienTrangs.map(h => `<option value="${h.maHT}">${h.tenHT}</option>`).join('')}</select>`;
+        } else if (action === 'muctt') {
+            title.innerText = 'Đổi Mức TT Hàng Loạt';
+            body.innerHTML = `<label class="filter-label">Chọn mức thanh toán</label><select id="bulkVal" class="hc-select"><option value="">-- Xóa trắng --</option>${meta.mucTTs.map(m => `<option value="${m.maMucTT}">${m.ten} (${m.mucDo}%)</option>`).join('')}</select>`;
+        }
+
+        modal.style.display = 'flex';
+        btn.onclick = async () => {
+            const val = document.getElementById('bulkVal').value;
+            const res = await fetch(`/admin/can-ho/api/bulk-update`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ids, type: action, value: val }) });
+            if ((await res.json()).success) { modal.style.display = 'none'; loadData(); Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'Cập nhật thành công', showConfirmButton: false, timer: 1500 }); }
+        };
     }
-
-    modal.style.display = 'flex';
-    btn.onclick = async () => {
-        const val = document.getElementById('bulkVal').value;
-        const res = await fetch(`/admin/can-ho/api/bulk-update`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ids, type:action, value:val}) });
-        if((await res.json()).success) { modal.style.display='none'; loadData(); Swal.fire({toast:true, position:'top-end', icon:'success', title:'Cập nhật thành công', showConfirmButton:false, timer:1500}); }
-    };
-}
 </script>

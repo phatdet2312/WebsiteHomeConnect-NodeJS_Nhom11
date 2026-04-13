@@ -60,9 +60,12 @@ class AdminCanHoController {
         try {
             const ids = Array.isArray(req.body.ids) ? req.body.ids : (req.body.ids ? req.body.ids.split(',') : []);
             if (!ids.length) return res.status(400).json({ success: false, message: 'Chưa chọn căn hộ' });
+            
             await service.deleteMultiple(ids);
             res.json({ success: true, message: `Đã xóa ${ids.length} căn hộ` });
-        } catch (err) { res.status(500).json({ success: false, message: err.message }); }
+        } catch (err) {
+            res.json({ success: false, message: err.message });
+        }
     }
 
     async apiChangeStatus(req, res) {

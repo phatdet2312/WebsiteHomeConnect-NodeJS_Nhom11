@@ -1,4 +1,4 @@
-const { CanHo, Tang, ToaNha, HienTrang, TTTTvaMucTT, TrangThai, PTTT, DSA_CanHo, Phong, DSA_Phong, HopDong, KhachHang, VaiTroHD } = require('../../models');
+const { CanHo, Tang, ToaNha, HienTrang, TTTTvaMucTT, TrangThai, PTTT, DSA_CanHo, Phong, DSA_Phong, HopDong, KhachHang, VaiTroHD, CT_HDDV, CT_HDHD } = require('../../models');
 
 class AdminCanHoRepository {
     async getMetadata() {
@@ -55,5 +55,20 @@ class AdminCanHoRepository {
     async getDSA_PhongById(id) { return await DSA_Phong.findByPk(id); }
     
     async updateBulk(payload, ids) { return await CanHo.update(payload, { where: { MaCanHo: ids } }); }
+
+    // ==========================================
+    // ĐÃ THÊM: CÁC HÀM KIỂM TRA RÀNG BUỘC XÓA
+    // ==========================================
+    async countHopDongByCanHo(maCanHo) {
+        return await HopDong.count({ where: { MaCanHo: maCanHo } });
+    }
+
+    async countHoaDonDichVuByCanHo(maCanHo) {
+        return await CT_HDDV.count({ where: { MaCanHo: maCanHo } });
+    }
+
+    async countHoaDonHopDongByCanHo(maCanHo) {
+        return await CT_HDHD.count({ where: { MaCanHo: maCanHo } });
+    }
 }
 module.exports = new AdminCanHoRepository();

@@ -1,3 +1,10 @@
+// Hàm xử lý số an toàn: Chuyển chuỗi rỗng, "undefined" hoặc NaN thành null
+const safeParseInt = (val) => {
+    if (val === null || val === undefined || val === '' || val === 'undefined') return null;
+    const res = parseInt(val);
+    return isNaN(res) ? null : res;
+};
+
 class DichVuDTO {
     constructor(data) {
         this.TenDV = data.TenDV?.trim();
@@ -22,13 +29,17 @@ class LoaiTTHDDTO {
 
 class HopDongDTO {
     constructor(data) {
-        this.MaKH = parseInt(data.MaKH);
-        this.MaCanHo = parseInt(data.MaCanHo);
-        this.MaLoaiHD = parseInt(data.MaLoaiHD);
-        this.MaVaiTroHD = parseInt(data.MaVaiTroHD);
-        this.MaNV = data.MaNV ? parseInt(data.MaNV) : null;
-        this.GiaTriCanHo = data.GiaTriCanHo ? parseInt(data.GiaTriCanHo) : null;
-        this.GiaThoaThuan = data.GiaThoaThuan ? parseInt(data.GiaThoaThuan) : null;
+        this.MaKH = safeParseInt(data.MaKH);
+        this.MaCanHo = safeParseInt(data.MaCanHo);
+        this.MaLoaiHD = safeParseInt(data.MaLoaiHD);
+        
+        // CHỐT: Dùng MaVaiTroHD (T hoa) để khớp với Model HopDong.js
+        this.MaVaiTroHD = safeParseInt(data.MaVaiTroHD || data.MaVaitroHD);
+        
+        this.MaNV = safeParseInt(data.MaNV);
+        this.GiaTriCanHo = safeParseInt(data.GiaTriCanHo);
+        this.GiaThoaThuan = safeParseInt(data.GiaThoaThuan);
+        
         this.NgayLap = data.NgayLap || new Date();
         this.NgayXuLyDuKien = data.NgayXuLyDuKien || null;
         this.NgayHieuLuc = data.NgayHieuLuc || null;
@@ -36,15 +47,20 @@ class HopDongDTO {
         this.DiaChiKyHopDong = data.DiaChiKyHopDong?.trim() || null;
         this.SDTNhanLienLac = data.SDTNhanLienLac?.trim() || null;
         
-        // Trạng thái HĐ có 3 mức: true, false, null
-        if (data.TrangThaiHD === 'null' || data.TrangThaiHD === undefined) this.TrangThaiHD = null;
-        else this.TrangThaiHD = data.TrangThaiHD === 'true' || data.TrangThaiHD === true;
+        if (data.TrangThaiHD === 'null' || data.TrangThaiHD === undefined || data.TrangThaiHD === '') {
+            this.TrangThaiHD = null;
+        } else {
+            this.TrangThaiHD = data.TrangThaiHD === 'true' || data.TrangThaiHD === true;
+        }
 
         this.DSA_HopDongToDelete = data.DSA_HopDongToDelete;
     }
+
     validate() {
-        if (isNaN(this.MaKH)) return 'Vui lòng chọn khách hàng';
-        if (isNaN(this.MaCanHo)) return 'Vui lòng chọn căn hộ';
+        if (!this.MaKH) return 'Vui lòng chọn khách hàng';
+        if (!this.MaCanHo) return 'Vui lòng chọn căn hộ';
+        if (!this.MaLoaiHD) return 'Vui lòng chọn loại hợp đồng';
+        if (!this.MaVaiTroHD) return 'Vui lòng chọn vai trò';
         return null;
     }
 }

@@ -3,6 +3,16 @@ const { LoaiTTHD, CT_ThanhToan, CanHo, Tang, ToaNha, KyTT, HD_HopDong, CT_HDHD, 
 class CTThanhToanRepository {
     async getAllLoaiTT() { return await LoaiTTHD.findAll({ where: { TTHienThi: true }, order: [['TenLoaiTT', 'ASC']] }); }
 
+
+    async getLatestStatusName(maHDHD) {
+        const ls = await LS_TTHDHD.findOne({
+            where: { MaHDHD: maHDHD },
+            include: [{ model: TrangThai, as: 'TrangThai' }],
+            order: [['ThoiGianThayDoi', 'DESC']]
+        });
+        return ls && ls.TrangThai ? ls.TrangThai.TenTT : null;
+    }
+    
     async getWorkspaceData(maLoaiTT) {
         return await CT_ThanhToan.findAll({
             where: { MaLoaiTT: maLoaiTT },

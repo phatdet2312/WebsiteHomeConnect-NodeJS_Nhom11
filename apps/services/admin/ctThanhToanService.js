@@ -14,10 +14,10 @@ class CTThanhToanService {
         for (const [maCanHo, cts] of Object.entries(grouped)) {
             const first = cts[0];
             const kyMoiNhat = [...cts].sort((a, b) => b.MaKyTT - a.MaKyTT)[0];
-            
+
             let tenTrangThai = 'Chưa thanh toán', tenPhuongThuc = '—', maKHTT = 0, tenKHTT = '?';
             const lsMoiNhat = await repo.getLatestLS(maLoaiTT, parseInt(maCanHo), kyMoiNhat.MaKyTT);
-            
+
             if (lsMoiNhat) {
                 tenTrangThai = lsMoiNhat.TrangThai ? lsMoiNhat.TrangThai.TenTT : 'Không xác định';
                 const hd = await repo.getHDById(lsMoiNhat.MaHDHD);
@@ -101,7 +101,16 @@ class CTThanhToanService {
 
     async processXoaCT(dto) {
         const count = await repo.countCTHDHD(dto.maLoaiTT, dto.maCanHo, dto.maKyTT);
-        if (count > 0) throw new Error('Đã có hóa đơn thanh toán, không thể xóa!');
+        if (count > 0) {
+            const chiTietHoaDons = await repo.getChiTietHoaDon(dto.maLoaiTT, dto.maCanHo, dto.maKyTT);
+            for (const ct of chiTietHoaDons) {
+                const status = await repo.getLatestStatusName(ct.MaHDHD);
+                if (status === 'Đã thanh toán') {
+                    throw new Error(`Khoản thanh toán này đã nằm trong Hóa đơn #${ct.MaHDHD} đã thanh toán.`);
+                }
+            }
+            throw new Error('Dữ liệu đã phát sinh hóa đơn hợp đồng. Tuyệt đối không được xóa.');
+        }
         await repo.deleteCT(dto.maLoaiTT, dto.maCanHo, dto.maKyTT);
     }
 

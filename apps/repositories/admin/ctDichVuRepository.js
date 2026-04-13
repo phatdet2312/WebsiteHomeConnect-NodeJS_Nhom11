@@ -3,6 +3,16 @@ const { DichVu, CT_DichVu, CanHo, Tang, ToaNha, Ky, HD_DichVu, CT_HDDV, LS_TTHDD
 class CTDichVuRepository {
     async getAllDichVu() { return await DichVu.findAll({ where: { TTHienThi: true }, order: [['TenDV', 'ASC']] }); }
     
+    // Lấy tên trạng thái mới nhất của một hóa đơn cụ thể
+    async getLatestStatusName(maHDDV) {
+        const ls = await LS_TTHDDV.findOne({
+            where: { MaHDDV: maHDDV },
+            include: [{ model: TrangThai, as: 'TrangThai' }],
+            order: [['ThoiGianThayDoi', 'DESC']]
+        });
+        return ls && ls.TrangThai ? ls.TrangThai.TenTT : null;
+    }
+
     async getWorkspaceData(maDV) {
         return await CT_DichVu.findAll({
             where: { MaDV: maDV },
