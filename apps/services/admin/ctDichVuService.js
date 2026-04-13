@@ -111,8 +111,19 @@ class CTDichVuService {
     }
 
     async processXoaCT(dto) {
+        // Kiểm tra xem đã có bản ghi trong CT_HDDV (đã tạo hóa đơn) chưa
         const count = await repo.countCTHDDV(dto.maDV, dto.maCanHo, dto.maKy);
-        if (count > 0) throw new Error('Đã có hóa đơn thanh toán, không thể xóa!');
+        if (count > 0) {
+            // Lấy danh sách hóa đơn chứa chi tiết này
+            const chiTietHoaDons = await repo.getChiTietHoaDon(dto.maDV, dto.maCanHo, dto.maKy);
+            for (const ct of chiTietHoaDons) {
+                const status = await repo.getLatestStatusName(ct.MaHDDV);
+                if (status === 'Đã thanh toán') {
+                    throw new Error(`Kỳ dịch vụ này đã nằm trong Hóa đơn #${ct.MaHDDV} đã thanh toán. Không thể xóa dữ liệu gốc.`);
+                }
+            }
+            throw new Error('Dữ liệu này đã được xuất hóa đơn. Vui lòng Hủy hóa đơn trước khi thực hiện thao tác này.');
+        }
         await repo.deleteCT(dto.maDV, dto.maCanHo, dto.maKy);
     }
 

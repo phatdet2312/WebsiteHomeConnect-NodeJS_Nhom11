@@ -173,12 +173,24 @@ class HopDongService {
     async deleteMultiple(ids) {
         for (const id of ids) {
             const hd = await repo.getById(id);
-            if (hd) {
-                this._deleteFile(hd.UrlAnhHD);
-                const dsanh = hd.DSA_HopDongS || [];
-                for (const dsa of dsanh) this._deleteFile(dsa.UrlAnh);
-                await hd.destroy();
+            if (!hd) continue;
+
+            // CHỐT CHẶN 1: Nếu hợp đồng đã ký (true)
+            if (hd.TrangThaiHD === true) {
+                throw new Error(`Hợp đồng #${id} đã được ký kết chính thức. Không được xóa chứng từ pháp lý này.`);
             }
+
+            // CHỐT CHẶN 2: Nếu đã phát sinh hóa đơn tài chính liên quan
+            const invoiceCount = await repo.countInvoicesGenerated(id);
+            if (invoiceCount > 0) {
+                throw new Error(`Hợp đồng #${id} đã phát sinh ${invoiceCount} hóa đơn tài chính. Để bảo vệ dữ liệu Thuế, bạn không được xóa.`);
+            }
+
+            // Nếu vượt qua 2 chốt chặn trên mới thực hiện xóa
+            this._deleteFile(hd.UrlAnhHD);
+            const dsanh = hd.DSA_HopDongS || [];
+            for (const dsa of dsanh) this._deleteFile(dsa.UrlAnh);
+            await hd.destroy();
         }
     }
 

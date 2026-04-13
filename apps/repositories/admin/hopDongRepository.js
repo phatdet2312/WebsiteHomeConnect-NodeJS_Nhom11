@@ -21,6 +21,9 @@ class HopDongRepository {
         ]);
     }
     
+    async countInvoicesGenerated(maHopDong) {
+        return await HD_HopDong.count({ where: { MaHopDong: maHopDong } });
+    }
     async getAllWithIncludes() { return await HopDong.findAll({ include: hopDongIncludes }); }
     async getById(id) { return await HopDong.findByPk(id, { include: [...hopDongIncludes, { model: DSA_HopDong }] }); }
     async create(data) { return await HopDong.create(data); }
